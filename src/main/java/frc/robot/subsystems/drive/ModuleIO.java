@@ -46,4 +46,13 @@ public interface ModuleIO {
 
   /** Run the turn motor to the specified rotation. */
   public default void setTurnPosition(Rotation2d rotation) {}
+
+  /** 5892: Apply PID Constants */
+  public default void setDrivePID(double kP, double kI, double kD, double kS, double kV) {}
+
+  /** 5892: Coast Drive motor */
+  default void coastDrive(boolean coast) {}
+
+  /** 5892: Coast Turn motor */
+  default void coastTurn(boolean coast) {}
 }

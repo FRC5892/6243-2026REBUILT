@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class Module {
   private final ModuleIO io;
@@ -30,6 +31,13 @@ public class Module {
   private final Alert turnDisconnectedAlert;
   private final Alert turnEncoderDisconnectedAlert;
   private SwerveModulePosition[] odometryPositions = new SwerveModulePosition[] {};
+
+  // 5892
+  private final LoggedNetworkBoolean moduleDisable;
+  private final LoggedNetworkBoolean disableDrive;
+
+  private boolean isModuleDisabled = false;
+  private boolean isDriveDisabled = false;
 
   public Module(
       ModuleIO io,
@@ -50,11 +58,27 @@ public class Module {
         new Alert(
             "Disconnected turn encoder on module " + Integer.toString(index) + ".",
             AlertType.kError);
+    // 5892
+    moduleDisable =
+        new LoggedNetworkBoolean("SmartDashboard/Drive/Module" + index + "/Disable", false);
+    disableDrive =
+        new LoggedNetworkBoolean("SmartDashboard/Drive/Module" + index + "/DisableDrive", false);
   }
 
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
+
+    // 5892
+    if (moduleDisable.get() != isModuleDisabled) {
+      io.coastTurn(moduleDisable.get());
+      io.coastDrive(moduleDisable.get());
+      isModuleDisabled = moduleDisable.get();
+    }
+    if (disableDrive.get() != isDriveDisabled) {
+      io.coastDrive(disableDrive.get());
+      isDriveDisabled = disableDrive.get();
+    }
 
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
@@ -78,8 +102,13 @@ public class Module {
     state.cosineScale(inputs.turnPosition);
 
     // Apply setpoints
-    io.setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
-    io.setTurnPosition(state.angle);
+    // 5892
+    if (!(isModuleDisabled || isDriveDisabled)) {
+      io.setDriveVelocity(state.speedMetersPerSecond / constants.WheelRadius);
+    }
+    if (!isModuleDisabled) {
+      io.setTurnPosition(state.angle);
+    }
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
@@ -137,5 +166,10 @@ public class Module {
   /** Returns the module velocity in rotations/sec (Phoenix native units). */
   public double getFFCharacterizationVelocity() {
     return Units.radiansToRotations(inputs.driveVelocityRadPerSec);
+  }
+
+  // 5892
+  public void setDrivePID(double p, double i, double d, double ks, double kv) {
+    io.setDrivePID(p, i, d, ks, kv);
   }
 }

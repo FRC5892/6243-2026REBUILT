@@ -43,8 +43,11 @@ import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.LoggedTunableNumber;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BiConsumer;
+import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -97,6 +100,28 @@ public class Drive extends SubsystemBase {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
+
+  // 5892
+  private final LoggedTunableNumber driveKPTunableNumber =
+      new LoggedTunableNumber("Drive kP", TunerConstants.BackLeft.DriveMotorGains.kP);
+  private final LoggedTunableNumber driveKITunableNumber =
+      new LoggedTunableNumber("Drive kI", TunerConstants.BackLeft.DriveMotorGains.kI);
+  private final LoggedTunableNumber driveKDTunableNumber =
+      new LoggedTunableNumber("Drive kD", TunerConstants.BackLeft.DriveMotorGains.kD);
+  private final LoggedTunableNumber driveKSTunableNumber =
+      new LoggedTunableNumber("Drive kS", TunerConstants.BackLeft.DriveMotorGains.kS);
+  private final LoggedTunableNumber driveKVTunableNumber =
+      new LoggedTunableNumber("Drive kV", TunerConstants.BackLeft.DriveMotorGains.kV);
+
+  @Getter @AutoLogOutput private int reefSector = -1;
+  @Getter @AutoLogOutput private double distanceToReefM = -1;
+
+  private BiConsumer<Double, Rotation2d> yawConsumer = null;
+
+  private static final LoggedTunableNumber teleopMaxSpeed =
+      new LoggedTunableNumber("Drive/teleopMaxSpeedPercent", 1);
+
+  // End 5892
 
   public Drive(
       GyroIO gyroIO,
@@ -151,6 +176,15 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+    LoggedTunableNumber.ifChanged(
+        this,
+        this::updateDrivePID,
+        driveKPTunableNumber,
+        driveKITunableNumber,
+        driveKDTunableNumber,
+        driveKSTunableNumber,
+        driveKVTunableNumber);
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -355,5 +389,17 @@ public class Drive extends SubsystemBase {
       new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
       new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
     };
+  }
+
+  // 5892
+  private void updateDrivePID(double[] values) {
+    double kP = values[0];
+    double kI = values[1];
+    double kD = values[2];
+    double kS = values[3];
+    double kV = values[4];
+    for (int i = 0; i < 4; i++) {
+      modules[i].setDrivePID(kP, kI, kD, kS, kV);
+    }
   }
 }
