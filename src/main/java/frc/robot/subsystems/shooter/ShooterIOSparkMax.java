@@ -29,8 +29,8 @@ public class ShooterIOSparkMax implements ShooterIO {
         shooterMotor.setIdleMode(IdleMode.kCoast);             // SPEED LIMIT
 
         shooterEncoder = shooterMotor.getEncoder();
-        shooterEncoder.setVelocityConversion(0.5);             // SPEED LIMIT
-        shooterEncoder.setPositionConversion(0.5);             // SPEED LIMIT
+        shooterEncoder.setVelocityConversionFactor(0.5);       // SPEED LIMIT
+        shooterEncoder.setPositionConversionFactor(0.5);       // SPEED LIMIT
 
         shooterPID = shooterMotor.getPIDController();
         shooterPID.setP(ShooterConstants.kP.get());
