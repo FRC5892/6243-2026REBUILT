@@ -30,6 +30,5 @@ public class RioServo extends LoggedServo {
 
   @Override
   public void setPowered(boolean powered) {
-    // TODO: IDK what to do here
   }
 }
