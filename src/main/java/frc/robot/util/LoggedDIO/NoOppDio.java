@@ -6,5 +6,5 @@ public class NoOppDio extends LoggedDIO {
   }
 
   @Override
-  protected void updateInputs(DIOInputsAutoLogged inputs) {}
+  public void updateInputs(DIOInputsAutoLogged inputs) {}
 }

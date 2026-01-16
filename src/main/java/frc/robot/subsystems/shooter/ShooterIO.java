@@ -7,27 +7,25 @@ package frc.robot.subsystems.shooter;
 public interface ShooterIO {
 
     class ShooterIOInputs {
-        public double mainVelocityRPM = 0.0;
-        public double followerVelocityRPM = 0.0;
-        public double feederVelocityRPM = 0.0;
-
-        public double mainCurrentAmps = 0.0;
-        public double followerCurrentAmps = 0.0;
-        public double feederCurrentAmps = 0.0;
-
-        public double appliedOutput = 0.0;
-        public boolean isFiring = false;
+        public double mainVelocityRPM;
+        public double followerVelocityRPM;
+        public double feederVelocityRPM;
+        public double mainCurrentAmps;
+        public double followerCurrentAmps;
+        public double feederCurrentAmps;
+        public double appliedOutput;
+        public boolean isFiring;
     }
 
     /** Update sensor readings */
-    default void updateInputs(ShooterIOInputs inputs) {}
+    void updateInputs(ShooterIOInputs inputs);
 
     /** Closed-loop shooter velocity */
-    default void setShooterVelocity(double velocityRPM, double ffVolts) {}
+    void setShooterVelocity(double velocityRPM, double ffVolts);
 
     /** Open-loop voltage control for shooter */
-    default void setShooterVoltage(double volts) {}
+    void setShooterVoltage(double volts);
 
     /** Open-loop voltage control for feeder */
-    default void setFeederVoltage(double volts) {}
+    void setFeederVoltage(double volts);
 }

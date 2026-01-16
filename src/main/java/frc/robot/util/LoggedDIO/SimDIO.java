@@ -13,7 +13,7 @@ public class SimDIO extends LoggedDIO {
   }
 
   @Override
-  protected void updateInputs(DIOInputsAutoLogged inputs) {
+  public void updateInputs(DIOInputsAutoLogged inputs) {
     inputs.value = simValue.getAsBoolean();
   }
 

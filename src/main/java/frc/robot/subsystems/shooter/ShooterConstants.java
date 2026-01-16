@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import org.littletonrobotics.junction.LoggedTunableNumber;
+import org.littletonrobotics.junction.networktables.LoggedTunableNumber;
 
 /**
  * Shooter subsystem constants.
@@ -10,10 +10,10 @@ public final class ShooterConstants {
     private ShooterConstants() {}
 
     // PIDF gains
-    public static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/kP", 0.001);
+    public static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/kP", 0.1);
     public static final LoggedTunableNumber kI = new LoggedTunableNumber("Shooter/kI", 0.0);
-    public static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD", 0.0001);
-    public static final LoggedTunableNumber kFF = new LoggedTunableNumber("Shooter/kFF", 0.0003398478);
+    public static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD", 0.0);
+    public static final LoggedTunableNumber kFF = new LoggedTunableNumber("Shooter/kFF", 0.0);
 
     // Voltage limits / idle speed
     public static final LoggedTunableNumber kIdleVoltage = new LoggedTunableNumber("Shooter/IdleVoltage", 4.9);      // SPEED LIMIT

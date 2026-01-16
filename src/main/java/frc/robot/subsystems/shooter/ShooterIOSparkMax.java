@@ -6,6 +6,9 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 
+import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterIO;
+
 public class ShooterIOSparkMax implements ShooterIO {
 
     private final CANSparkMax shooterMotor;
