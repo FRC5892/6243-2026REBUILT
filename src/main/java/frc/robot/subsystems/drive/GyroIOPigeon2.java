@@ -7,8 +7,6 @@
 
 package frc.robot.subsystems.drive;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -41,7 +39,7 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw.setUpdateFrequency(Drive.ODOMETRY_FREQUENCY);
     yawVelocity.setUpdateFrequency(50.0);
     // 5892 Phoenix optimize
-    PhoenixUtil.registerSignals(true,yaw,yawVelocity);
+    PhoenixUtil.registerSignals(true, yaw, yawVelocity);
     pigeon.optimizeBusUtilization();
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(yaw.clone());

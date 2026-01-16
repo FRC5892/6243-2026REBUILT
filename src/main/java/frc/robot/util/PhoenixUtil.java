@@ -20,6 +20,7 @@ public class PhoenixUtil {
       if (error.isOK()) break;
     }
   }
+
   // Copyright (c) 2025 FRC 6328
   // http://github.com/Mechanical-Advantage
   //
@@ -61,11 +62,11 @@ public class PhoenixUtil {
   public static boolean connected(StatusSignal<Integer> versionSignal) {
     return versionSignal.getTimestamp().getLatency() <= CONNECTED_LATENCY_S;
   }
+
   @SafeVarargs
   public static boolean connected(StatusSignal<Integer>... versionSignals) {
     for (StatusSignal<Integer> versionSignal : versionSignals) {
-      if (!connected(versionSignal))
-        return false;
+      if (!connected(versionSignal)) return false;
     }
     return true;
   }

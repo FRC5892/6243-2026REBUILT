@@ -13,8 +13,8 @@
 
 package frc.robot.util;
 
-import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkBase;
+import com.revrobotics.REVLibError;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -49,7 +49,8 @@ public class SparkUtil {
   }
 
   /** Attempts to run the command until no error is produced. */
-  public static void tryUntilOk(CANSparkBase spark, int maxAttempts, Supplier<REVLibError> command) {
+  public static void tryUntilOk(
+      CANSparkBase spark, int maxAttempts, Supplier<REVLibError> command) {
     for (int i = 0; i < maxAttempts; i++) {
       var error = command.get();
       if (error == REVLibError.kOk) {
