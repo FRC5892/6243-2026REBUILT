@@ -2,9 +2,9 @@ package frc.robot.subsystems.shooter;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.RelativeEncoder;
 
 public class ShooterIOSparkMax implements ShooterIO {
 
@@ -12,26 +12,25 @@ public class ShooterIOSparkMax implements ShooterIO {
     private final CANSparkMax followerMotor;
     private final CANSparkMax feederMotor;
 
-    private final SparkMaxPIDController shooterPID;
     private final RelativeEncoder shooterEncoder;
+    private final SparkMaxPIDController shooterPID;
 
     public ShooterIOSparkMax() {
 
         // Initialize motors
         shooterMotor = new CANSparkMax(17, CANSparkMaxLowLevel.MotorType.kBrushless);
         followerMotor = new CANSparkMax(37, CANSparkMaxLowLevel.MotorType.kBrushless);
-        feederMotor = new CANSparkMax(58, CANSparkMaxLowLevel.MotorType.kBrushless);
+        feederMotor   = new CANSparkMax(58, CANSparkMaxLowLevel.MotorType.kBrushless);
 
-        /* ================= Shooter setup ================= */
-
+        // Shooter setup
         shooterMotor.restoreFactoryDefaults();
-        shooterMotor.setSmartCurrentLimit(40);                   // SPEED LIMIT
-        shooterMotor.enableVoltageCompensation(11.0);           // SPEED LIMIT
-        shooterMotor.setIdleMode(IdleMode.kCoast);              // SPEED LIMIT
+        shooterMotor.setSmartCurrentLimit(40);                  // SPEED LIMIT
+        shooterMotor.enableVoltageCompensation(11.0);          // SPEED LIMIT
+        shooterMotor.setIdleMode(IdleMode.kCoast);             // SPEED LIMIT
 
         shooterEncoder = shooterMotor.getEncoder();
-        shooterEncoder.setVelocityConversionFactor(0.5);        // SPEED LIMIT
-        shooterEncoder.setPositionConversionFactor(0.5);        // SPEED LIMIT
+        shooterEncoder.setVelocityConversion(0.5);             // SPEED LIMIT
+        shooterEncoder.setPositionConversion(0.5);             // SPEED LIMIT
 
         shooterPID = shooterMotor.getPIDController();
         shooterPID.setP(ShooterConstants.kP.get());
@@ -39,20 +38,18 @@ public class ShooterIOSparkMax implements ShooterIO {
         shooterPID.setD(ShooterConstants.kD.get());
         shooterPID.setFF(ShooterConstants.kFF.get());
 
-        /* ================= Follower setup ================= */
-
+        // Follower setup
         followerMotor.restoreFactoryDefaults();
         followerMotor.follow(shooterMotor, true);
-        followerMotor.setSmartCurrentLimit(40);                 // SPEED LIMIT
-        followerMotor.enableVoltageCompensation(12.0);          // SPEED LIMIT
-        followerMotor.setIdleMode(IdleMode.kCoast);             // SPEED LIMIT
+        followerMotor.setSmartCurrentLimit(40);                // SPEED LIMIT
+        followerMotor.enableVoltageCompensation(12.0);         // SPEED LIMIT
+        followerMotor.setIdleMode(IdleMode.kCoast);            // SPEED LIMIT
 
-        /* ================= Feeder setup ================= */
-
+        // Feeder setup
         feederMotor.restoreFactoryDefaults();
-        feederMotor.setSmartCurrentLimit(30);                   // SPEED LIMIT
-        feederMotor.enableVoltageCompensation(12.0);           // SPEED LIMIT
-        feederMotor.setIdleMode(IdleMode.kBrake);               // SPEED LIMIT
+        feederMotor.setSmartCurrentLimit(30);                  // SPEED LIMIT
+        feederMotor.enableVoltageCompensation(12.0);          // SPEED LIMIT
+        feederMotor.setIdleMode(IdleMode.kBrake);              // SPEED LIMIT
         feederMotor.setInverted(true);
     }
 
@@ -72,21 +69,16 @@ public class ShooterIOSparkMax implements ShooterIO {
 
     @Override
     public void setShooterVelocity(double velocityRPM, double ffVolts) {
-        shooterPID.setReference(
-                velocityRPM,
-                com.revrobotics.CANSparkMax.ControlType.kVelocity,
-                0,
-                ffVolts
-        ); // SPEED LIMIT: feedforward capped
+        shooterPID.setReference(velocityRPM, CANSparkMax.ControlType.kVelocity, 0, ffVolts); // SPEED LIMIT
     }
 
     @Override
     public void setShooterVoltage(double volts) {
-        shooterMotor.setVoltage(volts); // SPEED LIMIT: voltage capped
+        shooterMotor.setVoltage(volts); // SPEED LIMIT
     }
 
     @Override
     public void setFeederVoltage(double volts) {
-        feederMotor.setVoltage(volts); // SPEED LIMIT: fixed feeder voltage
+        feederMotor.setVoltage(volts); // SPEED LIMIT
     }
 }

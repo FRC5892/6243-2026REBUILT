@@ -1,11 +1,8 @@
 package frc.robot.subsystems.shooter;
 
 /**
- * Shooter hardware abstraction.
- * Supports:
- * - Real hardware
- * - Simulated hardware
- * - AdvantageKit replay
+ * Hardware abstraction for Shooter subsystem.
+ * Supports real hardware, simulation, and AdvantageKit logging.
  */
 public interface ShooterIO {
 
@@ -22,15 +19,15 @@ public interface ShooterIO {
         public boolean isFiring = false;
     }
 
-    /** Update all sensor readings */
+    /** Update sensor readings */
     default void updateInputs(ShooterIOInputs inputs) {}
 
-    /** Closed-loop shooter control */
+    /** Closed-loop shooter velocity */
     default void setShooterVelocity(double velocityRPM, double ffVolts) {}
 
-    /** Open-loop shooter voltage */
+    /** Open-loop voltage control for shooter */
     default void setShooterVoltage(double volts) {}
 
-    /** Feeder control voltage */
+    /** Open-loop voltage control for feeder */
     default void setFeederVoltage(double volts) {}
 }

@@ -1,8 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-/**
- * Simple simulated shooter for testing / replay.
- */
 public class ShooterIOSim implements ShooterIO {
 
     private double velocity = 0.0;
@@ -18,18 +15,18 @@ public class ShooterIOSim implements ShooterIO {
         inputs.followerCurrentAmps = 5.0;
         inputs.feederCurrentAmps = firing ? 2.0 : 0.5;
 
-        inputs.appliedOutput = velocity / 5000.0; // normalized
+        inputs.appliedOutput = velocity / 5000.0;
         inputs.isFiring = firing;
     }
 
     @Override
     public void setShooterVelocity(double velocityRPM, double ffVolts) {
-        this.velocity = velocityRPM; // instantly apply
+        this.velocity = velocityRPM;
     }
 
     @Override
     public void setShooterVoltage(double volts) {
-        this.velocity = volts * 500.0; // crude simulation mapping
+        this.velocity = volts * 500.0;
     }
 
     @Override

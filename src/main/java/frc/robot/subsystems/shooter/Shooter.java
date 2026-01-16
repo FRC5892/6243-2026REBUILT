@@ -4,9 +4,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 /**
- * Shooter subsystem logic.
- * AdvantageKit logging and replay-ready.
- * Uses ShooterIO abstraction for real / sim hardware.
+ * Full shooter subsystem logic:
+ * - AdvantageKit logging
+ * - Characterization hooks
+ * - Idle / firing / closed-loop velocity control
+ * - Simulation support
  */
 public class Shooter extends SubsystemBase {
 
@@ -23,7 +25,7 @@ public class Shooter extends SubsystemBase {
         Logger.processInputs("Shooter", inputs);
     }
 
-    /** Set shooter closed-loop velocity */
+    /** Closed-loop shooter control with optional firing boost */
     public void setShooterSpeed(double velocityRPM, boolean firingBoost) {
         if (Math.abs(velocityRPM) < 1.0) {
             io.setShooterVoltage(0.0); // SPEED LIMIT: deadband
@@ -33,7 +35,7 @@ public class Shooter extends SubsystemBase {
         io.setShooterVelocity(velocityRPM, ffVolts);
     }
 
-    /** Idle shooter spin */
+    /** Spin shooter at idle voltage */
     public void setIdle() {
         io.setShooterVoltage(ShooterConstants.kIdleVoltage.get()); // SPEED LIMIT
         setFiring(false);
@@ -44,21 +46,22 @@ public class Shooter extends SubsystemBase {
         io.setFeederVoltage(firing ? ShooterConstants.kFeederVoltage.get() : 0.0); // SPEED LIMIT
     }
 
-    /** Check if shooter is at target RPM */
+    /** Check if shooter is at target velocity */
     public boolean isAtSpeed(double targetRPM) {
         return Math.abs(inputs.mainVelocityRPM - targetRPM) < ShooterConstants.kVelocityTolerance.get(); // SPEED LIMIT
     }
 
-    /** Characterization hook for voltage/velocity sweeps */
+    /** Run a voltage sweep for characterization */
     public void runCharacterization(double testVoltage) {
-        io.setShooterVoltage(testVoltage);
-        // AdvantageKit logs inputs automatically
+        io.setShooterVoltage(testVoltage); // AdvantageKit logs automatically
     }
 
+    /** Get current shooter velocity */
     public double getShooterVelocity() {
         return inputs.mainVelocityRPM;
     }
 
+    /** Get current drawn by feeder */
     public double getFeederCurrent() {
         return inputs.feederCurrentAmps;
     }
