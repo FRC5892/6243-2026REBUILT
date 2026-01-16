@@ -29,6 +29,5 @@ public class RioServo extends LoggedServo {
   }
 
   @Override
-  public void setPowered(boolean powered) {
-  }
+  public void setPowered(boolean powered) {}
 }
