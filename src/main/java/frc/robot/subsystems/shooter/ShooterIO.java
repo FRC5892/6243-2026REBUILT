@@ -15,6 +15,7 @@ public interface ShooterIO {
     public double feederCurrentAmps;
     public double appliedOutput;
     public boolean isFiring;
+
     @Override
     public void toLog(org.littletonrobotics.junction.LogTable table) {
       table.put("MainVelocityRPM", mainVelocityRPM);
@@ -26,6 +27,7 @@ public interface ShooterIO {
       table.put("AppliedOutput", appliedOutput);
       table.put("IsFiring", isFiring);
     }
+
     @Override
     public void fromLog(org.littletonrobotics.junction.LogTable table) {
       mainVelocityRPM = table.get("MainVelocityRPM", mainVelocityRPM);
