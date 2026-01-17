@@ -6,7 +6,7 @@ package frc.robot.subsystems.shooter;
  */
 public interface ShooterIO {
 
-  class ShooterIOInputs {
+  class ShooterIOInputs implements org.littletonrobotics.junction.inputs.LoggableInputs {
     public double mainVelocityRPM;
     public double followerVelocityRPM;
     public double feederVelocityRPM;
@@ -15,6 +15,28 @@ public interface ShooterIO {
     public double feederCurrentAmps;
     public double appliedOutput;
     public boolean isFiring;
+    @Override
+    public void toLog(org.littletonrobotics.junction.LogTable table) {
+      table.put("MainVelocityRPM", mainVelocityRPM);
+      table.put("FollowerVelocityRPM", followerVelocityRPM);
+      table.put("FeederVelocityRPM", feederVelocityRPM);
+      table.put("MainCurrentAmps", mainCurrentAmps);
+      table.put("FollowerCurrentAmps", followerCurrentAmps);
+      table.put("FeederCurrentAmps", feederCurrentAmps);
+      table.put("AppliedOutput", appliedOutput);
+      table.put("IsFiring", isFiring);
+    }
+    @Override
+    public void fromLog(org.littletonrobotics.junction.LogTable table) {
+      mainVelocityRPM = table.get("MainVelocityRPM", mainVelocityRPM);
+      followerVelocityRPM = table.get("FollowerVelocityRPM", followerVelocityRPM);
+      feederVelocityRPM = table.get("FeederVelocityRPM", feederVelocityRPM);
+      mainCurrentAmps = table.get("MainCurrentAmps", mainCurrentAmps);
+      followerCurrentAmps = table.get("FollowerCurrentAmps", followerCurrentAmps);
+      feederCurrentAmps = table.get("FeederCurrentAmps", feederCurrentAmps);
+      appliedOutput = table.get("AppliedOutput", appliedOutput);
+      isFiring = table.get("IsFiring", isFiring);
+    }
   }
 
   /** Update sensor readings */

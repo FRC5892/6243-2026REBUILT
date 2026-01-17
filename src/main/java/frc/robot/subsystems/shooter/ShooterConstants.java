@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import org.littletonrobotics.junction.networktables.LoggedTunableNumber;
+import frc.robot.util.LoggedTunableNumber;
 
 /** Shooter subsystem constants. All tunable numbers are logged for AdvantageKit. */
 public final class ShooterConstants {
