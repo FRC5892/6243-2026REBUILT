@@ -29,15 +29,6 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
-  }
-
-  
-  public final class IDConstants{
-    public static final int LEFT_FRONT_MOTOR_ID = 12;
-    public static final int LEFT_BACK_MOTOR_ID = 13;
-    public static final int RIGHT_FRONT_MOTOR_ID = 14;
-    public static final int RIGHT_BACK_MOTOR_ID = 15;
-  }
- 
+  } 
 
 }
