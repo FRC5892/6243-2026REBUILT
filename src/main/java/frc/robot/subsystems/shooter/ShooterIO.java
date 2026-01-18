@@ -1,31 +1,45 @@
 package frc.robot.subsystems.shooter;
 
 /**
- * Hardware-agnostic shooter interface. Can be implemented with real motors (REV/CANSparkMax) or
- * simulated for AdvantageKit.
+ * ShooterIO
+ *
+ * <p>Hardware abstraction layer for the shooter. This interface is implemented by: - ShooterIOSim
+ * (simulation) - ShooterIOReal (real robot, NOT included yet)
+ *
+ * <p>Shooter.java depends ONLY on this interface.
  */
 public interface ShooterIO {
 
-  /** Set the main shooter speed. */
-  void setShooterSpeed(double speed, boolean firingBoost);
+  /**
+   * Sets the shooter target speed.
+   *
+   * @param velocity Target velocity (units defined by implementation)
+   * @param firingBoost Whether to apply extra feedforward / voltage
+   */
+  void setShooterSpeed(double velocity, boolean firingBoost);
 
-  /** Returns current shooter velocity. */
+  /** Enables or disables the feeder */
+  void setFiring(boolean firing);
+
+  /**
+   * @return current shooter velocity
+   */
   double getShooterVelocity();
 
-  /** Returns current drawn by the feeder. */
+  /**
+   * @return current drawn by feeder motor (or simulated equivalent)
+   */
   double getFeederCurrent();
 
-  /** Controls feeder voltage for firing. */
-  void setFiring(boolean isFiring);
+  /** Checks if shooter is within tolerance of a target speed. Implementation defines tolerance. */
+  boolean isAtSpeed(double targetVelocity);
 
-  /** Returns true if shooter is at target speed. */
-  boolean isAtSpeed(double speed);
-
-  /** Called periodically for logging / simulation updates. */
+  /** Called once per robot loop */
   void periodic();
 
-  /** Provides the default idle speed for this implementation. */
-  default double getIdleSpeed() {
-    return 0; // override in real or sim implementations
-  }
+  /**
+   * Exposes idle speed to Shooter.java without Shooter knowing tunables exist. This keeps Shooter
+   * logic clean and hardware-agnostic.
+   */
+  double getIdleSpeed();
 }

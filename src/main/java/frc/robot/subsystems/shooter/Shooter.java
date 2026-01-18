@@ -4,8 +4,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * Hardware-agnostic Shooter subsystem. Talks only to a ShooterIO implementation, never touches
- * motors directly.
+ * Shooter
+ *
+ * <p>High-level subsystem logic. This class: - Does NOT know about hardware - Does NOT know about
+ * tunables - Only talks to ShooterIO
  */
 public class Shooter extends SubsystemBase {
 
@@ -14,7 +16,9 @@ public class Shooter extends SubsystemBase {
   public Shooter(ShooterIO io) {
     this.io = io;
 
-    // Default command: maintain idle speed and stop firing
+    // Default behavior:
+    //  - Hold idle speed
+    //  - Feeder off
     setDefaultCommand(
         Commands.run(
             () -> {
@@ -24,16 +28,16 @@ public class Shooter extends SubsystemBase {
             this));
   }
 
-  public void setShooterSpeed(double speed, boolean firingBoost) {
-    io.setShooterSpeed(speed, firingBoost);
+  public void setShooterSpeed(double velocity, boolean firingBoost) {
+    io.setShooterSpeed(velocity, firingBoost);
   }
 
   public void setFiring(boolean firing) {
     io.setFiring(firing);
   }
 
-  public boolean isAtSpeed(double speed) {
-    return io.isAtSpeed(speed);
+  public boolean isAtSpeed(double velocity) {
+    return io.isAtSpeed(velocity);
   }
 
   public double getShooterVelocity() {
