@@ -43,6 +43,32 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     // Add sim camera
     var cameraProperties = new SimCameraProperties();
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
+
+    /*
+     * Chromebook/low-resource-friendly version:
+     *
+     * The default PhotonCameraSim renders two simulated camera streams using OpenCV:
+     *  - raw stream
+     *  - processed stream
+     * These streams are nice if you want to actually view the simulated images, but
+     * they can be expensive on low-power laptops like Chromebooks.
+     *
+     * The following is a fully-commented-out alternative that disables both streams,
+     * but still allows tag detection and pose simulation to work.
+     * 
+     * It's not perfect, but it's much better than without.
+     *
+     * Uncomment to use this lightweight version:
+     *
+     * // var cameraProperties = new SimCameraProperties();
+     * // cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
+     * // cameraSim.enableRawStream(false);        // disables raw image stream
+     * // cameraSim.enableProcessedStream(false);  // disables processed image stream
+     *
+     * Use/Application: ideal for Chromebooks or low-spec machines where rendering
+     * the simulated camera images causes lag, but you still need vision data for testing.
+     */
+
     visionSim.addCamera(cameraSim, robotToCamera);
   }
 
