@@ -44,6 +44,22 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     var cameraProperties = new SimCameraProperties();
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
     visionSim.addCamera(cameraSim, robotToCamera);
+
+    /*
+     * Chromebook/low-performance-friendly version:
+     * PhotonVision by default renders two simulated camera streams of the tags using OpenCV.
+     * This can be slow on low-resource devices like Chromebooks.
+     * The following lines replace the default simulation with a lightweight version
+     * that disables the rendered OpenCV streams but still simulates tag detection.
+     *
+     * Uncomment these lines to use the optimized version of the above code:
+     *
+     * // var cameraProperties = new SimCameraProperties();
+     * // cameraProperties.enableSimulatedImage = false; // disables OpenCV render stream
+     * // cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
+     *
+     * Use/application: So that sim can run properly without error spam in terminal.
+     */
   }
 
   @Override
