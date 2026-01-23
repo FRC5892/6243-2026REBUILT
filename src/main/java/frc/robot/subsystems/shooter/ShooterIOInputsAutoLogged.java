@@ -3,14 +3,11 @@ package frc.robot.subsystems.shooter;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-/** Wrapper around ShooterIOInputs to make it AdvantageKit-loggable */
+/** AdvantageKit-compliant wrapper around ShooterIOInputs */
 @AutoLog
-public class ShooterIOInputsAutoLogged extends LoggableInputs {
+public class ShooterIOInputsAutoLogged implements LoggableInputs {
 
-  // The raw inputs object updated by IO layer
-  public final ShooterIO.ShooterIOInputs inputs = new ShooterIO.ShooterIOInputs();
-
-  // Expose fields for logging
+  // Logged fields
   public double flywheelVelocityRadPerSec = 0.0;
   public double flywheelCurrentAmps = 0.0;
   public boolean flywheelConnected = true;
@@ -18,14 +15,19 @@ public class ShooterIOInputsAutoLogged extends LoggableInputs {
   public double feederCurrentAmps = 0.0;
   public boolean feederConnected = true;
 
-  /** Copies the raw IO values into the loggable fields */
+  /** Copies values from raw IO object */
+  public void setFromRaw(ShooterIO.ShooterIOInputs raw) {
+    flywheelVelocityRadPerSec = raw.flywheelVelocityRadPerSec;
+    flywheelCurrentAmps = raw.flywheelCurrentAmps;
+    flywheelConnected = raw.flywheelConnected;
+
+    feederCurrentAmps = raw.feederCurrentAmps;
+    feederConnected = raw.feederConnected;
+  }
+
+  /** LoggableInputs interface method */
   @Override
   public void toLog() {
-    flywheelVelocityRadPerSec = inputs.flywheelVelocityRadPerSec;
-    flywheelCurrentAmps = inputs.flywheelCurrentAmps;
-    flywheelConnected = inputs.flywheelConnected;
-
-    feederCurrentAmps = inputs.feederCurrentAmps;
-    feederConnected = inputs.feederConnected;
+    // AdvantageKit automatically logs public fields; nothing else needed
   }
 }

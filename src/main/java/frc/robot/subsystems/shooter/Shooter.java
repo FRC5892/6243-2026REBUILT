@@ -2,29 +2,28 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
+
+  // Raw and loggable inputs
+  private final ShooterIO.ShooterIOInputs inputsRaw = new ShooterIO.ShooterIOInputs();
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
-  // Tunables live here so they work in replay
+  // Tunables
   private final LoggedTunableNumber targetVelocityRadPerSec =
       new LoggedTunableNumber("Shooter/TargetVelocityRadPerSec", 4000.0);
-
   private final LoggedTunableNumber velocityToleranceRadPerSec =
       new LoggedTunableNumber("Shooter/VelocityToleranceRadPerSec", 20.0);
-
   private final LoggedTunableNumber feederVoltage =
       new LoggedTunableNumber("Shooter/FeederVoltage", 6.0);
 
-  // Alerts for motor disconnects
+  // Alerts
   private final Alert flywheelDisconnected =
       new Alert("Shooter flywheel motor disconnected", AlertType.kError);
-
   private final Alert feederDisconnected =
       new Alert("Shooter feeder motor disconnected", AlertType.kError);
 
@@ -34,12 +33,12 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update the raw hardware or sim inputs
-    io.updateInputs(inputs.inputs);
+    // Update raw inputs from hardware or simulation
+    io.updateInputs(inputsRaw);
 
-    // Push data to AdvantageKit
-    inputs.toLog();
-    Logger.recordInputs("Shooter", inputs);
+    // Copy into AdvantageKit loggable fields
+    inputs.setFromRaw(inputsRaw);
+    inputs.toLog(); // required by LoggableInputs
 
     // Update alerts
     flywheelDisconnected.set(!inputs.flywheelConnected);
@@ -56,7 +55,7 @@ public class Shooter extends SubsystemBase {
     io.setFlywheelVelocity(0.0);
   }
 
-  /** Run feeder (open-loop, intentionally) */
+  /** Run feeder (open-loop) */
   public void feed() {
     io.setFeederVoltage(feederVoltage.get());
   }
