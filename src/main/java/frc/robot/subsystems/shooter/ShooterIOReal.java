@@ -7,8 +7,8 @@ import org.littletonrobotics.junction.AutoLog;
 @AutoLog
 public class ShooterIOReal implements ShooterIO {
 
-  private final MotorController flywheelMotor;
-  private final MotorController feederMotor;
+  protected final MotorController flywheelMotor;
+  protected final MotorController feederMotor;
 
   public ShooterIOReal(int flywheelPort, int feederPort) {
     flywheelMotor = new Spark(flywheelPort); // WPILib 2026 safe Spark
