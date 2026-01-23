@@ -1,11 +1,8 @@
 package frc.robot.subsystems.shooter;
 
-import org.littletonrobotics.junction.AutoLog;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
+import org.littletonrobotics.junction.AutoLog;
 
 @AutoLog
 public class ShooterIOReal implements ShooterIO {

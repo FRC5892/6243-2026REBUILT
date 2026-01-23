@@ -15,16 +15,14 @@ public class ShooterIOSim implements ShooterIO {
     // WPILib-identified flywheel velocity system
     LinearSystem<N1, N1, N1> flywheelPlant =
         LinearSystemId.identifyVelocitySystem(
-            0.02,  // kV placeholder
-            0.002  // kA placeholder
-        );
+            0.02, // kV placeholder
+            0.002 // kA placeholder
+            );
 
     flywheelSim =
         new FlywheelSim(
-            flywheelPlant,
-            DCMotor.getNEO(1),
-            1.0 // gearing
-        );
+            flywheelPlant, DCMotor.getNEO(1), 1.0 // gearing
+            );
   }
 
   @Override
