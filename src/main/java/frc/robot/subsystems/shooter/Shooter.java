@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase {
     io.setFeederVoltage(0.0);
   }
 
-  /** Check if shooter is at speed */
+  // Check if shooter is at speed */
   public boolean atSpeed() {
     return Math.abs(inputsLogged.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
         <= velocityToleranceRadPerSec.get();
