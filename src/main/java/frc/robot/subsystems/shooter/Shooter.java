@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
-  private final ShooterIO.ShooterIOInputs inputs = new ShooterIO.ShooterIOInputs();
+  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
   // Tunables live here so they work in replay
   private final LoggedTunableNumber targetVelocityRadPerSec =
