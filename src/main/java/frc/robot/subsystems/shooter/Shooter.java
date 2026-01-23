@@ -11,7 +11,7 @@ public class Shooter extends SubsystemBase {
 
   // Raw and loggable inputs
   private final ShooterIO.ShooterIOInputs inputsRaw = new ShooterIO.ShooterIOInputs();
-  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+  private final ShooterIO.ShooterIOInputsAutoLogged inputs = new ShooterIO.ShooterIOInputsAutoLogged();
 
   // Tunables
   private final LoggedTunableNumber targetVelocityRadPerSec =
@@ -37,9 +37,9 @@ public class Shooter extends SubsystemBase {
     io.updateInputs(inputsRaw);
 
     // Copy into AdvantageKit loggable fields
-    inputs.setFromRaw(inputsRaw);
-    inputs.toLog(); // required by LoggableInputs
-
+    inputs.from(inputsRaw); // AdvantageKit generated method
+    Logger.getInstance().processInputs("Shooter", inputs);
+    
     // Update alerts
     flywheelDisconnected.set(!inputs.flywheelConnected);
     feederDisconnected.set(!inputs.feederConnected);
