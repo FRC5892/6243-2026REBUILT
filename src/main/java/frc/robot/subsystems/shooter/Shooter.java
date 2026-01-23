@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
 
-  // Raw and loggable inputs
+  // Raw inputs (updated each loop) and the AdvantageKit generated loggable class
   private final ShooterIO.ShooterIOInputs inputsRaw = new ShooterIO.ShooterIOInputs();
-  private final ShooterIO.ShooterIOInputsAutoLogged inputs = new ShooterIO.ShooterIOInputsAutoLogged();
+  private final ShooterIOInputsAutoLogged inputsLogged = new ShooterIOInputsAutoLogged();
 
   // Tunables
   private final LoggedTunableNumber targetVelocityRadPerSec =
@@ -33,16 +34,16 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update raw inputs from hardware or simulation
+    // Update raw inputs from hardware or simulation first
     io.updateInputs(inputsRaw);
 
-    // Copy into AdvantageKit loggable fields
-    inputs.from(inputsRaw); // AdvantageKit generated method
-    Logger.getInstance().processInputs("Shooter", inputs);
-    
-    // Update alerts
-    flywheelDisconnected.set(!inputs.flywheelConnected);
-    feederDisconnected.set(!inputs.feederConnected);
+    // Process them through AdvantageKit
+    // This will log and (on replay) update inputsLogged based on logged data
+    Logger.processInputs("Shooter", inputsLogged);
+
+    // Update alerts based on the logged values
+    flywheelDisconnected.set(!inputsLogged.flywheelConnected);
+    feederDisconnected.set(!inputsLogged.feederConnected);
   }
 
   /** Spin flywheel to tunable target velocity */
@@ -55,7 +56,7 @@ public class Shooter extends SubsystemBase {
     io.setFlywheelVelocity(0.0);
   }
 
-  /** Run feeder (open-loop) */
+  /** Run feeder (open‑loop) */
   public void feed() {
     io.setFeederVoltage(feederVoltage.get());
   }
@@ -67,7 +68,7 @@ public class Shooter extends SubsystemBase {
 
   /** Check if shooter is at speed */
   public boolean atSpeed() {
-    return Math.abs(inputs.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
+    return Math.abs(inputsLogged.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
         <= velocityToleranceRadPerSec.get();
   }
 }
