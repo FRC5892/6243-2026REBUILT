@@ -7,7 +7,10 @@ import org.littletonrobotics.junction.Logger;
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
-  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+
+  // AdvantageKit-generated inputs container
+  private final ShooterIO.ShooterIOInputsAutoLogged inputs =
+      new ShooterIO.ShooterIOInputsAutoLogged();
 
   private final LoggedTunableNumber flywheelVoltage =
       new LoggedTunableNumber("Shooter/FlywheelVoltage", 8.0);
@@ -38,12 +41,7 @@ public class Shooter extends SubsystemBase {
 
   public void shoot() {
     io.setFlywheelVoltage(flywheelVoltage.get());
-
-    if (atTargetVelocity()) {
-      io.setFeederVoltage(feederVoltage.get());
-    } else {
-      io.setFeederVoltage(0.0);
-    }
+    io.setFeederVoltage(atTargetVelocity() ? feederVoltage.get() : 0.0);
   }
 
   public void stop() {

@@ -8,13 +8,13 @@ public class ShooterIOSim implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    // Extremely simple fake physics:
-    // Voltage slowly pushes velocity toward a made-up max speed.
-    double targetVelocity = appliedFlywheelVoltage * 80.0; // FAKE scaling
-    flywheelVelocityRadPerSec += (targetVelocity - flywheelVelocityRadPerSec) * 0.1;
+    // Extremely simple fake physics
+    double targetVelocity = appliedFlywheelVoltage * 80.0;
+    flywheelVelocityRadPerSec +=
+        (targetVelocity - flywheelVelocityRadPerSec) * 0.1;
 
     inputs.flywheelVelocityRadPerSec = flywheelVelocityRadPerSec;
-    inputs.feederCurrentAmps = Math.abs(appliedFeederVoltage) * 2.0; // FAKE current
+    inputs.feederCurrentAmps = Math.abs(appliedFeederVoltage) * 2.0;
   }
 
   @Override

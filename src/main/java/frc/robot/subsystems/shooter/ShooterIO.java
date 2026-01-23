@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterIO {
 
-  /** Container for all shooter sensor inputs (used for logging & replay). */
+  /** Container for all shooter sensor inputs (logging + replay). */
   @AutoLog
   class ShooterIOInputs {
     public double flywheelVelocityRadPerSec = 0.0;
