@@ -39,7 +39,7 @@ public class Shooter extends SubsystemBase {
 
     // Push data to AdvantageKit
     inputs.toLog();
-    Logger.processInputs("Shooter", inputs);
+    Logger.getInstance().recordInputs("Shooter", inputs);
 
     // Update alerts
     flywheelDisconnected.set(!inputs.flywheelConnected);
