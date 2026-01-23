@@ -4,19 +4,24 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterIO {
 
-  /** Container for all shooter sensor inputs (used for logging & replay). */
   @AutoLog
   class ShooterIOInputs {
+    // Flywheel
     public double flywheelVelocityRadPerSec = 0.0;
+    public double flywheelCurrentAmps = 0.0;
+    public boolean flywheelConnected = true;
+
+    // Feeder
     public double feederCurrentAmps = 0.0;
+    public boolean feederConnected = true;
   }
 
-  /** Updates the input structure with the latest sensor values. */
-  default void updateInputs(ShooterIOInputs inputs) {}
+  /** Update all sensor inputs */
+  void updateInputs(ShooterIOInputs inputs);
 
-  /** Sets the flywheel motor voltage. */
-  default void setFlywheelVoltage(double volts) {}
+  /** Flywheel closed-loop velocity control (hardware-specific) */
+  void setFlywheelVelocity(double velocityRadPerSec);
 
-  /** Sets the feeder motor voltage. */
-  default void setFeederVoltage(double volts) {}
+  /** Feeder open-loop voltage control */
+  void setFeederVoltage(double volts);
 }

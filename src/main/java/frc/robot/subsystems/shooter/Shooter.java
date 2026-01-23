@@ -3,23 +3,31 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
-  private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
+  private final ShooterIOInputsAutoLogged inputs =
+      new ShooterIOInputsAutoLogged();
 
-  private final LoggedTunableNumber flywheelVoltage =
-      new LoggedTunableNumber("Shooter/FlywheelVoltage", 8.0);
+  // Tunables live here so they work in replay
+  private final LoggedTunableNumber targetVelocityRadPerSec =
+      new LoggedTunableNumber("Shooter/TargetVelocityRadPerSec", 4000.0);
+
+  private final LoggedTunableNumber velocityToleranceRadPerSec =
+      new LoggedTunableNumber("Shooter/VelocityToleranceRadPerSec", 20.0);
 
   private final LoggedTunableNumber feederVoltage =
       new LoggedTunableNumber("Shooter/FeederVoltage", 6.0);
 
-  private final LoggedTunableNumber targetVelocityRadPerSec =
-      new LoggedTunableNumber("Shooter/TargetVelocityRadPerSec", 400.0);
+  // Alerts for motor disconnects
+  private final Alert flywheelDisconnected =
+      new Alert("Shooter flywheel motor disconnected", AlertType.kError);
 
-  private final LoggedTunableNumber velocityTolerance =
-      new LoggedTunableNumber("Shooter/VelocityToleranceRadPerSec", 20.0);
+  private final Alert feederDisconnected =
+      new Alert("Shooter feeder motor disconnected", AlertType.kError);
 
   public Shooter(ShooterIO io) {
     this.io = io;
@@ -29,30 +37,36 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Shooter", inputs);
+
+    flywheelDisconnected.set(!inputs.flywheelConnected);
+    feederDisconnected.set(!inputs.feederConnected);
   }
 
+  /** Spin flywheel to tunable target velocity */
   public void spinUp() {
-    io.setFlywheelVoltage(flywheelVoltage.get());
+    io.setFlywheelVelocity(targetVelocityRadPerSec.get());
+  }
+
+  /** Stop flywheel */
+  public void stopFlywheel() {
+    io.setFlywheelVelocity(0.0);
+  }
+
+  /** Run feeder (open-loop, intentionally) */
+  public void feed() {
+    io.setFeederVoltage(feederVoltage.get());
+  }
+
+  /** Stop feeder */
+  public void stopFeeder() {
     io.setFeederVoltage(0.0);
   }
 
-  public void shoot() {
-    io.setFlywheelVoltage(flywheelVoltage.get());
-
-    if (atTargetVelocity()) {
-      io.setFeederVoltage(feederVoltage.get());
-    } else {
-      io.setFeederVoltage(0.0);
-    }
-  }
-
-  public void stop() {
-    io.setFlywheelVoltage(0.0);
-    io.setFeederVoltage(0.0);
-  }
-
-  public boolean atTargetVelocity() {
-    return Math.abs(inputs.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
-        < velocityTolerance.get();
+  /** Check if shooter is at speed */
+  public boolean atSpeed() {
+    return Math.abs(
+        inputs.flywheelVelocityRadPerSec
+            - targetVelocityRadPerSec.get()
+    ) <= velocityToleranceRadPerSec.get();
   }
 }
