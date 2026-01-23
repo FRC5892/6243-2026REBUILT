@@ -1,58 +1,45 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.SparkMax;
-import com.revrobotics.SparkClosedLoopController;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import org.littletonrobotics.junction.AutoLog;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 
+@AutoLog
 public class ShooterIOReal implements ShooterIO {
 
-  private final SparkMax flywheel;
-  private final SparkMax feeder;
-  private final SparkClosedLoopController flywheelPID;
+  private final MotorController flywheelMotor;
+  private final MotorController feederMotor;
 
-  public ShooterIOReal(int flywheelCanId, int feederCanId) {
-    flywheel = new SparkMax(flywheelCanId, MotorType.kBrushless);
-    feeder = new SparkMax(feederCanId, MotorType.kBrushless);
-
-    SparkMaxConfig flywheelConfig = new SparkMaxConfig();
-    flywheelConfig.closedLoop.pid(0.0003, 0.0, 0.0);
-    flywheel.configure(
-        flywheelConfig,
-        SparkBase.ResetMode.kResetSafeParameters,
-        SparkBase.PersistMode.kPersistParameters
-    );
-
-    flywheelPID = flywheel.getClosedLoopController();
+  public ShooterIOReal(int flywheelPort, int feederPort) {
+    flywheelMotor = new Spark(flywheelPort); // WPILib 2026 safe Spark
+    feederMotor = new Spark(feederPort);
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    boolean flywheelOk = flywheel.getBusVoltage() > 1.0;
-    boolean feederOk = feeder.getBusVoltage() > 1.0;
+    inputs.flywheelVelocityRadPerSec = 0; // Ideally read from encoder if connected
+    inputs.flywheelCurrentAmps = 0; // Read from real motor
+    inputs.flywheelConnected = flywheelMotor != null;
 
-    inputs.flywheelVelocityRadPerSec =
-        flywheel.getEncoder().getVelocity();
-    inputs.flywheelCurrentAmps =
-        flywheel.getOutputCurrent();
-    inputs.feederCurrentAmps =
-        feeder.getOutputCurrent();
-
-    inputs.flywheelConnected = flywheelOk;
-    inputs.feederConnected = feederOk;
+    inputs.feederCurrentAmps = 0; // Read from real motor
+    inputs.feederConnected = feederMotor != null;
   }
 
   @Override
   public void setFlywheelVelocity(double velocityRadPerSec) {
-    flywheelPID.setReference(
-        velocityRadPerSec,
-        SparkBase.ControlType.kVelocity
-    );
+    // PID control could go here if using SparkMax; for now just voltage placeholder
+    if (flywheelMotor != null) {
+      flywheelMotor.set(velocityRadPerSec * 0.001); // placeholder feedforward
+    }
   }
 
   @Override
   public void setFeederVoltage(double volts) {
-    feeder.setVoltage(volts);
+    if (feederMotor != null) {
+      feederMotor.set(volts / 12.0);
+    }
   }
 }

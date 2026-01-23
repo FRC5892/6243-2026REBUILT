@@ -9,8 +9,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
-  private final ShooterIOInputsAutoLogged inputs =
-      new ShooterIOInputsAutoLogged();
+  private final ShooterIO.ShooterIOInputs inputs = new ShooterIO.ShooterIOInputs();
 
   // Tunables live here so they work in replay
   private final LoggedTunableNumber targetVelocityRadPerSec =
@@ -64,9 +63,7 @@ public class Shooter extends SubsystemBase {
 
   /** Check if shooter is at speed */
   public boolean atSpeed() {
-    return Math.abs(
-        inputs.flywheelVelocityRadPerSec
-            - targetVelocityRadPerSec.get()
-    ) <= velocityToleranceRadPerSec.get();
+    return Math.abs(inputs.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
+        <= velocityToleranceRadPerSec.get();
   }
 }

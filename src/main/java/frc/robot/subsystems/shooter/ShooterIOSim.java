@@ -15,8 +15,8 @@ public class ShooterIOSim implements ShooterIO {
     // WPILib-identified flywheel velocity system
     LinearSystem<N1, N1, N1> flywheelPlant =
         LinearSystemId.identifyVelocitySystem(
-            0.02,  // kV (V per rad/s) — placeholder
-            0.002  // kA (V per rad/s^2) — placeholder
+            0.02,  // kV placeholder
+            0.002  // kA placeholder
         );
 
     flywheelSim =
@@ -31,20 +31,17 @@ public class ShooterIOSim implements ShooterIO {
   public void updateInputs(ShooterIOInputs inputs) {
     flywheelSim.update(0.02);
 
-    inputs.flywheelVelocityRadPerSec =
-        flywheelSim.getAngularVelocityRadPerSec();
-    inputs.flywheelCurrentAmps =
-        flywheelSim.getCurrentDrawAmps();
+    inputs.flywheelVelocityRadPerSec = flywheelSim.getAngularVelocityRadPerSec();
+    inputs.flywheelCurrentAmps = flywheelSim.getCurrentDrawAmps();
 
     inputs.feederCurrentAmps = Math.abs(feederVolts);
-
     inputs.flywheelConnected = true;
     inputs.feederConnected = true;
   }
 
   @Override
   public void setFlywheelVelocity(double velocityRadPerSec) {
-    // Simple feedforward approximation for sim
+    // Simple feedforward approximation
     flywheelSim.setInputVoltage(velocityRadPerSec * 0.01);
   }
 
