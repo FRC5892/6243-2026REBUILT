@@ -10,10 +10,10 @@ public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
 
-  // Raw hardware inputs, updated each loop
+  // Raw hardware inputs updated each loop
   private final ShooterIO.ShooterIOInputs inputsRaw = new ShooterIO.ShooterIOInputs();
 
-  // AdvantageKit generated loggable wrapper for inputs
+  // AdvantageKit-generated loggable wrapper (generated at build)
   private final ShooterIOInputsAutoLogged inputsLogged = new ShooterIOInputsAutoLogged();
 
   // Tunables
@@ -39,18 +39,17 @@ public class Shooter extends SubsystemBase {
     // Update raw inputs from hardware or simulation
     io.updateInputs(inputsRaw);
 
-    // Copy the raw values into the generated loggable object
+    // Copy values into AdvantageKit loggable object
     inputsLogged.flywheelVelocityRadPerSec = inputsRaw.flywheelVelocityRadPerSec;
     inputsLogged.flywheelCurrentAmps = inputsRaw.flywheelCurrentAmps;
     inputsLogged.flywheelConnected = inputsRaw.flywheelConnected;
-
     inputsLogged.feederCurrentAmps = inputsRaw.feederCurrentAmps;
     inputsLogged.feederConnected = inputsRaw.feederConnected;
 
-    // Log inputs to AdvantageKit
+    // Log everything to AdvantageKit
     Logger.processInputs("Shooter", inputsLogged);
 
-    // Update alerts based on the loggable values
+    // Update alerts based on logged values
     flywheelDisconnected.set(!inputsLogged.flywheelConnected);
     feederDisconnected.set(!inputsLogged.feederConnected);
   }
