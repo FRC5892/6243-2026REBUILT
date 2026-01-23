@@ -10,8 +10,10 @@ public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
 
-  // Raw inputs (updated each loop) and the AdvantageKit generated loggable class
+  // Raw hardware inputs, updated each loop
   private final ShooterIO.ShooterIOInputs inputsRaw = new ShooterIO.ShooterIOInputs();
+
+  // AdvantageKit generated loggable wrapper for inputs
   private final ShooterIOInputsAutoLogged inputsLogged = new ShooterIOInputsAutoLogged();
 
   // Tunables
@@ -34,14 +36,21 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update raw inputs from hardware or simulation first
+    // Update raw inputs from hardware or simulation
     io.updateInputs(inputsRaw);
 
-    // Process them through AdvantageKit
-    // This will log and (on replay) update inputsLogged based on logged data
+    // Copy the raw values into the generated loggable object
+    inputsLogged.flywheelVelocityRadPerSec = inputsRaw.flywheelVelocityRadPerSec;
+    inputsLogged.flywheelCurrentAmps = inputsRaw.flywheelCurrentAmps;
+    inputsLogged.flywheelConnected = inputsRaw.flywheelConnected;
+
+    inputsLogged.feederCurrentAmps = inputsRaw.feederCurrentAmps;
+    inputsLogged.feederConnected = inputsRaw.feederConnected;
+
+    // Log inputs to AdvantageKit
     Logger.processInputs("Shooter", inputsLogged);
 
-    // Update alerts based on the logged values
+    // Update alerts based on the loggable values
     flywheelDisconnected.set(!inputsLogged.flywheelConnected);
     feederDisconnected.set(!inputsLogged.feederConnected);
   }
@@ -56,7 +65,7 @@ public class Shooter extends SubsystemBase {
     io.setFlywheelVelocity(0.0);
   }
 
-  /** Run feeder (open‑loop) */
+  /** Run feeder (open-loop) */
   public void feed() {
     io.setFeederVoltage(feederVoltage.get());
   }
@@ -66,7 +75,7 @@ public class Shooter extends SubsystemBase {
     io.setFeederVoltage(0.0);
   }
 
-  // Check if shooter is at speed
+  /** Check if shooter is at speed */
   public boolean atSpeed() {
     return Math.abs(inputsLogged.flywheelVelocityRadPerSec - targetVelocityRadPerSec.get())
         <= velocityToleranceRadPerSec.get();
