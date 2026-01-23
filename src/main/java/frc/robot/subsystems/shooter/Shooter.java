@@ -34,9 +34,14 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    io.updateInputs(inputs);
+    // Update the raw hardware or sim inputs
+    io.updateInputs(inputs.inputs);
+
+    // Push data to AdvantageKit
+    inputs.toLog();
     Logger.processInputs("Shooter", inputs);
 
+    // Update alerts
     flywheelDisconnected.set(!inputs.flywheelConnected);
     feederDisconnected.set(!inputs.feederConnected);
   }
