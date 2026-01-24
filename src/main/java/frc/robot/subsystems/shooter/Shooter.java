@@ -2,8 +2,10 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTunableNumber;
+import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.Logger;
 
+@RequiredArgsConstructor
 public class Shooter extends SubsystemBase {
 
   private final ShooterIO io;
@@ -22,10 +24,6 @@ public class Shooter extends SubsystemBase {
 
   private final LoggedTunableNumber velocityTolerance =
       new LoggedTunableNumber("Shooter/VelocityToleranceRadPerSec", 20.0);
-
-  public Shooter(ShooterIO io) {
-    this.io = io;
-  }
 
   @Override
   public void periodic() {
