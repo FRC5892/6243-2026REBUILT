@@ -20,6 +20,13 @@ Team 6243, the Energy NERDS, is an FRC team from Energy Institute High School in
 
 | Device              | CAN ID | Notes                                            |
 |---------------------|--------|--------------------------------------------------|
-|                     |        |                                                  |
+| Front Left Drive    |   5    | Swerve Module                                    |
+| Front Left Turn     |   3    | Swerve Module                                    |
+| Front Right Drive   |   6    | Swerve Module                                    |
+| Front Right Turn    |   1    | Swerve Module                                    |
+| Back Left Drive     |   8    | Swerve Module                                    |
+| Back Left Turn      |   4    | Swerve Module                                    |
+| Back Right Drive    |   7    | Swerve Module                                    |
+| Back Right Turn     |   2    | Swerve Module                                    |
 |                     |        |                                                  |
 
