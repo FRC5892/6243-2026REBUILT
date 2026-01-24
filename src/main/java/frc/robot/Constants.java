@@ -30,4 +30,14 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static class IdConstants{
+       public static final int CLIMB_ARM_MOTOR_ID = 12;
+  }
+
+  public static class SpeedConstants{
+      public static final double CLIMB_ARM_MOTOR_SPEED = 1;
+      public static final double CLIMB_BACK_MOTOR_SPEED = -1;
+  }
+
 }
