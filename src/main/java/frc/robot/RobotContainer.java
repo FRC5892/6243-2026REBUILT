@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -51,7 +50,7 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-    private final CommandXboxController m_codriverController = new CommandXboxController(1);
+  private final CommandXboxController m_codriverController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -168,10 +167,10 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
- 
+
     m_codriverController.rightTrigger().whileTrue(m_ClimbSubsystem.climbUpCommand());
     m_codriverController.leftTrigger().whileTrue(m_ClimbSubsystem.climbDownCommand());
-            }
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
