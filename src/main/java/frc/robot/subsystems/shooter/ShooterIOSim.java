@@ -3,8 +3,8 @@ package frc.robot.subsystems.shooter;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 
 public class ShooterIOSim implements ShooterIO {
 
@@ -12,12 +12,12 @@ public class ShooterIOSim implements ShooterIO {
   private final FlywheelSim flywheelSim =
       new FlywheelSim(
           LinearSystemId.identifyVelocitySystem(
-              0.02,   // kV (volts per rad/s) — tune later
-              0.001   // kA (volts per rad/s^2) — tune later
-          ),
+              0.02, // kV (volts per rad/s) — tune later
+              0.001 // kA (volts per rad/s^2) — tune later
+              ),
           DCMotor.getNEO(1),
           1.0 // gearing
-      );
+          );
 
   private double appliedFlywheelVoltage = 0.0;
   private double appliedFeederVoltage = 0.0;
@@ -36,10 +36,7 @@ public class ShooterIOSim implements ShooterIO {
 
     // Simulate battery sag
     RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(
-            flywheelSim.getCurrentDrawAmps()
-        )
-    );
+        BatterySim.calculateDefaultBatteryLoadedVoltage(flywheelSim.getCurrentDrawAmps()));
   }
 
   @Override
