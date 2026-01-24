@@ -30,7 +30,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
-import frc.robot.subsystems.shooter.Shooters;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -48,7 +47,6 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final ClimbSubsystem m_ClimbSubsystem = new ClimbSubsystem();
-  private final Shooters m_Shooters = new Shooters();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -62,6 +60,8 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
+        // a CANcoder
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -102,6 +102,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+
         break;
     }
 
@@ -167,12 +168,8 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // Climb bindings
     m_codriverController.rightTrigger().whileTrue(m_ClimbSubsystem.climbUpCommand());
     m_codriverController.leftTrigger().whileTrue(m_ClimbSubsystem.climbDownCommand());
-
-    // Shooter binding
-    m_codriverController.y().whileTrue(m_Shooters.shooterCommand());
   }
 
   /**
