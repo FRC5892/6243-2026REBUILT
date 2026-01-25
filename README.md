@@ -12,6 +12,8 @@ Team 6243, the Energy NERDS, is an FRC team from Energy Institute High School in
 
 | Function           | Controller | Button / Stick           | Description            |
 |--------------------|------------|--------------------------|------------------------|
+| Drive (field-oriented) | Driver     | Left Stick (X/Y)         | Robot translation      |
+| Drive (field-oriented) | Driver     | Right Stick (X/Y)  | Robot rotation         |
 |                    |            |                          |                        |
 |                    |            |                          |                        |
 |                    |            |                          |                        |
