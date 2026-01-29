@@ -49,10 +49,15 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+  private static final double lowBatteryVoltage = 11.0;
+  private static final double lowBatteryDisabledTime = 2.0;
+
   private Command autonomousCommand;
   private RobotContainer robotContainer;
 
   public Robot() {
+    super(Constants.loopPeriodSecs);
+
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -92,7 +97,7 @@ public class Robot extends LoggedRobot {
     // Start AdvantageKit logger
     Logger.start();
 
-    // Disable signal logging
+     // Disable signal logging
     SignalLogger.enableAutoLogging(false);
 
     // Instantiate our RobotContainer. This will perform all our button bindings,
@@ -114,10 +119,54 @@ public class Robot extends LoggedRobot {
     // finished or interrupted commands, and running subsystem periodic() methods.
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
+
+    // Main periodic functions
+    LoggedTracer.reset();
+    VirtualSubsystem.runAllPeriodic();
     CommandScheduler.getInstance().run();
 
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
+
+    LoggedTracer.record("Commands");
+    VirtualSubsystem.runAllPeriodicAfterScheduler();
+    FullSubsystem.runAllPeriodicAfterScheduler();
+    LoggedTracer.record("PeriodicAfterScheduler");
+
+    // Print auto duration removed
+    if (autonomousCommand != null) {
+      if (!autonomousCommand.isScheduled() && !autoMessagePrinted) {
+        autoMessagePrinted = true;
+      }
+    }
+
+    // Low battery alert
+    if (DriverStation.isEnabled()) {
+      disabledTimer.reset();
+    }
+    if (RobotController.getBatteryVoltage() > 0.0
+        && RobotController.getBatteryVoltage() <= lowBatteryVoltage
+        && disabledTimer.hasElapsed(lowBatteryDisabledTime)) {
+      lowBatteryAlert.set(true);
+      Leds.getGlobal().lowBatteryAlert = true;
+    }
+
+    // Clear shooting parameters
+    ShotCalculator.getInstance().clearShootingParameters();
+
+    // Update RobotContainer dashboard outputs
+    robotContainer.updateDashboardOutputs();
+
+    // Log Mechanism3d data
+    AlphaMechanism3d.getMeasured().log("Mechanism3d/Alpha");
+
+    // Record cycle time
+    LoggedTracer.record("RobotPeriodic");
+  }
+
+  /** Whether to display alerts related to hardware faults. */
+  public static boolean showHardwareAlerts() {
+    return Constants.getMode() != Mode.SIM && Timer.getTimestamp() > 30.0;
   }
 
   /** This function is called once when the robot is disabled. */
@@ -131,6 +180,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    autoStart = Timer.getTimestamp();
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
