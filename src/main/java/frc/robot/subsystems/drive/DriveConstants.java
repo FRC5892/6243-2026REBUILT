@@ -9,7 +9,6 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.Constants;
 
 public class DriveConstants {
   // robot constants
@@ -24,7 +23,7 @@ public class DriveConstants {
   public static final double DriveReduction = 6.02678571429;
   public static final double TurnReduction = 26.0;
 
-  // more constants 
+  // more constants
   public static final String CanBus = "*";
   public static final int GyroId = 1;
   public static final int DriveMotorIdFL = 2;
