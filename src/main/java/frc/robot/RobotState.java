@@ -21,8 +21,8 @@ import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
-import org.littletonrobotics.frc2026.subsystems.drive.DriveConstants;
-import org.littletonrobotics.frc2026.util.geometry.GeomUtil;
+import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.util.geometry.GeomUtil;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 @ExtensionMethod({GeomUtil.class})
