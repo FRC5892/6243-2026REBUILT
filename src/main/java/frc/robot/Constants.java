@@ -31,6 +31,22 @@ public final class Constants {
     REPLAY
   }
 
+  public static boolean disableHAL = false;
+  
+  public static void disableHAL() {
+    disableHAL = true;
+  }
+
+  /**checks that tuning mode is disabled before deploying code */
+  public static class CheckDeploy {
+    public static void main(String... args) {
+    if (tuningMode) {
+      System.err.println("Cannot deploy: tuning mode is enabled.");
+      System.exit(1);
+    }
+    }
+  }
+
   public static class IdConstants {
     public static final int CLIMB_ARM_MOTOR_ID = 12;
     public static final int SHOOTER_ID = 17;
