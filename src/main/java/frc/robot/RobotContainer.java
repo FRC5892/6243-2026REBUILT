@@ -50,7 +50,10 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final Climb m_ClimbSubsystem = new Climb();
+  private final Climb climb;
+  private final Flywheel flywheel;
+  private final Intake intake;
+  private final Rollers rollers;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -161,9 +164,9 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0° when Y button is pressed
     controller
-        .b()
+        .y()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -172,8 +175,8 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    m_codriverController.rightTrigger().whileTrue(m_ClimbSubsystem.climbUpCommand());
-    m_codriverController.leftTrigger().whileTrue(m_ClimbSubsystem.climbDownCommand());
+    m_codriverController.rightTrigger().whileTrue(climb.climbUpCommand());
+    m_codriverController.leftTrigger().whileTrue(climb.climbDownCommand());
   }
 
   /**
