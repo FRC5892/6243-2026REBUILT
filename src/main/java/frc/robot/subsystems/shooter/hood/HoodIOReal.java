@@ -1,6 +1,7 @@
 package frc.robot.subsystems.shooter.hood;
 
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class HoodIOReal implements HoodIO {
@@ -12,22 +13,31 @@ public class HoodIOReal implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    // Phoenix 6 TalonFX: getPosition() and getVelocity() already return doubles in native units
-    // Convert to radians if needed (assuming 1 rotation = 2π radians)
-    inputs.positionRad = motor.getPosition().getValue() * (2 * Math.PI);
-    inputs.velocityRadPerSec = motor.getVelocity().getValue() * (2 * Math.PI);
+    // Convert Phoenix6 position/velocity → radians
+    double rotations = motor.getPosition().getValueAsDouble();
+    double velocityRps = motor.getVelocity().getValueAsDouble();
+
+    inputs.positionRad = rotations * 2.0 * Math.PI;
+    inputs.velocityRadPerSec = velocityRps * 2.0 * Math.PI;
   }
 
   @Override
   public void applyOutputs(HoodIOOutputs outputs) {
     switch (outputs.mode) {
       case POSITION:
-        // Use PositionVoltage to set position in radians
-        motor.set(new PositionVoltage(outputs.positionRad));
+        // PositionDutyCycle for closed‑loop position with duty cycle feedforward
+        double targetRot = outputs.positionRad / (2.0 * Math.PI);
+        motor.setControl(new PositionDutyCycle(targetRot, outputs.dutyCycleFeedforward));
         break;
+
       case VOLTAGE:
-        // For open-loop voltage control, just set percent output
-        motor.setVoltage(outputs.voltage);
+        // Direct voltage control using DutyCycleOut:
+        // output is fraction of supply voltage (±1.0 = ±100% duty)
+        motor.setControl(new DutyCycleOut(outputs.voltagePercent));
+        break;
+
+      default:
+        motor.setControl(new DutyCycleOut(0.0));
         break;
     }
   }
