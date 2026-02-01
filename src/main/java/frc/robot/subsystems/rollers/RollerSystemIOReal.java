@@ -1,5 +1,3 @@
 package frc.robot.subsystems.rollers;
 
-public class RollerSystemIOReal {
-    
-}
+public class RollerSystemIOReal {}

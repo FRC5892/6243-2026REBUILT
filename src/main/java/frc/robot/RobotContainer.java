@@ -22,12 +22,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.rollers.RollerSystem;
-import frc.robot.subsystems.rollers.RollerSystemIO;
-import frc.robot.subsystems.rollers.RollerSystemIOSim;
-import frc.robot.subsystems.rollers.RollerSystemIOReal;
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -36,14 +30,19 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.rollers.RollerSystem;
+import frc.robot.subsystems.rollers.RollerSystemIO;
+import frc.robot.subsystems.rollers.RollerSystemIOReal;
+import frc.robot.subsystems.rollers.RollerSystemIOSim;
+import frc.robot.subsystems.shooter.flywheel.Flywheel;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOReal;
+import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.subsystems.shooter.flywheel.Flywheel;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOReal;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -84,7 +83,8 @@ public class RobotContainer {
         rollers = new RollerSystem(new RollerSystemIOReal(Constants.Rollers.motorId));
         flywheel =
             new Flywheel(
-                new FlywheelIOReal(Constants.Flywheel.leftMotorId, Constants.Flywheel.rightMotorId));
+                new FlywheelIOReal(
+                    Constants.Flywheel.leftMotorId, Constants.Flywheel.rightMotorId));
 
         climb = new Climb();
         break;

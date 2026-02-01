@@ -1,5 +1,3 @@
 package frc.robot.subsystems.shooter.hood;
 
-public class Hood {
-    
-}
+public class Hood {}
