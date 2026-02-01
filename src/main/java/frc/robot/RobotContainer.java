@@ -59,29 +59,28 @@ public class RobotContainer {
   private final Intake intake;
   private final RollerSystem rollers;
 
-  // Controller
+  // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandXboxController m_codriverController = new CommandXboxController(1);
 
-  // Dashboard inputs
+  // Dashboard chooser
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOLimelight(camera0Name, drive::getRotation),
-                new VisionIOLimelight(camera1Name, drive::getRotation));
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight)
+        );
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOLimelight(camera0Name, drive::getRotation),
+            new VisionIOLimelight(camera1Name, drive::getRotation)
+        );
 
         intake = new Intake(new RollerSystemIOReal(Constants.Intake.motorId));
         rollers = new RollerSystem(new RollerSystemIOReal(Constants.Rollers.motorId));
@@ -95,18 +94,18 @@ public class RobotContainer {
         break;
 
       case SIM:
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        vision =
-            new Vision(
-                drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        drive = new Drive(
+            new GyroIO() {},
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight)
+        );
+        vision = new Vision(
+            drive::addVisionMeasurement,
+            new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
+            new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose)
+        );
 
         intake = new Intake(new RollerSystemIOSim());
         rollers = new RollerSystem(new RollerSystemIOSim());
@@ -120,36 +119,25 @@ public class RobotContainer {
         break;
 
       default:
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        drive = new Drive(new GyroIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         intake = new Intake(new RollerSystemIO() {});
         rollers = new RollerSystem(new RollerSystemIO() {});
 
-                leftFlywheel =
-                        new Flywheel(
-                                new FlywheelIO() {
-                                    @Override
-                                      public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
-
-                                    @Override
-                                      public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
-                                });
-                rightFlywheel =
-                        new Flywheel(
-                                new FlywheelIO() {
-                                    @Override
-                                      public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
-
-                                    @Override
-                                      public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
-                                });
+        // Empty Flywheel/Hood for test mode
+        leftFlywheel = new Flywheel(new FlywheelIO() {
+          @Override
+          public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
+          @Override
+          public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
+        });
+        rightFlywheel = new Flywheel(new FlywheelIO() {
+          @Override
+          public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
+          @Override
+          public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
+        });
         leftHood = new Hood(new HoodIO() {});
         rightHood = new Hood(new HoodIO() {});
 
@@ -159,75 +147,57 @@ public class RobotContainer {
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
-    autoChooser.addOption(
-        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
-    autoChooser.addOption(
-        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    // Add drive characterizations
+    autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption("Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption("Drive SysId (Quasistatic Forward)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption("Drive SysId (Quasistatic Reverse)", drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption("Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     configureButtonBindings();
   }
 
   private void configureButtonBindings() {
     // Default field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+    drive.setDefaultCommand(DriveCommands.joystickDrive(
+        drive,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        () -> -controller.getRightX()
+    ));
 
     // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    controller.a().whileTrue(DriveCommands.joystickDriveAtAngle(
+        drive,
+        () -> -controller.getLeftY(),
+        () -> -controller.getLeftX(),
+        () -> Rotation2d.kZero
+    ));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when Y button is pressed
-    controller
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // Reset gyro when Y button is pressed
+    controller.y().onTrue(Commands.runOnce(
+        () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+        drive
+    ).ignoringDisable(true));
 
     // Climb controls
     m_codriverController.rightTrigger().whileTrue(climb.climbUpCommand());
     m_codriverController.leftTrigger().whileTrue(climb.climbDownCommand());
 
-    // Example: independent hood/flywheel controls (customize your actual commands)
-    controller.leftBumper().whileTrue(
-        Commands.parallel(
-            leftFlywheel.runFixedCommand(5000),  // left flywheel RPM
-            leftHood.runFixedCommand(45.0)      // left hood angle in degrees
-        )
-    );
+    // Flywheel/Hood independent controls using LoggedTalonFX
+    controller.leftBumper().whileTrue(Commands.parallel(
+        leftFlywheel.runFixedCommand(5000),   // left flywheel RPM
+        leftHood.runFixedCommand(45.0)        // left hood angle in degrees
+    ));
 
-    controller.rightBumper().whileTrue(
-        Commands.parallel(
-            rightFlywheel.runFixedCommand(5000), // right flywheel RPM
-            rightHood.runFixedCommand(45.0)      // right hood angle in degrees
-        )
-    );
+    controller.rightBumper().whileTrue(Commands.parallel(
+        rightFlywheel.runFixedCommand(5000),  // right flywheel RPM
+        rightHood.runFixedCommand(45.0)       // right hood angle in degrees
+    ));
   }
 
   public Command getAutonomousCommand() {

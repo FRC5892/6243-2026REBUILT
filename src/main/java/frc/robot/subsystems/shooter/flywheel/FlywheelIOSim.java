@@ -1,40 +1,32 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.Constants;
+import frc.robot.util.LoggedTalon.FlywheelSim;
+import frc.robot.util.LoggedTalon.LoggedTalonFX;
+import com.ctre.phoenix6.CANBus;
 
+/** Simulated Flywheel implementation for Robot simulation */
 public class FlywheelIOSim implements FlywheelIO {
-  private static final DCMotor motorModel = DCMotor.getNeo550(1);
-  private static final DCMotorSim sim =
-      new DCMotorSim(LinearSystemId.createDCMotorSystem(motorModel, 0.025, 1), motorModel);
+    private final FlywheelSim motorSim;
 
-  private PIDController controller = new PIDController(0.001, 0, 0, Constants.loopPeriodSecs);
-  private double currentOutput = 0.0;
-  private double appliedVolts = 0.0;
+    public FlywheelIOSim() {
+        // CAN ID and bus are arbitrary in sim
+        motorSim = new FlywheelSim(1, CANBus.CAN, "FlywheelSim");
+    }
 
-  @Override
-  public void updateInputs(FlywheelIOInputs inputs) {
-    appliedVolts = motorModel.getVoltage(currentOutput, sim.getAngularVelocityRadPerSec());
-    sim.setInputVoltage(MathUtil.clamp(appliedVolts, -12.0, 12.0));
-    sim.update(Constants.loopPeriodSecs);
+    @Override
+    public void updateInputs(FlywheelIOInputs inputs) {
+        inputs.velocityRadsPerSec = motorSim.getVelocity().get(RadiansPerSecond);
+        inputs.appliedVolts = motorSim.getPrimaryAppliedVoltage().get(Volts);
+    }
 
-    inputs.connected = true;
-    inputs.positionRads = sim.getAngularPositionRad();
-    inputs.velocityRadsPerSec = sim.getAngularVelocityRadPerSec();
-    inputs.appliedVoltage = appliedVolts;
-    inputs.supplyCurrentAmps = sim.getCurrentDrawAmps();
-    inputs.torqueCurrentAmps = currentOutput;
-    inputs.tempCelsius = 0.0;
-  }
+    @Override
+    public void applyOutputs(FlywheelIOOutputs outputs) {
+        motorSim.setControl(
+            motorSim.getPrimaryVelocityControlRequest(outputs.velocityRadsPerSec)
+        );
+    }
 
-  @Override
-  public void applyOutputs(FlywheelIOOutputs outputs) {
-    double measured = sim.getAngularVelocityRadPerSec();
-    double volts = controller.calculate(measured, outputs.velocityRadsPerSec);
-    currentOutput = MathUtil.clamp(volts / 12.0, -1.0, 1.0);
-  }
+    public LoggedTalonFX getMotor() {
+        return motorSim;
+    }
 }
