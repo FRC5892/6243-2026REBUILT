@@ -118,9 +118,6 @@ public class Drive extends SubsystemBase {
 
   private BiConsumer<Double, Rotation2d> yawConsumer = null;
 
-  private static final LoggedTunableNumber teleopMaxSpeed =
-      new LoggedTunableNumber("Drive/teleopMaxSpeedPercent", 1);
-
   // End 5892
 
   public Drive(
