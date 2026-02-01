@@ -24,17 +24,17 @@ public class HoodIOReal implements HoodIO {
   @Override
   public void applyOutputs(HoodIOOutputs outputs) {
     switch (outputs.mode) {
-      case POSITION: {
-        // radians → rotations
-        double targetRot = outputs.positionRad / (2.0 * Math.PI);
+      case POSITION:
+        {
+          // radians → rotations
+          double targetRot = outputs.positionRad / (2.0 * Math.PI);
 
-        PositionDutyCycle request =
-            new PositionDutyCycle(targetRot)
-                .withFeedForward(outputs.dutyCycleFeedforward);
+          PositionDutyCycle request =
+              new PositionDutyCycle(targetRot).withFeedForward(outputs.dutyCycleFeedforward);
 
-        motor.setControl(request);
-        break;
-      }
+          motor.setControl(request);
+          break;
+        }
 
       case VOLTAGE:
         motor.setControl(new DutyCycleOut(outputs.voltagePercent));
