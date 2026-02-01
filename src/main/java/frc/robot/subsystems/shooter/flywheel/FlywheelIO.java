@@ -23,5 +23,6 @@ public interface FlywheelIO {
   }
 
   void updateInputs(FlywheelIOInputs inputs);
+
   void applyOutputs(FlywheelIOOutputs outputs);
 }

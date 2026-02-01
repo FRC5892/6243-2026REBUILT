@@ -16,11 +16,11 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import lombok.experimental.ExtensionMethod;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
 import frc.robot.util.geometry.AllianceFlipUtil;
 import frc.robot.util.geometry.GeomUtil;
+import lombok.experimental.ExtensionMethod;
 import org.littletonrobotics.junction.Logger;
 
 @ExtensionMethod({GeomUtil.class})
@@ -40,10 +40,7 @@ public class ShotCalculator {
   }
 
   public record ShootingParameters(
-      boolean isValid,
-      double hoodAngle,
-      double hoodVelocity,
-      double flywheelSpeed) {}
+      boolean isValid, double hoodAngle, double hoodVelocity, double flywheelSpeed) {}
 
   private ShootingParameters latestParameters = null;
 
@@ -92,7 +89,8 @@ public class ShotCalculator {
   }
 
   // Accept pose and velocity as parameters instead of using RobotState
-  public ShootingParameters getParameters(Pose2d estimatedPose, ChassisSpeeds robotRelativeVelocity) {
+  public ShootingParameters getParameters(
+      Pose2d estimatedPose, ChassisSpeeds robotRelativeVelocity) {
     if (latestParameters != null) {
       return latestParameters;
     }
@@ -114,13 +112,15 @@ public class ShotCalculator {
     double timeOfFlight = timeOfFlightMap.get(distanceToTarget);
     double offsetX = robotRelativeVelocity.vxMetersPerSecond * timeOfFlight;
     double offsetY = robotRelativeVelocity.vyMetersPerSecond * timeOfFlight;
-    Translation2d lookaheadPosition = estimatedPose.getTranslation().plus(new Translation2d(offsetX, offsetY));
+    Translation2d lookaheadPosition =
+        estimatedPose.getTranslation().plus(new Translation2d(offsetX, offsetY));
     double lookaheadDistance = target.getDistance(lookaheadPosition);
 
     // Compute hood angle and velocity
     hoodAngle = shotHoodAngleMap.get(lookaheadDistance).getRadians();
     if (Double.isNaN(lastHoodAngle)) lastHoodAngle = hoodAngle;
-    hoodVelocity = hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.loopPeriodSecs);
+    hoodVelocity =
+        hoodAngleFilter.calculate((hoodAngle - lastHoodAngle) / Constants.loopPeriodSecs);
     lastHoodAngle = hoodAngle;
 
     latestParameters =

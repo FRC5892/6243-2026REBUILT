@@ -13,7 +13,7 @@ public interface HoodIO {
 
   enum Mode {
     POSITION, // closed-loop position control
-    VOLTAGE   // simple open-loop voltage
+    VOLTAGE // simple open-loop voltage
   }
 
   void updateInputs(HoodIOInputs inputs);
