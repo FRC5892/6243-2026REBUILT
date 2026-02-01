@@ -132,8 +132,24 @@ public class RobotContainer {
         intake = new Intake(new RollerSystemIO() {});
         rollers = new RollerSystem(new RollerSystemIO() {});
 
-        leftFlywheel = new Flywheel(new FlywheelIO() {});
-        rightFlywheel = new Flywheel(new FlywheelIO() {});
+                leftFlywheel =
+                        new Flywheel(
+                                new FlywheelIO() {
+                                    @Override
+                                      public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
+
+                                    @Override
+                                      public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
+                                });
+                rightFlywheel =
+                        new Flywheel(
+                                new FlywheelIO() {
+                                    @Override
+                                      public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
+
+                                    @Override
+                                      public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
+                                });
         leftHood = new Hood(new HoodIO() {});
         rightHood = new Hood(new HoodIO() {});
 
