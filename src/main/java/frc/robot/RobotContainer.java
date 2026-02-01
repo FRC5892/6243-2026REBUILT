@@ -69,9 +69,10 @@ public class RobotContainer {
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
-        // Wrap RollerSystemIOReal inside RollerSystem
-        rollers = new RollerSystem(new RollerSystemIOReal(Constants.Rollers.motorId));
-        intake = new Intake(rollers); // Intake now takes RollerSystem
+        rollers =
+            new RollerSystem(
+                "Rollers", "RollersInputs", new RollerSystemIOReal(Constants.Rollers.motorId));
+        intake = new Intake(rollers);
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
         rightFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.rightMotorId));
@@ -97,7 +98,11 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        rollers = new RollerSystem(new RollerSystemIO() {});
+        rollers =
+            new RollerSystem(
+                "RollersSim",
+                "RollersInputsSim",
+                new RollerSystemIOReal(Constants.Rollers.motorId));
         intake = new Intake(rollers);
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback if needed
@@ -118,7 +123,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        rollers = new RollerSystem(new RollerSystemIO() {});
+        rollers =
+            new RollerSystem("RollersDefault", "RollersInputsDefault", new RollerSystemIOReal(0));
         intake = new Intake(rollers);
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0));
@@ -193,17 +199,14 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                leftFlywheel.runFixedCommand(5000), // left flywheel RPM
-                leftHood.runFixedCommand(Math.toRadians(45)) // left hood angle in radians
-                ));
+                leftFlywheel.runFixedCommand(5000), leftHood.runFixedCommand(Math.toRadians(45))));
 
     controller
         .rightBumper()
         .whileTrue(
             Commands.parallel(
-                rightFlywheel.runFixedCommand(5000), // right flywheel RPM
-                rightHood.runFixedCommand(Math.toRadians(45)) // right hood angle in radians
-                ));
+                rightFlywheel.runFixedCommand(5000),
+                rightHood.runFixedCommand(Math.toRadians(45))));
   }
 
   public Command getAutonomousCommand() {
