@@ -1,7 +1,7 @@
 package frc.robot.subsystems.shooter.hood;
 
-import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 public class HoodIOReal implements HoodIO {
