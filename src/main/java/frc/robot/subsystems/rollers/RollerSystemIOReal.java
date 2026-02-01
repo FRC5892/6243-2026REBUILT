@@ -3,6 +3,7 @@ package frc.robot.subsystems.rollers;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 
 /** Real hardware implementation of RollerSystemIO using Phoenix‑6 TalonFX */
 public class RollerSystemIOReal implements RollerSystemIO {
@@ -39,9 +40,9 @@ public class RollerSystemIOReal implements RollerSystemIO {
     motor.setControl(new DutyCycleOut(outputs.appliedVoltage));
 
     // Set brake/coast mode
-    motor
-        .getConfigurator()
-        .setNeutralMode(
-            (outputs.brakeModeEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast));
+    var motorConfigs = new MotorOutputConfigs()
+        .withNeutralMode(
+            outputs.brakeModeEnabled ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    motor.getConfigurator().apply(motorConfigs);
   }
 }
