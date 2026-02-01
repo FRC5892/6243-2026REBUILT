@@ -1,10 +1,3 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
@@ -30,19 +23,12 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.rollers.RollerSystem;
-import frc.robot.subsystems.rollers.RollerSystemIO;
 import frc.robot.subsystems.rollers.RollerSystemIOReal;
-import frc.robot.subsystems.rollers.RollerSystemIOSim;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIO;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOReal;
-import frc.robot.subsystems.shooter.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.hood.HoodIO;
 import frc.robot.subsystems.shooter.hood.HoodIOReal;
-import frc.robot.subsystems.shooter.hood.HoodIOSim;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -76,17 +62,20 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
         vision =
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
-        intake = new Intake(new RollerSystemIOReal(Constants.Intake.motorId));
+        // Wrap RollerSystemIOReal inside RollerSystem
         rollers = new RollerSystem(new RollerSystemIOReal(Constants.Rollers.motorId));
+        intake = new Intake(rollers); // Intake now takes RollerSystem
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
         rightFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.rightMotorId));
+
         leftHood = new Hood(new HoodIOReal(Constants.Hood.leftMotorId));
         rightHood = new Hood(new HoodIOReal(Constants.Hood.rightMotorId));
 
@@ -101,19 +90,20 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
         vision =
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        intake = new Intake(new RollerSystemIOSim());
-        rollers = new RollerSystem(new RollerSystemIOSim());
+        rollers = new RollerSystem(new RollerSystemIO() {});
+        intake = new Intake(rollers);
 
-        leftFlywheel = new Flywheel(new FlywheelIOSim());
-        rightFlywheel = new Flywheel(new FlywheelIOSim());
-        leftHood = new Hood(new HoodIOSim());
-        rightHood = new Hood(new HoodIOSim());
+        leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback if needed
+        rightFlywheel = new Flywheel(new FlywheelIOReal(0));
+        leftHood = new Hood(new HoodIOReal(0));
+        rightHood = new Hood(new HoodIOReal(0));
 
         climb = new Climb();
         break;
@@ -128,30 +118,13 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake = new Intake(new RollerSystemIO() {});
         rollers = new RollerSystem(new RollerSystemIO() {});
+        intake = new Intake(rollers);
 
-        // Empty Flywheel/Hood for test mode
-        leftFlywheel =
-            new Flywheel(
-                new FlywheelIO() {
-                  @Override
-                  public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
-
-                  @Override
-                  public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
-                });
-        rightFlywheel =
-            new Flywheel(
-                new FlywheelIO() {
-                  @Override
-                  public void updateInputs(FlywheelIO.FlywheelIOInputs inputs) {}
-
-                  @Override
-                  public void applyOutputs(FlywheelIO.FlywheelIOOutputs outputs) {}
-                });
-        leftHood = new Hood(new HoodIO() {});
-        rightHood = new Hood(new HoodIO() {});
+        leftFlywheel = new Flywheel(new FlywheelIOReal(0));
+        rightFlywheel = new Flywheel(new FlywheelIOReal(0));
+        leftHood = new Hood(new HoodIOReal(0));
+        rightHood = new Hood(new HoodIOReal(0));
 
         climb = new Climb();
         break;
@@ -215,13 +188,13 @@ public class RobotContainer {
     m_codriverController.rightTrigger().whileTrue(climb.climbUpCommand());
     m_codriverController.leftTrigger().whileTrue(climb.climbDownCommand());
 
-    // Flywheel/Hood independent controls using LoggedTalonFX
+    // Flywheel/Hood independent controls
     controller
         .leftBumper()
         .whileTrue(
             Commands.parallel(
                 leftFlywheel.runFixedCommand(5000), // left flywheel RPM
-                leftHood.runFixedCommand(45.0) // left hood angle in degrees
+                leftHood.runFixedCommand(Math.toRadians(45)) // left hood angle in radians
                 ));
 
     controller
@@ -229,7 +202,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.parallel(
                 rightFlywheel.runFixedCommand(5000), // right flywheel RPM
-                rightHood.runFixedCommand(45.0) // right hood angle in degrees
+                rightHood.runFixedCommand(Math.toRadians(45)) // right hood angle in radians
                 ));
   }
 
