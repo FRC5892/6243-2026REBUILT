@@ -13,7 +13,7 @@ public class HoodIOReal implements HoodIO {
 
   @Override
   public void updateInputs(HoodIOInputs inputs) {
-    // Convert Phoenix6 position/velocity → radians
+    // Phoenix 6 reports rotations and rotations/sec
     double rotations = motor.getPosition().getValueAsDouble();
     double velocityRps = motor.getVelocity().getValueAsDouble();
 
@@ -24,15 +24,19 @@ public class HoodIOReal implements HoodIO {
   @Override
   public void applyOutputs(HoodIOOutputs outputs) {
     switch (outputs.mode) {
-      case POSITION:
-        // PositionDutyCycle for closed‑loop position with duty cycle feedforward
+      case POSITION: {
+        // radians → rotations
         double targetRot = outputs.positionRad / (2.0 * Math.PI);
-        motor.setControl(new PositionDutyCycle(targetRot, outputs.dutyCycleFeedforward));
+
+        PositionDutyCycle request =
+            new PositionDutyCycle(targetRot)
+                .withFeedForward(outputs.dutyCycleFeedforward);
+
+        motor.setControl(request);
         break;
+      }
 
       case VOLTAGE:
-        // Direct voltage control using DutyCycleOut:
-        // output is fraction of supply voltage (±1.0 = ±100% duty)
         motor.setControl(new DutyCycleOut(outputs.voltagePercent));
         break;
 
