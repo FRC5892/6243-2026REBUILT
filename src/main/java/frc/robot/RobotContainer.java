@@ -188,8 +188,7 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                leftFlywheel.runFixedCommand(5000),
-                leftHood.runFixedCommand(Math.toRadians(45))));
+                leftFlywheel.runFixedCommand(5000), leftHood.runFixedCommand(Math.toRadians(45))));
 
     controller
         .rightBumper()
@@ -199,10 +198,12 @@ public class RobotContainer {
                 rightHood.runFixedCommand(Math.toRadians(45))));
 
     // Intake controls (example: left trigger = intake, right trigger = outtake)
-    controller.leftTrigger().whileTrue(
-        Commands.run(() -> intake.setGoal(Intake.Goal.INTAKE), intake));
-    controller.rightTrigger().whileTrue(
-        Commands.run(() -> intake.setGoal(Intake.Goal.OUTTAKE), intake));
+    controller
+        .leftTrigger()
+        .whileTrue(Commands.run(() -> intake.setGoal(Intake.Goal.INTAKE), intake));
+    controller
+        .rightTrigger()
+        .whileTrue(Commands.run(() -> intake.setGoal(Intake.Goal.OUTTAKE), intake));
     controller.b().onTrue(Commands.runOnce(() -> intake.setGoal(Intake.Goal.STOP), intake));
   }
 
