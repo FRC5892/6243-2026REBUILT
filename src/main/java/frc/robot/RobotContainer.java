@@ -22,7 +22,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.rollers.RollerSystem;
 import frc.robot.subsystems.rollers.RollerSystemIOReal;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOReal;
@@ -43,7 +42,6 @@ public class RobotContainer {
   private final Hood leftHood;
   private final Hood rightHood;
   private final Intake intake;
-  private final RollerSystem rollers;
 
   // Controllers
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -69,10 +67,8 @@ public class RobotContainer {
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
-        rollers =
-            new RollerSystem(
-                "Rollers", "RollersInputs", new RollerSystemIOReal(Constants.Rollers.motorId));
-        intake = new Intake(rollers);
+        // Pass RollerSystemIOReal directly to Intake
+        intake = new Intake(new RollerSystemIOReal(Constants.Rollers.motorId));
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
         rightFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.rightMotorId));
@@ -98,14 +94,9 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        rollers =
-            new RollerSystem(
-                "RollersSim",
-                "RollersInputsSim",
-                new RollerSystemIOReal(Constants.Rollers.motorId));
-        intake = new Intake(rollers);
+        intake = new Intake(new RollerSystemIOReal(Constants.Rollers.motorId));
 
-        leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback if needed
+        leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
         leftHood = new Hood(new HoodIOReal(0));
         rightHood = new Hood(new HoodIOReal(0));
@@ -123,9 +114,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        rollers =
-            new RollerSystem("RollersDefault", "RollersInputsDefault", new RollerSystemIOReal(0));
-        intake = new Intake(rollers);
+        intake = new Intake(new RollerSystemIOReal(0));
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0));
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
