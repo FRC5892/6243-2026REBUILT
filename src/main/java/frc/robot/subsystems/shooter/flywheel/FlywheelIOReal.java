@@ -1,10 +1,7 @@
 package frc.robot.subsystems.shooter.flywheel;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import frc.robot.Constants;
-import frc.robot.util.LoggedTalon.LoggedTalonFX;
+import com.revrobotics.spark.SparkMax;
 
 /** Real implementation of FlywheelIO using your team’s LoggedTalonFX. */
 public class FlywheelIOReal implements FlywheelIO {
@@ -25,6 +22,7 @@ public class FlywheelIOReal implements FlywheelIO {
     if (motor == null) return;
     // only implementing the bang-bang / velocity mode
   }
+
   public void setSpeed(double speed) {
     motor.set(speed);
   }
