@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-// TODO: add commands to robot container
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -24,7 +22,6 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.rollers.RollerSystemIO;
 import frc.robot.subsystems.rollers.RollerSystemIOReal;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.flywheel.FlywheelIOReal;
@@ -70,7 +67,7 @@ public class RobotContainer {
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
-        // Pass RollerSystemIOReal directly to Intake
+        // Intake now creates its own RollerSystem internally
         intake = new Intake(new RollerSystemIOReal(Constants.Rollers.motorId));
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
@@ -191,7 +188,8 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                leftFlywheel.runFixedCommand(5000), leftHood.runFixedCommand(Math.toRadians(45))));
+                leftFlywheel.runFixedCommand(5000),
+                leftHood.runFixedCommand(Math.toRadians(45))));
 
     controller
         .rightBumper()
@@ -199,6 +197,13 @@ public class RobotContainer {
             Commands.parallel(
                 rightFlywheel.runFixedCommand(5000),
                 rightHood.runFixedCommand(Math.toRadians(45))));
+
+    // Intake controls (example: left trigger = intake, right trigger = outtake)
+    controller.leftTrigger().whileTrue(
+        Commands.run(() -> intake.setGoal(Intake.Goal.INTAKE), intake));
+    controller.rightTrigger().whileTrue(
+        Commands.run(() -> intake.setGoal(Intake.Goal.OUTTAKE), intake));
+    controller.b().onTrue(Commands.runOnce(() -> intake.setGoal(Intake.Goal.STOP), intake));
   }
 
   public Command getAutonomousCommand() {
