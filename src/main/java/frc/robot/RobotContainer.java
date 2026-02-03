@@ -69,7 +69,8 @@ public class RobotContainer {
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
         // Intake now creates its own RollerSystem internally
-        intake = new Intake(new RollerSystemIOReal(Constants.Rollers.motorId));
+        // RollerSystemIOReal currently has a no-arg constructor; don't pass a motor id here.
+        intake = new Intake(new RollerSystemIOReal());
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
         rightFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.rightMotorId));
@@ -95,7 +96,7 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        intake = new Intake(new RollerSystemIOReal(Constants.Rollers.motorId));
+        intake = new Intake(new RollerSystemIOReal());
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
@@ -115,7 +116,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake = new Intake(new RollerSystemIOReal(0));
+        intake = new Intake(new RollerSystemIOReal());
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0));
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
@@ -189,14 +190,15 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.parallel(
-                leftFlywheel.runFixedCommand(5000), leftHood.runFixedCommand(Math.toRadians(45))));
+                Commands.runOnce(() -> leftFlywheel.setVelocity(5000), leftFlywheel),
+                Commands.runOnce(() -> leftHood.setPosition(Math.toRadians(45)), leftHood)));
 
     controller
         .rightBumper()
         .whileTrue(
             Commands.parallel(
-                rightFlywheel.runFixedCommand(5000),
-                rightHood.runFixedCommand(Math.toRadians(45))));
+                Commands.runOnce(() -> rightFlywheel.setVelocity(5000), rightFlywheel),
+                Commands.runOnce(() -> rightHood.setPosition(Math.toRadians(45)), rightHood)));
 
     // Intake controls (example: left trigger = intake, right trigger = outtake)
     controller

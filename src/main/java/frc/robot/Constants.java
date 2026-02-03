@@ -59,4 +59,27 @@ public final class Constants {
     public static final double CLIMB_BACK_MOTOR_SPEED = -1;
     public static final double SHOOTER_SPEED = -0.6;
   }
+
+  /**
+   * Subsystem-specific hardware IDs. These are simple placeholders so callers like RobotContainer
+   * can reference motor IDs (e.g. Constants.Flywheel.leftMotorId). Update these values to match
+   * your robot's CAN IDs before deploying to hardware.
+   */
+  public static class Rollers {
+    // Example: roller motor CAN ID
+    public static final int motorId = 16;
+  }
+
+  public static class Flywheel {
+    // Use SHOOTER_ID as a sensible default for the left flywheel; adjust as needed.
+    public static final int leftMotorId = IdConstants.SHOOTER_ID;
+    // Default to SHOOTER_ID + 1 for a second motor (if present).
+    public static final int rightMotorId = IdConstants.SHOOTER_ID + 1;
+  }
+
+  public static class Hood {
+    // Default placeholder CAN IDs for hood motors. Replace with real IDs.
+    public static final int leftMotorId = IdConstants.SHOOTER_ID + 2;
+    public static final int rightMotorId = IdConstants.SHOOTER_ID + 3;
+  }
 }
