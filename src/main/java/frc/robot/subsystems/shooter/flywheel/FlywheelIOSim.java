@@ -1,7 +1,13 @@
 package frc.robot.subsystems.shooter.flywheel;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import com.ctre.phoenix6.CANBus;
-import frc.robot.util.LoggedTalon.FlywheelSim;
+
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.util.LoggedTalon.LoggedTalonFX;
 
 /** Simulated Flywheel implementation for Robot simulation */
@@ -10,18 +16,18 @@ public class FlywheelIOSim implements FlywheelIO {
 
   public FlywheelIOSim() {
     // CAN ID and bus are arbitrary in sim
-    motorSim = new FlywheelSim(1, CANBus.CAN, "FlywheelSim");
+    motorSim = new FlywheelSim(LinearSystemId.createFlywheelSystem(DCMotor.getNEO(1), 0.5, 1), DCMotor.getNEO(1), 0);
   }
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
-    inputs.velocityRadsPerSec = motorSim.getVelocity().get(RadiansPerSecond);
-    inputs.appliedVolts = motorSim.getPrimaryAppliedVoltage().get(Volts);
+    inputs.velocityRadsPerSec = motorSim.getAngularVelocity().in(RadiansPerSecond);
+    inputs.appliedVoltage = motorSim.getInputVoltage();
   }
 
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
-    motorSim.setControl(motorSim.getPrimaryVelocityControlRequest(outputs.velocityRadsPerSec));
+    motorSim.update(0.02);
   }
 
   public LoggedTalonFX getMotor() {

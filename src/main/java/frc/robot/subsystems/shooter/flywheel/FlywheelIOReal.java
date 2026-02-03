@@ -3,12 +3,10 @@ package frc.robot.subsystems.shooter.flywheel;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-/** Real implementation of FlywheelIO using your team’s LoggedTalonFX. */
 public class FlywheelIOReal implements FlywheelIO {
   private final SparkMax motor;
 
   public FlywheelIOReal(int motorId) {
-    // construct the TalonFX with PID tuning enabled
     motor = new SparkMax(motorId, MotorType.kBrushless);
   }
 
@@ -20,7 +18,6 @@ public class FlywheelIOReal implements FlywheelIO {
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     if (motor == null) return;
-    // only implementing the bang-bang / velocity mode
   }
 
   public void setSpeed(double speed) {
