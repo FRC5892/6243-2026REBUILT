@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import frc.robot.util.LoggedTalon.LoggedTalonFX;
 
 /** Simulated Flywheel implementation for Robot simulation */
 public class FlywheelIOSim implements FlywheelIO {
@@ -27,9 +26,5 @@ public class FlywheelIOSim implements FlywheelIO {
   @Override
   public void applyOutputs(FlywheelIOOutputs outputs) {
     motorSim.update(0.02);
-  }
-
-  public LoggedTalonFX getMotor() {
-    return motorSim;
   }
 }
