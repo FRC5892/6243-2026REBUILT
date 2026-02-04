@@ -11,6 +11,9 @@ public class RollerSystemIOReal implements RollerSystemIO {
   private final SparkMax motor;
   private final RelativeEncoder encoder;
 
+  private static final int BRAKE_MODE = 1; // Brake
+  private static final int COAST_MODE = 0; // Coast
+
   public RollerSystemIOReal(int motorId) {
     motor = new SparkMax(motorId, MotorType.kBrushless);
     encoder = motor.getEncoder();
@@ -32,9 +35,7 @@ public class RollerSystemIOReal implements RollerSystemIO {
   public void applyOutputs(RollerSystemIOOutputs outputs) {
     motor.setVoltage(outputs.appliedVoltage);
 
-    // toggle brake/coast dynamically
-    motor.setIdleMode(outputs.brakeModeEnabled
-        ? com.revrobotics.spark.SparkLowLevel.IdleMode.kBrake
-        : com.revrobotics.spark.SparkLowLevel.IdleMode.kCoast);
+    // Toggle brake/coast dynamically using 2026 API integers
+    motor.setIdleMode(outputs.brakeModeEnabled ? BRAKE_MODE : COAST_MODE);
   }
 }
