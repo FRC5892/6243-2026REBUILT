@@ -17,12 +17,12 @@ public class RollerSystemIOReal implements RollerSystemIO {
     motor = new SparkMax(motorId, MotorType.kBrushless);
     encoder = motor.getEncoder();
 
-    // Initial motor config
+    // Initial motor configuration
     SparkMaxConfig config = new SparkMaxConfig();
     config.smartCurrentLimit(40);
     config.idleMode(SparkBaseConfig.IdleMode.kBrake);
 
-    // Apply initial config (single-argument)
+    // Apply config (2026 API)
     motor.configure(config);
   }
 
@@ -41,15 +41,14 @@ public class RollerSystemIOReal implements RollerSystemIO {
   public void applyOutputs(RollerSystemIOOutputs outputs) {
     motor.setVoltage(outputs.appliedVoltage);
 
-    // Runtime brake mode toggle (2026 simplified API)
+    // Toggle brake/coast at runtime
     SparkMaxConfig runtimeConfig = new SparkMaxConfig();
     runtimeConfig.idleMode(
-        outputs.brakeModeEnabled
-            ? SparkBaseConfig.IdleMode.kBrake
-            : SparkBaseConfig.IdleMode.kCoast
+        outputs.brakeModeEnabled ? SparkBaseConfig.IdleMode.kBrake
+                                 : SparkBaseConfig.IdleMode.kCoast
     );
 
-    // Apply immediately, no deprecated enums
+    // 2026 API: single-argument configure
     motor.configure(runtimeConfig);
   }
 }
