@@ -3,7 +3,6 @@ package frc.robot.subsystems.rollers;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.util.Units;
 
 public class RollerSystemIOReal implements RollerSystemIO {
