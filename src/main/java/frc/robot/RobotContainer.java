@@ -68,9 +68,8 @@ public class RobotContainer {
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
 
-        // Intake now creates its own RollerSystem internally
-        // RollerSystemIOReal currently has a no-arg constructor; don't pass a motor id here.
-        intake = new Intake(new RollerSystemIOReal());
+        // Intake with placeholder motor ID; replace 0 with actual motor ID later
+        intake = new Intake(new RollerSystemIOReal(0)); // TODO: Replace placeholder motor ID
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.leftMotorId));
         rightFlywheel = new Flywheel(new FlywheelIOReal(Constants.Flywheel.rightMotorId));
@@ -96,7 +95,8 @@ public class RobotContainer {
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
 
-        intake = new Intake(new RollerSystemIOReal());
+        // Intake with placeholder motor ID for simulation
+        intake = new Intake(new RollerSystemIOReal(0)); // TODO: Replace placeholder motor ID
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0)); // Sim fallback
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
@@ -116,7 +116,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake = new Intake(new RollerSystemIOReal());
+        // Intake with placeholder motor ID for fallback mode
+        intake = new Intake(new RollerSystemIOReal(0)); // TODO: Replace placeholder motor ID
 
         leftFlywheel = new Flywheel(new FlywheelIOReal(0));
         rightFlywheel = new Flywheel(new FlywheelIOReal(0));
