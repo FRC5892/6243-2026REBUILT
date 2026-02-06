@@ -1,3 +1,3 @@
-public class Hood {
-    
-}
+package frc.robot.subsystems.shooter.hood;
+
+public class Hood {}

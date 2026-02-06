@@ -1,3 +1,3 @@
-public class Shooter {
-    
-}
+package frc.robot.subsystems.shooter;
+
+public class Shooter {}
