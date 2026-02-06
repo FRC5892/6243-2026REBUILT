@@ -56,9 +56,18 @@ public class Flywheel extends SubsystemBase {
     topMotor.periodic();
     bottomMotor.periodic();
 
-    topAtSetpoint = topMotor.atSetpoint(topMMControl.getVelocityMeasure(), tolerance.get());
+    // Replace atSetpoint with a tolerance check manually
+    topAtSetpoint =
+        Math.abs(
+                topMotor.getVelocity().in(RotationsPerSecond)
+                    - topMMControl.getVelocityMeasure().in(RotationsPerSecond))
+            < tolerance.get().in(RotationsPerSecond);
+
     bottomAtSetpoint =
-        bottomMotor.atSetpoint(bottomMMControl.getVelocityMeasure(), tolerance.get());
+        Math.abs(
+                bottomMotor.getVelocity().in(RotationsPerSecond)
+                    - bottomMMControl.getVelocityMeasure().in(RotationsPerSecond))
+            < tolerance.get().in(RotationsPerSecond);
 
     ShotCalculator.getInstance().clearCache();
   }
