@@ -44,13 +44,10 @@ public class Flywheel extends SubsystemBase {
   public Command aimCommand() {
     return run(
         () -> {
-          double speed =
-              ShotCalculator.getInstance().calculateShot().flywheelSpeedRotPerSec();
+          double speed = ShotCalculator.getInstance().calculateShot().flywheelSpeedRotPerSec();
 
           // Both flywheels controlled independently (can be changed later if you want offsets)
-          setSetpoints(
-              RotationsPerSecond.of(speed),
-              RotationsPerSecond.of(speed));
+          setSetpoints(RotationsPerSecond.of(speed), RotationsPerSecond.of(speed));
         });
   }
 

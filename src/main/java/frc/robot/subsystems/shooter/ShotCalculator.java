@@ -106,8 +106,7 @@ public class ShotCalculator {
 
     // Distance from robot center (fixed shooter) to target
     Translation2d target = AllianceFlipUtil.apply(FieldConstants.hubCenter);
-    double robotToTargetDistance =
-        target.getDistance(estimatedPose.getTranslation());
+    double robotToTargetDistance = target.getDistance(estimatedPose.getTranslation());
 
     // Iterative lookahead to account for robot motion during flight
     Pose2d lookaheadPose = estimatedPose;
@@ -123,13 +122,11 @@ public class ShotCalculator {
               estimatedPose.getTranslation().plus(new Translation2d(offsetX, offsetY)),
               estimatedPose.getRotation());
 
-      lookaheadDistance =
-          target.getDistance(lookaheadPose.getTranslation());
+      lookaheadDistance = target.getDistance(lookaheadPose.getTranslation());
     }
 
     // Robot must rotate to face the target
-    Rotation2d robotAimAngle =
-        target.minus(lookaheadPose.getTranslation()).getAngle();
+    Rotation2d robotAimAngle = target.minus(lookaheadPose.getTranslation()).getAngle();
 
     hoodAngle = shotHoodAngleMap.get(lookaheadDistance);
 
