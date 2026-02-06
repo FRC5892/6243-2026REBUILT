@@ -16,36 +16,53 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Flywheel extends SubsystemBase {
 
-  private final LoggedTalonFX motor;
+  private final LoggedTalonFX topMotor;
+  private final LoggedTalonFX bottomMotor;
 
-  private final MotionMagicVelocityTorqueCurrentFOC mmControl =
+  private final MotionMagicVelocityTorqueCurrentFOC topMMControl =
       new MotionMagicVelocityTorqueCurrentFOC(0);
-  @Getter @AutoLogOutput private boolean atSetpoint = false;
+  private final MotionMagicVelocityTorqueCurrentFOC bottomMMControl =
+      new MotionMagicVelocityTorqueCurrentFOC(0);
+
+  @Getter @AutoLogOutput private boolean topAtSetpoint = false;
+  @Getter @AutoLogOutput private boolean bottomAtSetpoint = false;
+
   private final LoggedTunableMeasure<MutAngularVelocity> tolerance =
       new LoggedTunableMeasure<>("Flywheel/Tolerance", RPM.mutable(5));
 
-  public Flywheel(LoggedTalonFX motor) {
-    this.motor = motor;
+  public Flywheel(LoggedTalonFX topMotor, LoggedTalonFX bottomMotor) {
+    this.topMotor = topMotor;
+    this.bottomMotor = bottomMotor;
     setDefaultCommand(aimCommand());
   }
 
-  public void setSetpoint(AngularVelocity velocity) {
-    motor.setControl(mmControl.withVelocity(velocity));
+  public void setSetpoints(AngularVelocity topVelocity, AngularVelocity bottomVelocity) {
+    topMotor.setControl(topMMControl.withVelocity(topVelocity));
+    bottomMotor.setControl(bottomMMControl.withVelocity(bottomVelocity));
   }
 
   public Command aimCommand() {
     return run(
         () -> {
-          setSetpoint(
-              RotationsPerSecond.of(
-                  ShotCalculator.getInstance().calculateShot().flywheelSpeedRotPerSec()));
+          double speed =
+              ShotCalculator.getInstance().calculateShot().flywheelSpeedRotPerSec();
+
+          // Both flywheels controlled independently (can be changed later if you want offsets)
+          setSetpoints(
+              RotationsPerSecond.of(speed),
+              RotationsPerSecond.of(speed));
         });
   }
 
   @Override
   public void periodic() {
-    motor.periodic();
-    atSetpoint = motor.atSetpoint(mmControl.getVelocityMeasure(), tolerance.get());
+    topMotor.periodic();
+    bottomMotor.periodic();
+
+    topAtSetpoint = topMotor.atSetpoint(topMMControl.getVelocityMeasure(), tolerance.get());
+    bottomAtSetpoint =
+        bottomMotor.atSetpoint(bottomMMControl.getVelocityMeasure(), tolerance.get());
+
     ShotCalculator.getInstance().clearCache();
   }
 }
