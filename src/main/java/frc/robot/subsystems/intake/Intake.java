@@ -1,16 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Rotation;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,21 +26,24 @@ public class Intake extends SubsystemBase {
   private final VoltageOut voltageOut = new VoltageOut(tunedVoltage.get()).withEnableFOC(true);
   private final MotionMagicTorqueCurrentFOC mmOut = new MotionMagicTorqueCurrentFOC(0);
 
-  /**
-   * Creates a new Intake.
-   *
-   * @param phoenixTalonFX
-   */
   public Intake(LoggedTalonFX rollerMotor, LoggedTalonFX slapDownMotor) {
-    this.rollerMotor = rollerMotor.withConfig(LoggedTalonFX.buildStandardConfig(20, 20));
-    var slapDownConfig =
-        LoggedTalonFX.buildStandardConfig(20, 20, NeutralModeValue.Brake)
-            .withSlot0(new Slot0Configs().withKP(0).withKI(0).withKD(0).withKS(0).withKV(0))
-            .withMotionMagic(
-                new MotionMagicConfigs()
-                    .withMotionMagicAcceleration(2)
-                    .withMotionMagicCruiseVelocity(5));
-    this.slapDownMotor = slapDownMotor.withConfig(slapDownConfig).withMMPIDTuning(slapDownConfig);
+    // Build a blank config for the roller motor
+    var rollerConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
+    this.rollerMotor = rollerMotor.withConfig(rollerConfig);
+
+    // Build the slap down config manually
+    var slapDownConfig = new com.ctre.phoenix6.configs.TalonFXConfiguration();
+    slapDownConfig.Slot0.kP = 0;
+    slapDownConfig.Slot0.kI = 0;
+    slapDownConfig.Slot0.kD = 0;
+    slapDownConfig.Slot0.kS = 0;
+    slapDownConfig.Slot0.kV = 0;
+    slapDownConfig.MotionMagic.MotionMagicAcceleration = 2;
+    slapDownConfig.MotionMagic.MotionMagicCruiseVelocity = 5;
+
+    this.slapDownMotor =
+        slapDownMotor.withConfig(slapDownConfig)
+                     .withMMPIDTuning(slapDownConfig);
   }
 
   public Command intakeCommand() {
@@ -58,25 +54,32 @@ public class Intake extends SubsystemBase {
 
   public Command extendCommand() {
     return startEnd(
-            () -> slapDownMotor.setControl(mmOut.withPosition(this.outPosition.get())), () -> {})
-        .until(() -> slapDownMotor.atSetpoint(outPosition.get(), tolerance.get()));
+            () -> slapDownMotor.setControl(mmOut.withPosition(outPosition.get())),
+            () -> {})
+        .until(() ->
+            Math.abs(slapDownMotor.getPosition().in(Rotation)
+                     - outPosition.get().in(Rotation))
+            < tolerance.get().in(Rotation)
+        );
   }
 
   public Command retractCommand() {
     return startEnd(
-            () -> slapDownMotor.setControl(mmOut.withPosition(this.inPosition.get())), () -> {})
-        .until(() -> slapDownMotor.atSetpoint(inPosition.get(), tolerance.get()));
+            () -> slapDownMotor.setControl(mmOut.withPosition(inPosition.get())),
+            () -> {})
+        .until(() ->
+            Math.abs(slapDownMotor.getPosition().in(Rotation)
+                     - inPosition.get().in(Rotation))
+            < tolerance.get().in(Rotation)
+        );
   }
 
   public Command intakeSequence() {
     return extendCommand().andThen(intakeCommand());
   }
 
-  // Everywhere constant is referenced use tunable number instead
-
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     rollerMotor.periodic();
     slapDownMotor.periodic();
   }
