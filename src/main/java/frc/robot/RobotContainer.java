@@ -39,6 +39,7 @@ import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
