@@ -85,8 +85,8 @@ public class RobotContainer {
                 new VisionIOLimelight(camera1Name, drive::getRotation));
         intake =
             new Intake(
-                new PhoenixTalonFXS(30, rioCAN, "IntakeRoller"),
-                new PhoenixTalonFXS(31, rioCAN, "IntakeSlapDown"));
+                new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
+                new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
         break;
 
       case SIM:
