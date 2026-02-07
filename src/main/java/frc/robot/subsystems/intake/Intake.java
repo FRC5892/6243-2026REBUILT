@@ -7,9 +7,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.LoggedTalon.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
+import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFX;
 
 public class Intake extends SubsystemBase {
   private final LoggedTalonFX rollerMotor;
@@ -41,9 +41,7 @@ public class Intake extends SubsystemBase {
     slapDownConfig.MotionMagic.MotionMagicAcceleration = 2;
     slapDownConfig.MotionMagic.MotionMagicCruiseVelocity = 5;
 
-    this.slapDownMotor =
-        slapDownMotor.withConfig(slapDownConfig)
-                     .withMMPIDTuning(slapDownConfig);
+    this.slapDownMotor = slapDownMotor.withConfig(slapDownConfig).withMMPIDTuning(slapDownConfig);
   }
 
   public Command intakeCommand() {
@@ -53,25 +51,19 @@ public class Intake extends SubsystemBase {
   }
 
   public Command extendCommand() {
-    return startEnd(
-            () -> slapDownMotor.setControl(mmOut.withPosition(outPosition.get())),
-            () -> {})
-        .until(() ->
-            Math.abs(slapDownMotor.getPosition().in(Rotation)
-                     - outPosition.get().in(Rotation))
-            < tolerance.get().in(Rotation)
-        );
+    return startEnd(() -> slapDownMotor.setControl(mmOut.withPosition(outPosition.get())), () -> {})
+        .until(
+            () ->
+                Math.abs(slapDownMotor.getPosition().in(Rotation) - outPosition.get().in(Rotation))
+                    < tolerance.get().in(Rotation));
   }
 
   public Command retractCommand() {
-    return startEnd(
-            () -> slapDownMotor.setControl(mmOut.withPosition(inPosition.get())),
-            () -> {})
-        .until(() ->
-            Math.abs(slapDownMotor.getPosition().in(Rotation)
-                     - inPosition.get().in(Rotation))
-            < tolerance.get().in(Rotation)
-        );
+    return startEnd(() -> slapDownMotor.setControl(mmOut.withPosition(inPosition.get())), () -> {})
+        .until(
+            () ->
+                Math.abs(slapDownMotor.getPosition().in(Rotation) - inPosition.get().in(Rotation))
+                    < tolerance.get().in(Rotation));
   }
 
   public Command intakeSequence() {
