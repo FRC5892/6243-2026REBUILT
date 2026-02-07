@@ -7,9 +7,9 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
-import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFX;
 
 public class Intake extends SubsystemBase {
   private final LoggedTalonFX rollerMotor;
