@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ShootCommands;
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.shooter.ShootCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -87,7 +87,7 @@ public class RobotContainer {
         intake =
             new Intake(
                 new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
-                new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
+                new PhoenixTalonFX(31, rioCAN, "IntakeSlapdownDown"));
         break;
 
       case SIM:
@@ -107,7 +107,7 @@ public class RobotContainer {
         intake =
             new Intake(
                 new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
-                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
+                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlapdown", 1, 1));
         break;
 
       default:
@@ -121,7 +121,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
+        intake =
+            new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlapdown", 0));
         break;
     }
     indexer = new Indexer(rioCAN);
