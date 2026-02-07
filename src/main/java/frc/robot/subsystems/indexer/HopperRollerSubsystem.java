@@ -1,5 +1,3 @@
 package frc.robot.subsystems.indexer;
 
-public class HopperRollerSubsystem {
-    
-}
+public class HopperRollerSubsystem {}
