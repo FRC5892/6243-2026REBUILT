@@ -31,9 +31,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.*;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.Goal;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -87,7 +89,7 @@ public class RobotContainer {
         intake =
             new Intake(
                 new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
-                new PhoenixTalonFX(31, rioCAN, "IntakeSlapdownDown"));
+                new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
         break;
 
       case SIM:
@@ -107,7 +109,7 @@ public class RobotContainer {
         intake =
             new Intake(
                 new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
-                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlapdown", 1, 1));
+                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
         break;
 
       default:
@@ -121,8 +123,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake =
-            new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlapdown", 0));
+        intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
         break;
     }
     indexer = new Indexer(rioCAN);
@@ -177,6 +178,10 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
     controller.a().onTrue(ShootCommands.shoot(indexer, shooter));
+
+    controller.x().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.LEFT));
+    controller.b().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.RIGHT));
+    controller.y().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.HUB));
   }
 
   /**
