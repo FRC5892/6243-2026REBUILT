@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.ShotCalculator;
-import frc.robot.util.LoggedTalon.TalonFXS.LoggedTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
