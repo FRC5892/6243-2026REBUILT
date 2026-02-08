@@ -6,7 +6,7 @@ Welcome to the repository for (tbd), FRC Team 6243 Energy NERDs' robot for the 2
 Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High School located in Houston, Texas. It is the sister team of FRC 5892, the Energy HEROs.
 
 ## About (tbd) (2026)
-(tbd) is our robot entry for the 2026 FRC competition, REBUILT. (tbd) features a swerve drivechain (a system allowing wheels to rotate and move in any direction), a double shooter with a conjoined hood, an expandable hopper design, a slapdown intake, an indexer, a serializer of unknown type, L3? climbing capabilities, and can navigate both over the bump and under the trench.
+(tbd) is our robot entry for the 2026 FRC competition, REBUILT. (tbd) features a swerve drivechain (a system allowing wheels to rotate and move in any direction), a double shooter with a conjoined hood, an expandable hopper design, a slapdown intake, an indexer, a hopper roller system, a serializer of unknown type, L3? climbing capabilities, and can navigate both over the bump and under the trench.
 
 ## Controls
 
