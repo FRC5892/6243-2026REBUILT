@@ -25,7 +25,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.shooter.ShootCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbL1;
+import frc.robot.subsystems.climb.ClimbL3;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -58,7 +59,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final Intake intake;
-  private final Climb climb;
+  private final ClimbL1 climbl1;
+  private final ClimbL3 climbl3;
   private final Indexer indexer;
   private final Shooter shooter;
 
