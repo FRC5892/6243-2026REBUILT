@@ -78,9 +78,10 @@ public class ClimbL1 extends SubsystemBase {
   }
 
   public Command stopAllCommand() {
-    return runOnce(() -> {
-      stopLeftMotor();
-      stopRightMotor();
-    });
+    return runOnce(
+        () -> {
+          stopLeftMotor();
+          stopRightMotor();
+        });
   }
 }
