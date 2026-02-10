@@ -73,7 +73,6 @@ public class ClimbL3 extends SubsystemBase {
         });
   }
 
-  // FIX #3/4: don’t try to convert Angle → double → back to Angle
   public Command fixPIDPositionReference(double currentAngle) {
     return runOnce(
         () -> {
@@ -99,8 +98,6 @@ public class ClimbL3 extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Your LoggedTalon wrapper already logs internally.
-    // Don’t call raw CTRE signal methods that don’t exist here.
     Logger.recordOutput("Climber FeedForward", lastFF);
   }
 }

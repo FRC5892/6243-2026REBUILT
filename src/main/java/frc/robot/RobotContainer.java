@@ -60,7 +60,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final ClimbL1 climbl1;
-  private final ClimbL3 climbl3;
+  // private final ClimbL3 climbl3;
   private final Indexer indexer;
   private final Shooter shooter;
 
