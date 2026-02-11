@@ -26,13 +26,17 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 
 | Device              | CAN ID | Notes                                            |
 |---------------------|--------|--------------------------------------------------|
-|                     |        |                                                  |
-|                     |        |                                                  |
-| Front Left Drive    |   5    | Swerve Module                                    |
-| Front Left Steer    |   3    | Swerve Module                                    |
-| Front Right Drive   |   6    | Swerve Module                                    |
-| Front Right Steer   |   1    | Swerve Module                                    |
-| Back Left Drive     |   8    | Swerve Module                                    |
-| Back Left Steer     |   4    | Swerve Module                                    |
-| Back Right Drive    |   7    | Swerve Module                                    |
-| Back Right Steer    |   2    | Swerve Module                                    |
+|                     |   #    |                                                  |
+|                     |   #    |                                                  |
+| Left Climb          |   #    |                                                  |
+| Right Climb         |   #    |                                                  |
+| Indexer             |   #    |                                                  |
+| Intake              |   #    |                                                  |
+| Front Left Drive    |   #    | Swerve Module                                    |
+| Front Left Steer    |   #    | Swerve Module                                    |
+| Front Right Drive   |   #    | Swerve Module                                    |
+| Front Right Steer   |   #    | Swerve Module                                    |
+| Back Left Drive     |   #    | Swerve Module                                    |
+| Back Left Steer     |   #    | Swerve Module                                    |
+| Back Right Drive    |   #    | Swerve Module                                    |
+| Back Right Steer    |   #    | Swerve Module                                    |
