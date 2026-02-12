@@ -138,7 +138,6 @@ public class RobotContainer {
 
         break;
     }
-    indexer = new Indexer(rioCAN);
     shooter = new Shooter(rioCAN);
    
     // Set up auto routines
