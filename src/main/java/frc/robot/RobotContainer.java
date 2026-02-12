@@ -140,9 +140,7 @@ public class RobotContainer {
     }
     indexer = new Indexer(rioCAN);
     shooter = new Shooter(rioCAN);
-    intake = new Intake(rioCAN);
-    climb = new Climb(rioCAN);
-
+   
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
