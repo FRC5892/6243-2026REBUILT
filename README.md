@@ -28,10 +28,12 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 |---------------------|--------|--------------------------------------------------|
 |                     |   #    |                                                  |
 |                     |   #    |                                                  |
-| Left Climb          |   #    |                                                  |
-| Right Climb         |   #    |                                                  |
+| Left Climb Arm      |   #    |                                                  |
+| Right Climb Arm     |   #    |                                                  |
 | Indexer             |   #    |                                                  |
-| Intake              |   #    |                                                  |
+| Hopper Rollers      |   #    |                                                  |
+| Intake Rollers      |   #    |                                                  |
+| Intake Slapdown     |   #    |                                                  |
 | Front Left Drive    |   #    | Swerve Module                                    |
 | Front Left Steer    |   #    | Swerve Module                                    |
 | Front Right Drive   |   #    | Swerve Module                                    |
