@@ -26,7 +26,7 @@ import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.shooter.ShootCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbL1;
-import frc.robot.subsystems.climb.ClimbL3;
+// import frc.robot.subsystems.climb.ClimbL3;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -93,6 +93,10 @@ public class RobotContainer {
             new Intake(
                 new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
                 new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
+        climbl1 =
+            new ClimbL1(
+                new PhoenixTalonFX(13, rioCAN, "RightClimb"),
+                new PhoenixTalonFX(3, rioCAN, "LeftClimb"));
         break;
 
       case SIM:
@@ -113,6 +117,10 @@ public class RobotContainer {
             new Intake(
                 new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
                 new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
+        climbl1 =
+            new ClimbL1(
+                new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
+                new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
         break;
 
       default:
@@ -127,10 +135,15 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
+        
+        climbl1 = new ClimbL1(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
+
         break;
     }
     indexer = new Indexer(rioCAN);
     shooter = new Shooter(rioCAN);
+    intake = new Intake(rioCAN);
+    climbl1 = new ClimbL1(rioCAN);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -170,7 +183,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Reset gyro to 0° when B button is pressed
+    // Reset gyro to 0° when Y button is pressed
     controller
         .y()
         .onTrue(
