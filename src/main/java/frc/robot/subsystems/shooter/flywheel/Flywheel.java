@@ -16,29 +16,29 @@ import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Flywheel extends SubsystemBase {
 
-  private final LoggedTalonFX topMotor;
-  private final LoggedTalonFX bottomMotor;
+  private final LoggedTalonFX rightMotor;
+  private final LoggedTalonFX leftMotor;
 
-  private final MotionMagicVelocityTorqueCurrentFOC topMMControl =
+  private final MotionMagicVelocityTorqueCurrentFOC rightMMControl =
       new MotionMagicVelocityTorqueCurrentFOC(0);
-  private final MotionMagicVelocityTorqueCurrentFOC bottomMMControl =
+  private final MotionMagicVelocityTorqueCurrentFOC leftMMControl =
       new MotionMagicVelocityTorqueCurrentFOC(0);
 
-  @Getter @AutoLogOutput private boolean topAtSetpoint = false;
-  @Getter @AutoLogOutput private boolean bottomAtSetpoint = false;
+  @Getter @AutoLogOutput private boolean rightAtSetpoint = false;
+  @Getter @AutoLogOutput private boolean leftAtSetpoint = false;
 
   private final LoggedTunableMeasure<MutAngularVelocity> tolerance =
       new LoggedTunableMeasure<>("Flywheel/Tolerance", RPM.mutable(5));
 
-  public Flywheel(LoggedTalonFX topMotor, LoggedTalonFX bottomMotor) {
-    this.topMotor = topMotor;
-    this.bottomMotor = bottomMotor;
+  public Flywheel(LoggedTalonFX rightMotor, LoggedTalonFX leftMotor) {
+    this.rightMotor = rightMotor;
+    this.leftMotor = leftMotor;
     setDefaultCommand(aimCommand());
   }
 
-  public void setSetpoints(AngularVelocity topVelocity, AngularVelocity bottomVelocity) {
-    topMotor.setControl(topMMControl.withVelocity(topVelocity));
-    bottomMotor.setControl(bottomMMControl.withVelocity(bottomVelocity));
+  public void setSetpoints(AngularVelocity rightVelocity, AngularVelocity leftVelocity) {
+    rightMotor.setControl(rightMMControl.withVelocity(rightVelocity));
+    leftMotor.setControl(leftMMControl.withVelocity(leftVelocity));
   }
 
   public Command aimCommand() {
@@ -53,20 +53,20 @@ public class Flywheel extends SubsystemBase {
 
   @Override
   public void periodic() {
-    topMotor.periodic();
-    bottomMotor.periodic();
+    rightMotor.periodic();
+    leftMotor.periodic();
 
     // Replace atSetpoint with a tolerance check manually
-    topAtSetpoint =
+    rightAtSetpoint =
         Math.abs(
-                topMotor.getVelocity().in(RotationsPerSecond)
-                    - topMMControl.getVelocityMeasure().in(RotationsPerSecond))
+                rightMotor.getVelocity().in(RotationsPerSecond)
+                    - rightMMControl.getVelocityMeasure().in(RotationsPerSecond))
             < tolerance.get().in(RotationsPerSecond);
 
-    bottomAtSetpoint =
+    leftAtSetpoint =
         Math.abs(
-                bottomMotor.getVelocity().in(RotationsPerSecond)
-                    - bottomMMControl.getVelocityMeasure().in(RotationsPerSecond))
+                leftMotor.getVelocity().in(RotationsPerSecond)
+                    - leftMMControl.getVelocityMeasure().in(RotationsPerSecond))
             < tolerance.get().in(RotationsPerSecond);
 
     ShotCalculator.getInstance().clearCache();
