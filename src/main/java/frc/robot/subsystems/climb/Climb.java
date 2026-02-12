@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 
-public class ClimbL1 extends SubsystemBase {
+public class Climb extends SubsystemBase {
 
   private final LoggedTalonFX climberLeft;
   private final LoggedTalonFX climberRight;
@@ -20,7 +20,7 @@ public class ClimbL1 extends SubsystemBase {
   private final DutyCycleOut leftRequest = new DutyCycleOut(0);
   private final DutyCycleOut rightRequest = new DutyCycleOut(0);
 
-  public ClimbL1(LoggedTalonFX climberLeft, LoggedTalonFX climberRight) {
+  public Climb(LoggedTalonFX climberLeft, LoggedTalonFX climberRight) {
     this.climberLeft = climberLeft;
     this.climberRight = climberRight;
 

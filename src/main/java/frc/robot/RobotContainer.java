@@ -25,8 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.shooter.ShootCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.climb.ClimbL1;
-// import frc.robot.subsystems.climb.ClimbL3;
+import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -59,8 +58,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Vision vision;
   private final Intake intake;
-  private final ClimbL1 climbl1;
-  // private final ClimbL3 climbl3;
+  private final Climb climb;
   private final Indexer indexer;
   private final Shooter shooter;
 
@@ -93,8 +91,8 @@ public class RobotContainer {
             new Intake(
                 new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
                 new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
-        climbl1 =
-            new ClimbL1(
+        climb =
+            new Climb(
                 new PhoenixTalonFX(13, rioCAN, "RightClimb"),
                 new PhoenixTalonFX(3, rioCAN, "LeftClimb"));
         break;
@@ -117,8 +115,8 @@ public class RobotContainer {
             new Intake(
                 new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
                 new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
-        climbl1 =
-            new ClimbL1(
+        climb =
+            new Climb(
                 new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
                 new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
         break;
@@ -136,14 +134,14 @@ public class RobotContainer {
 
         intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
         
-        climbl1 = new ClimbL1(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
+        climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
 
         break;
     }
     indexer = new Indexer(rioCAN);
     shooter = new Shooter(rioCAN);
     intake = new Intake(rioCAN);
-    climbl1 = new ClimbL1(rioCAN);
+    climb = new Climb(rioCAN);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
