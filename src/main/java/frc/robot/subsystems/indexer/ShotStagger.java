@@ -1,5 +1,3 @@
 package frc.robot.subsystems.indexer;
 
-public class ShotStagger {
-    
-}
+public class ShotStagger {}

@@ -18,7 +18,6 @@ public class RollerSubsystem extends SubsystemBase {
     // Use the same speed for both directions
     this(motor, forwardVolts, forwardVolts);
   }
-  
 
   @Override
   public void periodic() {

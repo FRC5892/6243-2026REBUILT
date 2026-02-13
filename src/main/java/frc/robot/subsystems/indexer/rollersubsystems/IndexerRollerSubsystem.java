@@ -1,7 +1,7 @@
 package frc.robot.subsystems.indexer.rollersubsystems;
 
-import frc.robot.util.RollerSubsystem;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
+import frc.robot.util.RollerSubsystem;
 import java.util.function.DoubleSupplier;
 
 public class IndexerRollerSubsystem extends RollerSubsystem {
@@ -13,9 +13,7 @@ public class IndexerRollerSubsystem extends RollerSubsystem {
    * @param leaderMotor The motor that will be directly controlled.
    * @param followerMotor The motor that should already be configured to follow the leader.
    */
-  public IndexerRollerSubsystem(
-      LoggedTalonFX leaderMotor,
-      LoggedTalonFX followerMotor) {
+  public IndexerRollerSubsystem(LoggedTalonFX leaderMotor, LoggedTalonFX followerMotor) {
 
     super(leaderMotor, kForwardVolts, kReverseVolts);
 

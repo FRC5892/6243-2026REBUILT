@@ -1,7 +1,7 @@
 package frc.robot.subsystems.indexer.rollersubsystems;
 
-import frc.robot.util.RollerSubsystem;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
+import frc.robot.util.RollerSubsystem;
 import java.util.function.DoubleSupplier;
 
 public class FeederRollerSubsystem extends RollerSubsystem {
