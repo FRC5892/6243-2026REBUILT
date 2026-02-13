@@ -13,7 +13,7 @@ import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.RollerSubsystem;
 import lombok.Getter;
 
-/** Container for indexer mechanisms (feeder, rollers, shot stagger). */
+/** Container for indexer mechanisms (feeder, indexer rollers). */
 public class Indexer {
 
   @Getter private final FeederRollerSubsystem feeder;
