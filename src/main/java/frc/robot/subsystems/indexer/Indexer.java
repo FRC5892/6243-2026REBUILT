@@ -6,8 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.indexer.rollersubsystems.FeederRollerSubsystem;
 import frc.robot.subsystems.indexer.rollersubsystems.IndexerRollerSubsystem;
-import frc.robot.util.LoggedDIO.HardwareDIO;
-import frc.robot.util.LoggedDIO.SimDIO;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
@@ -20,7 +18,6 @@ public class Indexer {
 
   @Getter private final FeederRollerSubsystem feeder;
   @Getter private final IndexerRollerSubsystem indexerRollers;
-  @Getter private final ShotStagger shotStagger;
 
   public Indexer(CANBus bus) {
 
@@ -39,10 +36,6 @@ public class Indexer {
                 32, bus, "IndexerLeft", new PhoenixTalonFollower(31, MotorAlignmentValue.Aligned));
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
-
-        // Shot stagger gates
-        shotStagger =
-            new ShotStagger(new HardwareDIO("ShotPathA", 3), new HardwareDIO("ShotPathB", 4));
       }
 
       case SIM -> {
@@ -57,8 +50,6 @@ public class Indexer {
             new TalonFXSimpleMotorSim(32, bus, "IndexerLeft", 0.001, 1);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
-
-        shotStagger = new ShotStagger(SimDIO.fromNT("ShotPathA"), SimDIO.fromNT("ShotPathB"));
       }
 
       default -> {
@@ -71,9 +62,6 @@ public class Indexer {
         NoOppTalonFX leftIndexer = new NoOppTalonFX("IndexerLeft", 0);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
-
-        shotStagger =
-            new ShotStagger(new HardwareDIO("ShotPathA", 3), new HardwareDIO("ShotPathB", 4));
       }
     }
   }
@@ -85,11 +73,10 @@ public class Indexer {
   public Command runForShooting() {
     return feeder
         .runRoller(RollerSubsystem.Direction.FORWARD)
-        .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD))
-        .alongWith(shotStagger.staggerShots());
+        .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD));
   }
 
   public Command stopAll() {
-    return feeder.stop().alongWith(indexerRollers.stop()).alongWith(shotStagger.stop());
+    return feeder.stop().alongWith(indexerRollers.stop());
   }
 }
