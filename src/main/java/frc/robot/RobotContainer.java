@@ -12,8 +12,11 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -44,7 +47,6 @@ import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -94,7 +96,11 @@ public class RobotContainer {
         climb =
             new Climb(
                 new PhoenixTalonFX(13, rioCAN, "RightClimb"),
-                new PhoenixTalonFX(3, rioCAN, "LeftClimb"));
+                new PhoenixTalonFX(3, rioCAN, "LeftClimb")); 
+        indexer =
+            new Indexer(
+                new PhoenixTalonFX(21,rioCAN, "IndexLeader"),
+                new PhoenixTalonFX(44, rioCAN, "IndexFollower")); 
         break;
 
       case SIM:
@@ -119,6 +125,10 @@ public class RobotContainer {
             new Climb(
                 new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
                 new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
+        indexer =
+            new Indexer(
+                new TalonFXSimpleMotorSim(21, rioCAN, "IndexLeader", 1, 1),
+                new TalonFXSimpleMotorSim(44, rioCAN, "IndexFollower", 1, 1));
         break;
 
       default:
@@ -136,6 +146,7 @@ public class RobotContainer {
         
         climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
 
+        indexer = new Indexer(new NoOppTalonFX("IndexLeader", 1), new NoOppTalonFX("IndexFollower", 0));
         break;
     }
     shooter = new Shooter(rioCAN);
