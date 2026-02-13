@@ -61,7 +61,6 @@ public class RobotContainer {
   private final Vision vision;
   private final Intake intake;
   private final Climb climb;
-  private final Indexer indexer;
   private final Shooter shooter;
 
   // Controller
@@ -97,10 +96,6 @@ public class RobotContainer {
             new Climb(
                 new PhoenixTalonFX(13, rioCAN, "RightClimb"),
                 new PhoenixTalonFX(3, rioCAN, "LeftClimb")); 
-        indexer =
-            new Indexer(
-                new PhoenixTalonFX(21,rioCAN, "IndexLeader"),
-                new PhoenixTalonFX(44, rioCAN, "IndexFollower")); 
         break;
 
       case SIM:
@@ -125,10 +120,6 @@ public class RobotContainer {
             new Climb(
                 new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
                 new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
-        indexer =
-            new Indexer(
-                new TalonFXSimpleMotorSim(21, rioCAN, "IndexLeader", 1, 1),
-                new TalonFXSimpleMotorSim(44, rioCAN, "IndexFollower", 1, 1));
         break;
 
       default:
@@ -145,8 +136,6 @@ public class RobotContainer {
         intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
         
         climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
-
-        indexer = new Indexer(new NoOppTalonFX("IndexLeader", 1), new NoOppTalonFX("IndexFollower", 0));
         break;
     }
     shooter = new Shooter(rioCAN);
