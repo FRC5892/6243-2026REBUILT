@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
-// TODO: add commands to robot container
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -31,6 +30,9 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
+// TODO: add commands to robot container
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
@@ -47,10 +49,11 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final Climb m_ClimbSubsystem = new Climb();
-
+  private final Climb Climb = new Climb();
+  private final Intake Intake = new Intake();
+  private final Shooter shooter = new Shooter();
   // Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController m_drivecontroller = new CommandXboxController(0);
   private final CommandXboxController m_codriverController = new CommandXboxController(1);
 
   // Dashboard inputs
@@ -139,38 +142,32 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+        DriveCommands.joystickDrive(drive,() -> -m_drivecontroller.getLeftY(),() -> -m_drivecontroller.getLeftX(),() -> -m_drivecontroller.getRightX()));
 
     // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    m_drivecontroller.a().whileTrue(DriveCommands.joystickDriveAtAngle(drive,() -> -m_drivecontroller.getLeftY(),() -> -m_drivecontroller.getLeftX(),() -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    m_drivecontroller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // Reset gyro to 0° when Y button is pressed
+    m_drivecontroller.y().onTrue(Commands.runOnce(() ->drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),drive).ignoringDisable(true));
+    
+    // Shooter Commands
+    m_drivecontroller.rightBumper().whileTrue(shooter.shoot());
+    m_codriverController.rightBumper().whileTrue(shooter.shoot());
 
-    m_codriverController.rightTrigger().whileTrue(m_ClimbSubsystem.climbUpCommand());
-    m_codriverController.leftTrigger().whileTrue(m_ClimbSubsystem.climbDownCommand());
+    // Climb Commands
+    m_drivecontroller.povUp().whileTrue(Climb.climbUpCommand());
+    m_drivecontroller.povDown().whileTrue(Climb.climbDownCommand());
+    m_codriverController.povUp().whileTrue(Climb.climbUpCommand());
+    m_codriverController.povDown().whileTrue(Climb.climbDownCommand());
+
+    // Intake Commands
+
+    // Hood Commands
+
+    // Auto Align
   }
 
   /**
