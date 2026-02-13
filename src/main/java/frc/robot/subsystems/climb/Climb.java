@@ -1,54 +1,87 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.climb;
 
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SlotConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 
 public class Climb extends SubsystemBase {
-  private final SparkMax climbArmMotor =
-      new SparkMax(Constants.IdConstants.CLIMB_ARM_MOTOR_ID, MotorType.kBrushless);
 
-  /** Creates a new ClimbSubsystem. */
-  public Climb() {}
+  private final LoggedTalonFX climberLeft;
+  private final LoggedTalonFX climberRight;
 
-  public Command climbUpCommand() {
-    return runEnd(
-        () -> {
-          climbArmMotor.set(Constants.SpeedConstants.CLIMB_ARM_MOTOR_SPEED);
-        },
-        () -> {
-          climbArmMotor.stopMotor();
-        });
+  private final DutyCycleOut leftRequest = new DutyCycleOut(0);
+  private final DutyCycleOut rightRequest = new DutyCycleOut(0);
+
+  public Climb(LoggedTalonFX climberLeft, LoggedTalonFX climberRight) {
+    this.climberLeft = climberLeft;
+    this.climberRight = climberRight;
+
+    var config =
+        new TalonFXConfiguration()
+            .withSlot0(new Slot0Configs().withKP(0).withKI(0).withKD(0))
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withNeutralMode(NeutralModeValue.Brake)
+                    .withInverted(InvertedValue.Clockwise_Positive))
+            .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(60));
+
+    this.climberLeft.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
+    this.climberRight.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
   }
 
-  public Command climbDownCommand() {
-    return runEnd(
-        () -> {
-          climbArmMotor.set(Constants.SpeedConstants.CLIMB_BACK_MOTOR_SPEED);
-        },
-        () -> {
-          climbArmMotor.stopMotor();
-        });
+  public void climberLeftUp() {
+    climberLeft.setControl(leftRequest.withOutput(-0.75));
   }
 
-  public Command climbStopCommand() {
-    return runEnd(
-        () -> {
-          climbArmMotor.set(0);
-        },
-        () -> {
-          climbArmMotor.stopMotor();
-        });
+  public void climberLeftDown() {
+    climberLeft.setControl(leftRequest.withOutput(0.75));
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void climberRightUp() {
+    climberRight.setControl(rightRequest.withOutput(0.75));
+  }
+
+  public void climberRightDown() {
+    climberRight.setControl(rightRequest.withOutput(-0.75));
+  }
+
+  public void stopLeftMotor() {
+    climberLeft.setControl(leftRequest.withOutput(0));
+  }
+
+  public void stopRightMotor() {
+    climberRight.setControl(rightRequest.withOutput(0));
+  }
+
+  public Command leftUpCommand() {
+    return startEnd(this::climberLeftUp, this::stopLeftMotor);
+  }
+
+  public Command leftDownCommand() {
+    return startEnd(this::climberLeftDown, this::stopLeftMotor);
+  }
+
+  public Command rightUpCommand() {
+    return startEnd(this::climberRightUp, this::stopRightMotor);
+  }
+
+  public Command rightDownCommand() {
+    return startEnd(this::climberRightDown, this::stopRightMotor);
+  }
+
+  public Command stopAllCommand() {
+    return runOnce(
+        () -> {
+          stopLeftMotor();
+          stopRightMotor();
+        });
   }
 }

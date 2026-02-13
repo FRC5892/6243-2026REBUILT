@@ -12,7 +12,11 @@ import static frc.robot.subsystems.vision.VisionConstants.camera1Name;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -21,8 +25,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.DriveCommands;
-// TODO: add commands to robot container
+import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.shooter.ShootCommands;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -30,12 +35,18 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.generated.TunerConstants;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShotCalculator;
+import frc.robot.subsystems.shooter.ShotCalculator.Goal;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,14 +55,17 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private final CANBus rioCAN = new CANBus("rio");
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final Climb m_ClimbSubsystem = new Climb();
+  private final Intake intake;
+  private final Climb climb;
+  private final Indexer indexer;
+  private final Shooter shooter;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandXboxController m_codriverController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -75,6 +89,18 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
+        intake =
+            new Intake(
+                new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
+                new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
+        climb =
+            new Climb(
+                new PhoenixTalonFX(13, rioCAN, "RightClimb"),
+                new PhoenixTalonFX(3, rioCAN, "LeftClimb")); 
+        indexer =
+            new Indexer(
+                new PhoenixTalonFX(21,rioCAN, "IndexLeader"),
+                new PhoenixTalonFX(44, rioCAN, "IndexFollower")); 
         break;
 
       case SIM:
@@ -91,6 +117,18 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        intake =
+            new Intake(
+                new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
+                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
+        climb =
+            new Climb(
+                new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
+                new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
+        indexer =
+            new Indexer(
+                new TalonFXSimpleMotorSim(21, rioCAN, "IndexLeader", 1, 1),
+                new TalonFXSimpleMotorSim(44, rioCAN, "IndexFollower", 1, 1));
         break;
 
       default:
@@ -104,8 +142,14 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
+        intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
+        
+        climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
+
+        indexer = new Indexer(new NoOppTalonFX("IndexLeader", 1), new NoOppTalonFX("IndexFollower", 0));
         break;
     }
+    shooter = new Shooter(rioCAN);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -126,7 +170,7 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Configure the button bindings
+    // TODO: Configure the button bindings
     configureButtonBindings();
   }
 
@@ -145,22 +189,9 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
+    // Reset gyro to 0° when Y button is pressed
     controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
-
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
+        .y()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -168,9 +199,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+    controller.a().onTrue(ShootCommands.shoot(indexer, shooter));
 
-    m_codriverController.rightTrigger().whileTrue(m_ClimbSubsystem.climbUpCommand());
-    m_codriverController.leftTrigger().whileTrue(m_ClimbSubsystem.climbDownCommand());
+    controller.x().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.LEFT));
+    controller.b().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.RIGHT));
+    controller.y().onTrue(ShotCalculator.getInstance().setGoalCommand(Goal.HUB));
   }
 
   /**
