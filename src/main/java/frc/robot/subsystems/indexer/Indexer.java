@@ -6,8 +6,8 @@ import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 
 public class Indexer extends SubsystemBase {
 
-  private final LoggedTalonFX leftMotor;
-  private final LoggedTalonFX rightMotor;
+  private final LoggedTalonFX leadMotor;
+  private final LoggedTalonFX followerMotor;
 
   private final DutyCycleOut request = new DutyCycleOut(0);
 
@@ -34,9 +34,9 @@ public class Indexer extends SubsystemBase {
   private SystemState systemState = SystemState.IDLE;
   private WantedState wantedState = WantedState.IDLE;
 
-  public Indexer(LoggedTalonFX leftMotor, LoggedTalonFX rightMotor) {
-    this.leftMotor = leftMotor;
-    this.rightMotor = rightMotor;
+  public Indexer(LoggedTalonFX leadMotor, LoggedTalonFX followerMotor) {
+    this.leadMotor = leadMotor;
+    this.followerMotor = followerMotor;
   }
 
   public void setWantedState(WantedState state) {
@@ -44,8 +44,8 @@ public class Indexer extends SubsystemBase {
   }
 
   private void setPower(double power) {
-    leftMotor.setControl(request.withOutput(power));
-    rightMotor.setControl(request.withOutput(power));
+    leadMotor.setControl(request.withOutput(power));
+    followerMotor.setControl(request.withOutput(power));
   }
 
   @Override
