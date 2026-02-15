@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotState;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.FieldConstants.LinesHorizontal;
 import frc.robot.util.FieldConstants.LinesVertical;
 import frc.robot.util.GenericPositionMechanismSubsystem;
@@ -29,7 +30,6 @@ import frc.robot.util.LoggedDIO.LoggedDIO;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
-import frc.robot.subsystems.shooter.ShotCalculator;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Hood extends GenericPositionMechanismSubsystem {
