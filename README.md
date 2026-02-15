@@ -27,10 +27,10 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 | Device              | CAN ID | Notes                                            |
 |---------------------|--------|--------------------------------------------------|
 |                     |   #    |                                                  |
-|                     |   #    |                                                  |
+| Indexer             |   #    |                                                  |
+| Feeder              |   #    |                                                  |
 | Left Climb Arm      |   #    |                                                  |
 | Right Climb Arm     |   #    |                                                  |
-| Indexer             |   #    |                                                  |
 | Hopper Rollers      |   #    |                                                  |
 | Intake Rollers      |   #    |                                                  |
 | Intake Slapdown     |   #    |                                                  |
