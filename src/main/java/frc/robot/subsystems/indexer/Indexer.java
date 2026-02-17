@@ -1,93 +1,82 @@
 package frc.robot.subsystems.indexer;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.subsystems.indexer.rollersubsystems.FeederRollerSubsystem;
+import frc.robot.subsystems.indexer.rollersubsystems.IndexerRollerSubsystem;
+import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
+import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
+import frc.robot.util.RollerSubsystem;
+import lombok.Getter;
 
-public class Indexer extends SubsystemBase {
+/** Container for indexer mechanisms (feeder, indexer rollers). */
+public class Indexer {
 
-  private final LoggedTalonFX leadMotor;
-  private final LoggedTalonFX followerMotor;
+  @Getter private final FeederRollerSubsystem feeder;
+  @Getter private final IndexerRollerSubsystem indexerRollers;
 
-  private final DutyCycleOut request = new DutyCycleOut(0);
+  public Indexer(CANBus bus) {
 
-  private static final double kFeedPower = 1.0;
-  private static final double kReversePower = -1.0;
-  private static final double kUnjamInPower = -0.5;
-  private static final double kUnjamOutPower = 0.5;
+    switch (Constants.currentMode) {
+      case REAL -> {
+        // Feeder (single motor)
+        PhoenixTalonFX feederMotor = new PhoenixTalonFX(30, bus, "Feeder");
 
-  public enum SystemState {
-    FEEDING,
-    UNJAMMING_IN,
-    UNJAMMING_OUT,
-    EXHAUSTING,
-    IDLE
-  }
+        feeder = new FeederRollerSubsystem(feederMotor);
 
-  public enum WantedState {
-    FEED,
-    UNJAM,
-    EXHAUST,
-    IDLE
-  }
+        // Indexer rollers (right is primary, left follows)
+        PhoenixTalonFX rightIndexer = new PhoenixTalonFX(31, bus, "IndexerRight");
 
-  private SystemState systemState = SystemState.IDLE;
-  private WantedState wantedState = WantedState.IDLE;
+        PhoenixTalonFX leftIndexer =
+            new PhoenixTalonFX(
+                32, bus, "IndexerLeft", new PhoenixTalonFollower(31, MotorAlignmentValue.Aligned));
 
-  public Indexer(LoggedTalonFX leadMotor, LoggedTalonFX followerMotor) {
-    this.leadMotor = leadMotor;
-    this.followerMotor = followerMotor;
-  }
+        indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
+      }
 
-  public void setWantedState(WantedState state) {
-    wantedState = state;
-  }
+      case SIM -> {
+        TalonFXSimpleMotorSim feederMotor = new TalonFXSimpleMotorSim(30, bus, "Feeder", 0.001, 1);
 
-  private void setPower(double power) {
-    leadMotor.setControl(request.withOutput(power));
-    followerMotor.setControl(request.withOutput(power));
-  }
+        feeder = new FeederRollerSubsystem(feederMotor);
 
-  @Override
-  public void periodic() {
-    switch (systemState) {
-      case IDLE:
-        setPower(0);
-        systemState = nextState();
-        break;
+        TalonFXSimpleMotorSim rightIndexer =
+            new TalonFXSimpleMotorSim(31, bus, "IndexerRight", 0.001, 1);
 
-      case FEEDING:
-        setPower(kFeedPower);
-        systemState = nextState();
-        break;
+        TalonFXSimpleMotorSim leftIndexer =
+            new TalonFXSimpleMotorSim(32, bus, "IndexerLeft", 0.001, 1);
 
-      case EXHAUSTING:
-        setPower(kReversePower);
-        systemState = nextState();
-        break;
+        indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
+      }
 
-      case UNJAMMING_OUT:
-        setPower(kUnjamOutPower);
-        systemState = nextState();
-        break;
+      default -> {
+        NoOppTalonFX feederMotor = new NoOppTalonFX("Feeder", 0);
 
-      case UNJAMMING_IN:
-        setPower(kUnjamInPower);
-        systemState = nextState();
-        break;
+        feeder = new FeederRollerSubsystem(feederMotor);
+
+        NoOppTalonFX rightIndexer = new NoOppTalonFX("IndexerRight", 0);
+
+        NoOppTalonFX leftIndexer = new NoOppTalonFX("IndexerLeft", 0);
+
+        indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
+      }
     }
   }
 
-  private SystemState nextState() {
-    return switch (wantedState) {
-      case FEED -> SystemState.FEEDING;
-      case UNJAM -> SystemState.UNJAMMING_OUT;
-      case EXHAUST -> SystemState.EXHAUSTING;
-      default -> SystemState.IDLE;
-    };
+  /**
+   * This should be scheduled whenever the shooter is actively firing. It runs feeder + rollers and
+   * lets the shot stagger alternate paths.
+   */
+  public Command runForShooting() {
+    return feeder
+        .runRoller(RollerSubsystem.Direction.FORWARD)
+        .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD));
   }
 
-  public void stop() {
-    wantedState = WantedState.IDLE;
+  public Command stopAll() {
+    return feeder.stop().alongWith(indexerRollers.stop());
   }
 }

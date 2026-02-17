@@ -8,12 +8,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.ShotCalculator.Goal;
+import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LinesHorizontal;
 import frc.robot.util.FieldConstants.LinesVertical;
 import lombok.Getter;
 import lombok.Setter;
+import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class RobotState {
@@ -26,34 +32,48 @@ public class RobotState {
     return instance;
   }
 
+  private RobotState() {
+    AutoLogOutputManager.addObject(this);
+  }
+
   @Getter @Setter private boolean autoGoal = true;
 
   public Goal updateGoal() {
     if (!autoGoal) {
       return goal;
     }
-    if (topTarget.contains(robotPosition.getTranslation())) {
+    if (AllianceFlipUtil.apply(topTarget).contains(robotPosition.getTranslation())) {
       goal = Goal.RIGHT;
-    } else if (bottomTarget.contains(robotPosition.getTranslation())) {
+    } else if (AllianceFlipUtil.apply(bottomTarget).contains(robotPosition.getTranslation())) {
       goal = Goal.LEFT;
     } else {
       goal = Goal.HUB;
     }
+    Logger.recordOutput("TopTargetCenter", AllianceFlipUtil.apply(topTarget));
+    Logger.recordOutput("BottomTargetCenter", AllianceFlipUtil.apply(bottomTarget));
+
     return goal;
   }
 
-  @Getter @Setter private Goal goal;
+  public Command setGoalCommand(Goal goal) {
+    return Commands.runOnce(() -> setGoal(goal));
+  }
+
+  @AutoLogOutput @Getter @Setter private Goal goal;
   @Getter @Setter private ChassisSpeeds robotRelativeVelocity = new ChassisSpeeds();
   @Getter @Setter private Pose2d robotPosition = new Pose2d();
 
+  @AutoLogOutput
   private static final Rectangle2d topTarget =
       new Rectangle2d(
           new Translation2d(LinesVertical.starting, LinesHorizontal.leftTrenchOpenStart),
-          new Translation2d(FieldConstants.fieldWidth, LinesHorizontal.leftTrenchOpenEnd));
+          new Translation2d(FieldConstants.fieldWidth * 2, LinesHorizontal.center));
+
+  @AutoLogOutput
   private static Rectangle2d bottomTarget =
       new Rectangle2d(
+          new Translation2d(LinesVertical.starting, LinesHorizontal.rightTrenchOpenEnd),
           new Translation2d(
-              (2 * LinesVertical.center) - LinesVertical.starting,
-              LinesHorizontal.leftTrenchOpenStart),
-          new Translation2d(FieldConstants.fieldWidth, LinesHorizontal.leftTrenchOpenEnd));
+              FieldConstants.fieldWidth * 2,
+              (2 * LinesHorizontal.center) - LinesHorizontal.center));
 }

@@ -7,6 +7,7 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,6 +20,11 @@ public class AllianceFlipUtil {
 
   public static double applyY(double y) {
     return shouldFlip() ? FieldConstants.fieldWidth - y : y;
+  }
+
+  public static Rectangle2d apply(Rectangle2d rectangle) {
+    return new Rectangle2d(
+        apply(rectangle.getCenter()), rectangle.getXWidth(), rectangle.getYWidth());
   }
 
   public static Translation2d apply(Translation2d translation) {
