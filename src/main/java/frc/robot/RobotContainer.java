@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
+import frc.robot.commands.shooter.SnapToTargetCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
@@ -216,6 +217,13 @@ public class RobotContainer {
     // Hood Commands
 
     // Auto Align
+    m_drivecontroller
+    .rightTrigger()
+    .whileTrue(new SnapToTargetCommand(drive, shooter));
+
+    m_codriverController
+    .rightTrigger()
+    .whileTrue(new SnapToTargetCommand(drive, shooter));
   }
 
   /**
