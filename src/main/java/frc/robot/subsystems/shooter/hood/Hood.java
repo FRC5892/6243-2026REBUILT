@@ -11,7 +11,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -76,7 +75,6 @@ public class Hood extends SubsystemBase {
   @AutoLogOutput private Rectangle2d[] trenchAreas = new Rectangle2d[4];
 
   /* Control  Requests*/
-  private final NeutralOut neutralControl = new NeutralOut();
   private final MotionMagicVoltage mmControl = new MotionMagicVoltage(targetPosition);
 
   public Hood(LoggedTalonFX motor, LoggedDIO reverseLimit, LoggedDIO forwardLimit) {
