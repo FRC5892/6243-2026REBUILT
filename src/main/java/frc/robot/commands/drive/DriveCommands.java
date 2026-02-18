@@ -23,13 +23,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.shooter.ShotCalculator;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import frc.robot.subsystems.shooter.ShotCalculator;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -109,8 +109,7 @@ public class DriveCommands {
 
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(),
-                      rotationSupplier.get().getRadians());
+                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
 
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
@@ -133,9 +132,7 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
-  /**
-   * SNAP TO TARGET USING APRILTAG + SHOT CALCULATOR
-   */
+  /** SNAP TO TARGET USING APRILTAG + SHOT CALCULATOR */
   public static Command snapToShotTarget(Drive drive) {
     ProfiledPIDController angleController =
         new ProfiledPIDController(
@@ -156,11 +153,9 @@ public class DriveCommands {
 
               double omega =
                   angleController.calculate(
-                      drive.getRotation().getRadians(),
-                      shot.robotYaw().getRadians());
+                      drive.getRotation().getRadians(), shot.robotYaw().getRadians());
 
-              Translation2d linearVelocity =
-                  getLinearVelocityFromJoysticks(xSpeed, ySpeed);
+              Translation2d linearVelocity = getLinearVelocityFromJoysticks(xSpeed, ySpeed);
 
               ChassisSpeeds speeds =
                   new ChassisSpeeds(
@@ -261,8 +256,7 @@ public class DriveCommands {
                       for (int i = 0; i < 4; i++) {
                         wheelDelta += Math.abs(positions[i] - state.positions[i]) / 4.0;
                       }
-                      double wheelRadius =
-                          (state.gyroDelta * Drive.DRIVE_BASE_RADIUS) / wheelDelta;
+                      double wheelRadius = (state.gyroDelta * Drive.DRIVE_BASE_RADIUS) / wheelDelta;
 
                       NumberFormat formatter = new DecimalFormat("#0.000");
                       System.out.println(

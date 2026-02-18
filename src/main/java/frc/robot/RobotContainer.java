@@ -15,7 +15,6 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import static edu.wpi.first.units.Units.Degree;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,7 +41,6 @@ import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
-import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -217,13 +215,9 @@ public class RobotContainer {
     // Hood Commands
 
     // Auto Align
-    m_drivecontroller
-    .rightTrigger()
-    .whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_drivecontroller.rightTrigger().whileTrue(new SnapToTargetCommand(drive, shooter));
 
-    m_codriverController
-    .rightTrigger()
-    .whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_codriverController.rightTrigger().whileTrue(new SnapToTargetCommand(drive, shooter));
   }
 
   /**

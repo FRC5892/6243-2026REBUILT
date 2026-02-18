@@ -47,10 +47,7 @@ public class ShotCalculator {
   private Rotation2d hoodAngle = Rotation2d.kZero;
 
   public record ShotParameters(
-      boolean isValid,
-      Rotation2d robotYaw,
-      Rotation2d hoodAngle,
-      double flywheelSpeedRotPerSec) {}
+      boolean isValid, Rotation2d robotYaw, Rotation2d hoodAngle, double flywheelSpeedRotPerSec) {}
 
   private ShotParameters latestShot = null;
 
@@ -121,13 +118,11 @@ public class ShotCalculator {
                 robotRelativeVelocity.vyMetersPerSecond * phaseDelay,
                 robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
 
-    Translation2d target =
-        AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
+    Translation2d target = AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
 
     Logger.recordOutput("ShotCalculator/Target", new Pose2d(target, Rotation2d.kZero));
 
-    double robotToTargetDistance =
-        target.getDistance(estimatedPose.getTranslation());
+    double robotToTargetDistance = target.getDistance(estimatedPose.getTranslation());
 
     double robotVelocityX = robotVelocity.vxMetersPerSecond;
     double robotVelocityY = robotVelocity.vyMetersPerSecond;
@@ -146,12 +141,10 @@ public class ShotCalculator {
               estimatedPose.getTranslation().plus(new Translation2d(offsetX, offsetY)),
               estimatedPose.getRotation());
 
-      lookaheadDistance =
-          target.getDistance(lookaheadPose.getTranslation());
+      lookaheadDistance = target.getDistance(lookaheadPose.getTranslation());
     }
 
-    robotYaw =
-        target.minus(lookaheadPose.getTranslation()).getAngle();
+    robotYaw = target.minus(lookaheadPose.getTranslation()).getAngle();
 
     hoodAngle = shotHoodAngleMap.get(lookaheadDistance);
 
