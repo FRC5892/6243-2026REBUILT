@@ -1,24 +1,33 @@
 package frc.robot.commands.shooter;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.shooter.hood.Hood;
-import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShotCalculator;
 
-/** Snap the robot to face the target, adjust hood, and spin up flywheel while button held */
-public class SnapToTargetCommand {
+public class SnapToTargetCommand extends Command {
 
     private final Drive drive;
-    private final Hood hood;
     private final Shooter shooter;
 
-    public SnapToTargetCommand(Drive drive, Hood hood, Shooter shooter) {
+    private final PIDController yawPID = new PIDController(6.0, 0.0, 0.2);
+
+    public SnapToTargetCommand(Drive drive, Shooter shooter) {
         this.drive = drive;
-        this.hood = hood;
         this.shooter = shooter;
-        addRequirements(drive, hood, shooter);
+
+        // Require the actual subsystems
+        addRequirements(
+            drive,
+            shooter.getHood()   // flywheel already has its own default command
+        );
+
+        yawPID.enableContinuousInput(-Math.PI, Math.PI);
+        yawPID.setTolerance(Math.toRadians(1.0));
     }
 
     @Override
@@ -28,33 +37,30 @@ public class SnapToTargetCommand {
 
     @Override
     public void execute() {
-        // Calculate latest shot parameters
         var shot = ShotCalculator.getInstance().calculateShot();
-        if (!shot.isValid()) {
-            return; // Skip if target out of range
-        }
+        if (!shot.isValid()) return;
 
-        // Rotate robot toward target (yaw)
         Rotation2d desiredYaw = shot.robotYaw();
-        drive.setTargetYaw(desiredYaw); // drivetrain subsystem should implement PID yaw control
+        Rotation2d currentYaw = drive.getPose().getRotation();
 
-        // Set hood angle
-        hood.requestAngle(shot.hoodAngle());
+        double omega = yawPID.calculate(
+                currentYaw.getRadians(),
+                desiredYaw.getRadians());
 
-        // Set flywheel speed
-        shooter.setFlywheelSpeed(shot.flywheelSpeedRotPerSec());
+        // rotate robot only
+        drive.runVelocity(new ChassisSpeeds(0.0, 0.0, omega));
+
+        // hood is manual
+        shooter.getHood().requestAngle(shot.hoodAngle());
     }
 
     @Override
     public boolean isFinished() {
-        // Never finishes on its own; ends when button released
         return false;
     }
 
     @Override
     public void end(boolean interrupted) {
-        // Optionally stop rotation and flywheel if you want when button released
-        drive.stopYawControl();
-        shooter.stopFlywheel();
+        drive.runVelocity(new ChassisSpeeds());
     }
 }

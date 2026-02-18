@@ -11,10 +11,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.RobotState;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
 
-/** Shot calculator modified for single-shooter robot rotation (yaw) instead of turret */
+/** Robot-aim version of 6328-style shot calculator */
 public class ShotCalculator {
   private static ShotCalculator instance;
 
@@ -34,28 +34,6 @@ public class ShotCalculator {
     return instance;
   }
 
-  private Rotation2d robotYaw; // robot rotation to target
-  private Rotation2d hoodAngle = Rotation2d.kZero;
-
-  public record ShotParameters(
-      boolean isValid,
-      Rotation2d robotYaw,
-      Rotation2d hoodAngle,
-      double flywheelSpeedRotPerSec) {}
-
-  // Cache parameters
-  private ShotParameters latestShot = null;
-
-  private static final double minDistance;
-  private static final double maxDistance;
-  private static final double phaseDelay;
-  private static final InterpolatingTreeMap<Double, Rotation2d> shotHoodAngleMap =
-      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
-  private static final InterpolatingDoubleTreeMap shotFlywheelSpeedMap =
-      new InterpolatingDoubleTreeMap();
-  private static final InterpolatingDoubleTreeMap timeOfFlightMap =
-      new InterpolatingDoubleTreeMap();
-
   private static final Translation2d rightTarget =
       AllianceFlipUtil.apply(new Translation2d(1.5, 1.5));
 
@@ -65,12 +43,35 @@ public class ShotCalculator {
   private static final Translation2d centerTarget =
       new Translation2d(rightTarget.getX(), LinesHorizontal.center);
 
+  private Rotation2d robotYaw;
+  private Rotation2d hoodAngle = Rotation2d.kZero;
+
+  public record ShotParameters(
+      boolean isValid,
+      Rotation2d robotYaw,
+      Rotation2d hoodAngle,
+      double flywheelSpeedRotPerSec) {}
+
+  private ShotParameters latestShot = null;
+
+  private static final double minDistance;
+  private static final double maxDistance;
+  private static final double phaseDelay;
+
+  private static final InterpolatingTreeMap<Double, Rotation2d> shotHoodAngleMap =
+      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
+
+  private static final InterpolatingDoubleTreeMap shotFlywheelSpeedMap =
+      new InterpolatingDoubleTreeMap();
+
+  private static final InterpolatingDoubleTreeMap timeOfFlightMap =
+      new InterpolatingDoubleTreeMap();
+
   static {
     minDistance = 1.34;
     maxDistance = 5.60;
     phaseDelay = 0.03;
 
-    // Hood angles (degrees from vertical)
     shotHoodAngleMap.put(1.34, Rotation2d.fromDegrees(19.0));
     shotHoodAngleMap.put(1.78, Rotation2d.fromDegrees(19.0));
     shotHoodAngleMap.put(2.17, Rotation2d.fromDegrees(24.0));
@@ -82,7 +83,6 @@ public class ShotCalculator {
     shotHoodAngleMap.put(5.57, Rotation2d.fromDegrees(32.0));
     shotHoodAngleMap.put(5.60, Rotation2d.fromDegrees(35.0));
 
-    // Flywheel speeds (rotations per second)
     shotFlywheelSpeedMap.put(1.34, 210.0);
     shotFlywheelSpeedMap.put(1.78, 220.0);
     shotFlywheelSpeedMap.put(2.17, 220.0);
@@ -94,7 +94,6 @@ public class ShotCalculator {
     shotFlywheelSpeedMap.put(5.57, 275.0);
     shotFlywheelSpeedMap.put(5.60, 290.0);
 
-    // Time of flight map
     timeOfFlightMap.put(5.68, 1.16);
     timeOfFlightMap.put(4.55, 1.12);
     timeOfFlightMap.put(3.15, 1.11);
@@ -105,12 +104,16 @@ public class ShotCalculator {
   }
 
   public ShotParameters calculateShot() {
-    if (latestShot != null) return latestShot;
+    if (latestShot != null) {
+      return latestShot;
+    }
 
     Pose2d estimatedPose = RobotState.getInstance().getRobotPosition();
     ChassisSpeeds robotRelativeVelocity = RobotState.getInstance().getRobotRelativeVelocity();
+
     ChassisSpeeds robotVelocity =
         ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeVelocity, estimatedPose.getRotation());
+
     estimatedPose =
         estimatedPose.exp(
             new Twist2d(
@@ -118,37 +121,50 @@ public class ShotCalculator {
                 robotRelativeVelocity.vyMetersPerSecond * phaseDelay,
                 robotRelativeVelocity.omegaRadiansPerSecond * phaseDelay));
 
-    Translation2d target = AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
-    Logger.recordOutput("ShotCalculator/Target", target);
+    Translation2d target =
+        AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
 
-    // Distance from robot center to target
-    double distanceToTarget = target.getDistance(estimatedPose.getTranslation());
+    Logger.recordOutput("ShotCalculator/Target", new Pose2d(target, Rotation2d.kZero));
 
-    // Account for robot motion during shot
-    double timeOfFlight;
-    Translation2d lookaheadTranslation = estimatedPose.getTranslation();
+    double robotToTargetDistance =
+        target.getDistance(estimatedPose.getTranslation());
+
+    double robotVelocityX = robotVelocity.vxMetersPerSecond;
+    double robotVelocityY = robotVelocity.vyMetersPerSecond;
+
+    Pose2d lookaheadPose = estimatedPose;
+    double lookaheadDistance = robotToTargetDistance;
+
     for (int i = 0; i < 20; i++) {
-      timeOfFlight = timeOfFlightMap.get(distanceToTarget);
-      double offsetX = robotVelocity.vxMetersPerSecond * timeOfFlight;
-      double offsetY = robotVelocity.vyMetersPerSecond * timeOfFlight;
-      lookaheadTranslation = lookaheadTranslation.plus(new Translation2d(offsetX, offsetY));
-      distanceToTarget = target.getDistance(lookaheadTranslation);
+      double timeOfFlight = timeOfFlightMap.get(lookaheadDistance);
+
+      double offsetX = robotVelocityX * timeOfFlight;
+      double offsetY = robotVelocityY * timeOfFlight;
+
+      lookaheadPose =
+          new Pose2d(
+              estimatedPose.getTranslation().plus(new Translation2d(offsetX, offsetY)),
+              estimatedPose.getRotation());
+
+      lookaheadDistance =
+          target.getDistance(lookaheadPose.getTranslation());
     }
 
-    // Robot yaw to target
-    robotYaw = target.minus(lookaheadTranslation).getAngle();
-    hoodAngle = shotHoodAngleMap.get(distanceToTarget);
+    robotYaw =
+        target.minus(lookaheadPose.getTranslation()).getAngle();
+
+    hoodAngle = shotHoodAngleMap.get(lookaheadDistance);
 
     latestShot =
         new ShotParameters(
-            distanceToTarget >= minDistance && distanceToTarget <= maxDistance,
+            lookaheadDistance >= minDistance && lookaheadDistance <= maxDistance,
             robotYaw,
             hoodAngle,
-            shotFlywheelSpeedMap.get(distanceToTarget));
+            shotFlywheelSpeedMap.get(lookaheadDistance));
 
     Logger.recordOutput("ShotCalculator/LatestShot", latestShot);
-    Logger.recordOutput("ShotCalculator/LookaheadPose", lookaheadTranslation);
-    Logger.recordOutput("ShotCalculator/DistanceToTarget", distanceToTarget);
+    Logger.recordOutput("ShotCalculator/LookaheadPose", lookaheadPose);
+    Logger.recordOutput("ShotCalculator/Distance", lookaheadDistance);
 
     return latestShot;
   }
