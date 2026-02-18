@@ -15,6 +15,7 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import static edu.wpi.first.units.Units.Degree;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -23,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
-import frc.robot.commands.shooter.ShootCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
@@ -35,17 +35,13 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.shooter.ShotCalculator;
-import frc.robot.subsystems.shooter.ShotCalculator.Goal;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
-// TODO: add commands to robot container
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
+import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -174,17 +170,36 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(drive,() -> -m_drivecontroller.getLeftY(),() -> -m_drivecontroller.getLeftX(),() -> -m_drivecontroller.getRightX()));
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -m_drivecontroller.getLeftY(),
+            () -> -m_drivecontroller.getLeftX(),
+            () -> -m_drivecontroller.getRightX()));
 
     // Lock to 0° when A button is held
-    m_drivecontroller.a().whileTrue(DriveCommands.joystickDriveAtAngle(drive,() -> -m_drivecontroller.getLeftY(),() -> -m_drivecontroller.getLeftX(),() -> Rotation2d.kZero));
+    m_drivecontroller
+        .a()
+        .whileTrue(
+            DriveCommands.joystickDriveAtAngle(
+                drive,
+                () -> -m_drivecontroller.getLeftY(),
+                () -> -m_drivecontroller.getLeftX(),
+                () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
     m_drivecontroller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when Y button is pressed
-    m_drivecontroller.y().onTrue(Commands.runOnce(() ->drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),drive).ignoringDisable(true));
-    
+    m_drivecontroller
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                    drive)
+                .ignoringDisable(true));
+
     // Shooter Commands
     m_drivecontroller.rightBumper().whileTrue(shooter.shoot());
     m_codriverController.rightBumper().whileTrue(shooter.shoot());
