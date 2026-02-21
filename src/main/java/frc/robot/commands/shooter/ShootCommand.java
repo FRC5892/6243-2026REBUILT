@@ -16,24 +16,21 @@ public class ShootCommand {
    * @return a Command ready to be scheduled
    */
   public static Command shoot(Shooter shooter, Indexer indexer) {
-    return shooter
-        .getFlywheel()
-        .run(
-            () -> {
-              // Calculate shot
-              var shot = frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
+  return shooter
+      .getFlywheel()
+      .run(
+          () -> {
+            var shot =
+                frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
 
-              // Apply flywheel and hood setpoints
-              shooter
-                  .getFlywheel()
-                  .setSetpoints(
-                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()),
-                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
-              shooter.getHood().requestAngle(shot.hoodAngle());
+            shooter
+                .getFlywheel()
+                .setSetpoints(
+                    RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()),
+                    RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
 
-              // Only run indexer if flywheel and hood are ready, and robot is facing correct
-              // rotation
-              indexer.runWhenShooterReady(shooter).execute();
-            });
+            shooter.getHood().requestAngle(shot.hoodAngle());
+          })
+      .alongWith(indexer.runWhenShooterReady(shooter));
   }
 }
