@@ -287,6 +287,7 @@ public class Hood extends SubsystemBase {
   private Rotation2d positionToAngle(Angle position) {
     return new Rotation2d(position.baseUnitMagnitude() + downPosition.get().baseUnitMagnitude());
   }
+
   /** Returns the current hood angle relative to vertical down. */
   public Rotation2d getAngle() {
     return positionToAngle(motor.getPosition());

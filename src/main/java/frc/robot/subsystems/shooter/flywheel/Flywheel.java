@@ -83,8 +83,9 @@ public class Flywheel extends SubsystemBase {
     // Clear AFTER everything uses the cached value
     ShotCalculator.getInstance().clearCache();
   }
+
   /** Returns the current flywheel velocity in units consistent with ShotCalculator. */
-public double getVelocity() {
+  public double getVelocity() {
     return rightMotor.getVelocity().in(RotationsPerSecond);
   }
 }
