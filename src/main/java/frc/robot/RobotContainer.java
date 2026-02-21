@@ -201,8 +201,9 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Shooter Commands
-    m_codriverController.rightBumper().whileTrue(shooter.shoot().alongWith(indexer.feed()));
-
+    m_codriverController.leftTrigger().whileTrue(
+        frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer)
+    );
     // Climb Commands
     m_codriverController.povUp().whileTrue(climb.climbUpCommand());
     m_codriverController.povDown().whileTrue(climb.climbDownCommand());
