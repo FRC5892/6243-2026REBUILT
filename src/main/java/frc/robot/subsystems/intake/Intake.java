@@ -68,11 +68,6 @@ public class Intake {
     return slap.retractCommand();
   }
 
-  /** Stop the slap actuator. */
-  public Command stopSlap() {
-    return slap.stop();
-  }
-
   /** Deploy intake: rollers forward + slap down. */
   public Command deploy() {
     return Commands.parallel(runRollerForward(), extendSlap());
