@@ -69,6 +69,9 @@ public class Hood extends SubsystemBase {
   /** The target position of the motor. 0 is the hood resting on the robot. */
   @AutoLogOutput private final MutAngle targetPosition = Degrees.mutable(0);
 
+  // Track the current hood angle from ShotCalculator for atSetpoint
+  private Rotation2d targetHoodAngle = Rotation2d.fromDegrees(0.0);
+
   @AutoLogOutput private boolean positionControl = false;
   @AutoLogOutput @Setter private boolean homed = false;
   @AutoLogOutput @Getter private boolean atSetpoint = false;
@@ -106,7 +109,9 @@ public class Hood extends SubsystemBase {
     return run(
         () -> {
           if (homed) {
-            this.requestAngle(ShotCalculator.getInstance().calculateShot().hoodAngle());
+            var shot = ShotCalculator.getInstance().calculateShot();
+            targetHoodAngle = shot.hoodAngle(); // store the target
+            this.requestAngle(targetHoodAngle);
           }
         });
   }
@@ -230,8 +235,11 @@ public class Hood extends SubsystemBase {
     motor.periodic();
     reverseLimit.periodic();
     forwardLimit.periodic();
-    atSetpoint = motor.atSetpoint(targetPosition, tolerance.get());
-    Logger.recordOutput("Hood/Angle", positionToAngle(motor.getPosition()).getDegrees(), "deg");
+
+    // Use .in(Degrees) for MutAngle tolerance
+    atSetpoint =
+        Math.abs(positionToAngle(motor.getPosition()).getDegrees() - targetHoodAngle.getDegrees())
+            < tolerance.get().in(Degrees);
 
     ShotCalculator.getInstance().clearCache();
     LoggedTunableNumber.ifChanged(this, (value) -> this.updateTrenchAreas(), stowTrenchGapOffset);
@@ -278,5 +286,9 @@ public class Hood extends SubsystemBase {
    */
   private Rotation2d positionToAngle(Angle position) {
     return new Rotation2d(position.baseUnitMagnitude() + downPosition.get().baseUnitMagnitude());
+  }
+  /** Returns the current hood angle relative to vertical down. */
+  public Rotation2d getAngle() {
+    return positionToAngle(motor.getPosition());
   }
 }

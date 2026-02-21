@@ -2,7 +2,9 @@ package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants;
+import frc.robot.RobotState;
 import frc.robot.subsystems.shooter.flywheel.Flywheel;
 import frc.robot.subsystems.shooter.hood.Hood;
 import frc.robot.util.LoggedDIO.HardwareDIO;
@@ -14,7 +16,6 @@ import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import lombok.Getter;
 
-/** Container for shooting bits. This class will initialize the proper IO interfaces. */
 public class Shooter {
   @Getter private final Flywheel flywheel;
   @Getter private final Hood hood;
@@ -22,10 +23,10 @@ public class Shooter {
   public Shooter(CANBus bus) {
     switch (Constants.currentMode) {
       case REAL -> {
-        // Real flywheel motors: left and right
         PhoenixTalonFX leftFlywheel =
             new PhoenixTalonFX(
                 25, bus, "FlywheelLeft", new PhoenixTalonFollower(26, MotorAlignmentValue.Aligned));
+
         PhoenixTalonFX rightFlywheel = new PhoenixTalonFX(26, bus, "FlywheelRight");
 
         flywheel = new Flywheel(rightFlywheel, leftFlywheel);
@@ -38,7 +39,6 @@ public class Shooter {
       }
 
       case SIM -> {
-        // Sim flywheel motors: left and right
         TalonFXFlywheelSim leftFlywheel =
             new TalonFXFlywheelSim(
                 25,
@@ -47,6 +47,7 @@ public class Shooter {
                 0.0007567661,
                 1 / 1.25,
                 new PhoenixTalonFollower(26, MotorAlignmentValue.Aligned));
+
         TalonFXSimpleMotorSim rightFlywheel =
             new TalonFXSimpleMotorSim(26, bus, "FlywheelRight", 0.0007567661, 1 / 1.25);
 
@@ -60,7 +61,6 @@ public class Shooter {
       }
 
       default -> {
-        // NOOP flywheel motors: left and right
         NoOppTalonFX leftFlywheel = new NoOppTalonFX("FlywheelLeft", 1);
         NoOppTalonFX rightFlywheel = new NoOppTalonFX("FlywheelRight", 1);
 
@@ -73,5 +73,33 @@ public class Shooter {
                 new HardwareDIO("HoodForward", 2));
       }
     }
+  }
+
+  /** Main readiness check. */
+  public boolean isReadyToShoot() {
+    var shot = ShotCalculator.getInstance().calculateShot();
+
+    if (!shot.isValid()) return false;
+
+    return flywheelMatches(shot.flywheelSpeedRotPerSec())
+        && hoodMatches(shot.hoodAngle())
+        && rotationMatches(shot.robotYaw());
+  }
+
+  /** ---------------- MATCH CHECKS ---------------- */
+  private boolean flywheelMatches(double target) {
+    double actual = flywheel.getVelocity(); // must exist in Flywheel
+    return Math.abs(actual - target) < 100;
+  }
+
+  private boolean hoodMatches(Rotation2d target) {
+    Rotation2d actual = hood.getAngle(); // must exist in Hood
+    return Math.abs(actual.minus(target).getDegrees()) < 1.0;
+  }
+
+  private boolean rotationMatches(Rotation2d target) {
+    Rotation2d current = RobotState.getInstance().getRobotPosition().getRotation();
+
+    return Math.abs(current.minus(target).getDegrees()) < 2.0;
   }
 }

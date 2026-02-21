@@ -24,6 +24,10 @@ public class Flywheel extends SubsystemBase {
   private final MotionMagicVelocityTorqueCurrentFOC leftMMControl =
       new MotionMagicVelocityTorqueCurrentFOC(0);
 
+  // Store targets explicitly (this is the important part you were missing)
+  private AngularVelocity targetRightVelocity = RotationsPerSecond.of(0);
+  private AngularVelocity targetLeftVelocity = RotationsPerSecond.of(0);
+
   @Getter @AutoLogOutput private boolean rightAtSetpoint = false;
   @Getter @AutoLogOutput private boolean leftAtSetpoint = false;
 
@@ -37,6 +41,9 @@ public class Flywheel extends SubsystemBase {
   }
 
   public void setSetpoints(AngularVelocity rightVelocity, AngularVelocity leftVelocity) {
+    targetRightVelocity = rightVelocity;
+    targetLeftVelocity = leftVelocity;
+
     rightMotor.setControl(rightMMControl.withVelocity(rightVelocity));
     leftMotor.setControl(leftMMControl.withVelocity(leftVelocity));
   }
@@ -44,11 +51,16 @@ public class Flywheel extends SubsystemBase {
   public Command aimCommand() {
     return run(
         () -> {
-          double speed = ShotCalculator.getInstance().calculateShot().flywheelSpeedRotPerSec();
+          var shot = ShotCalculator.getInstance().calculateShot();
 
-          // Both flywheels controlled independently (can be changed later if you want offsets)
+          double speed = shot.flywheelSpeedRotPerSec();
+
           setSetpoints(RotationsPerSecond.of(speed), RotationsPerSecond.of(speed));
         });
+  }
+
+  public boolean isAtTarget() {
+    return rightAtSetpoint && leftAtSetpoint;
   }
 
   @Override
@@ -56,19 +68,23 @@ public class Flywheel extends SubsystemBase {
     rightMotor.periodic();
     leftMotor.periodic();
 
-    // Replace atSetpoint with a tolerance check manually
     rightAtSetpoint =
         Math.abs(
                 rightMotor.getVelocity().in(RotationsPerSecond)
-                    - rightMMControl.getVelocityMeasure().in(RotationsPerSecond))
+                    - targetRightVelocity.in(RotationsPerSecond))
             < tolerance.get().in(RotationsPerSecond);
 
     leftAtSetpoint =
         Math.abs(
                 leftMotor.getVelocity().in(RotationsPerSecond)
-                    - leftMMControl.getVelocityMeasure().in(RotationsPerSecond))
+                    - targetLeftVelocity.in(RotationsPerSecond))
             < tolerance.get().in(RotationsPerSecond);
 
+    // Clear AFTER everything uses the cached value
     ShotCalculator.getInstance().clearCache();
+  }
+  /** Returns the current flywheel velocity in units consistent with ShotCalculator. */
+public double getVelocity() {
+    return rightMotor.getVelocity().in(RotationsPerSecond);
   }
 }

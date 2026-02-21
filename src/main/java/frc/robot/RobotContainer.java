@@ -201,14 +201,11 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Shooter Commands
-    m_drivecontroller.rightBumper().whileTrue(shooter.shoot());
-    m_codriverController.rightBumper().whileTrue(shooter.shoot());
+    m_codriverController.rightBumper().whileTrue(shooter.shoot().alongWith(indexer.feed()));
 
     // Climb Commands
-    m_drivecontroller.povUp().whileTrue(Climb.climbUpCommand());
-    m_drivecontroller.povDown().whileTrue(Climb.climbDownCommand());
-    m_codriverController.povUp().whileTrue(Climb.climbUpCommand());
-    m_codriverController.povDown().whileTrue(Climb.climbDownCommand());
+    m_codriverController.povUp().whileTrue(climb.climbUpCommand());
+    m_codriverController.povDown().whileTrue(climb.climbDownCommand());
 
     // Intake Commands
 

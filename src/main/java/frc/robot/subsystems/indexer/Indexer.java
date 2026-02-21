@@ -3,9 +3,11 @@ package frc.robot.subsystems.indexer;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.indexer.rollersubsystems.FeederRollerSubsystem;
 import frc.robot.subsystems.indexer.rollersubsystems.IndexerRollerSubsystem;
+import frc.robot.subsystems.shooter.Shooter; // <-- YOU NEED THIS
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
@@ -23,12 +25,9 @@ public class Indexer {
 
     switch (Constants.currentMode) {
       case REAL -> {
-        // Feeder (single motor)
         PhoenixTalonFX feederMotor = new PhoenixTalonFX(30, bus, "Feeder");
-
         feeder = new FeederRollerSubsystem(feederMotor);
 
-        // Indexer rollers (right is primary, left follows)
         PhoenixTalonFX rightIndexer = new PhoenixTalonFX(31, bus, "IndexerRight");
 
         PhoenixTalonFX leftIndexer =
@@ -40,7 +39,6 @@ public class Indexer {
 
       case SIM -> {
         TalonFXSimpleMotorSim feederMotor = new TalonFXSimpleMotorSim(30, bus, "Feeder", 0.001, 1);
-
         feeder = new FeederRollerSubsystem(feederMotor);
 
         TalonFXSimpleMotorSim rightIndexer =
@@ -54,11 +52,9 @@ public class Indexer {
 
       default -> {
         NoOppTalonFX feederMotor = new NoOppTalonFX("Feeder", 0);
-
         feeder = new FeederRollerSubsystem(feederMotor);
 
         NoOppTalonFX rightIndexer = new NoOppTalonFX("IndexerRight", 0);
-
         NoOppTalonFX leftIndexer = new NoOppTalonFX("IndexerLeft", 0);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
@@ -66,14 +62,25 @@ public class Indexer {
     }
   }
 
-  /**
-   * This should be scheduled whenever the shooter is actively firing. It runs feeder + rollers and
-   * lets the shot stagger alternate paths.
-   */
+  /** Runs indexer ONLY when shooter is ready (flywheel speed + hood angle + robot rotation). */
+  public Command runWhenShooterReady(Shooter shooter) {
+    return Commands.either(
+        runForShooting(), stopAll(), shooter::isReadyToShoot // <-- YOU implement this
+        );
+  }
+
+  /** Basic shooting command (no gating). */
   public Command runForShooting() {
     return feeder
         .runRoller(RollerSubsystem.Direction.FORWARD)
         .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD));
+  }
+
+  /** Optional: staged feeding (prevents double-feeding / jams). */
+  public Command runStagedFeed() {
+    return Commands.sequence(
+        indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD).withTimeout(0.15),
+        feeder.runRoller(RollerSubsystem.Direction.FORWARD));
   }
 
   public Command stopAll() {
