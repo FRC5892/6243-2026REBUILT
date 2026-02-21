@@ -86,14 +86,14 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
-        intake =
-            new Intake(
-                new PhoenixTalonFX(30, rioCAN, "IntakeRoller"),
-                new PhoenixTalonFX(31, rioCAN, "IntakeSlapDown"));
         climb =
             new Climb(
                 new PhoenixTalonFX(13, rioCAN, "RightClimb"),
                 new PhoenixTalonFX(3, rioCAN, "LeftClimb"));
+
+        intake = new Intake(rioCAN);
+
+        indexer = new Indexer(rioCAN);
         break;
 
       case SIM:
@@ -110,14 +110,14 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        intake =
-            new Intake(
-                new TalonFXSimpleMotorSim(30, rioCAN, "IntakeRoller", 1, 1),
-                new TalonFXSimpleMotorSim(31, rioCAN, "IntakeSlap", 1, 1));
         climb =
             new Climb(
                 new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
                 new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
+      
+        intake = new Intake(rioCAN);
+
+        indexer = new Indexer(rioCAN);  
         break;
 
       default:
@@ -131,9 +131,11 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-        intake = new Intake(new NoOppTalonFX("IntakeRoller", 0), new NoOppTalonFX("IntakeSlap", 0));
-
         climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
+       
+        intake = new Intake(rioCAN);
+
+        indexer = new Indexer(rioCAN);
         break;
     }
     shooter = new Shooter(rioCAN);

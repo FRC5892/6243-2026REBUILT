@@ -1,6 +1,7 @@
 package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
@@ -27,17 +28,20 @@ public class Intake {
 
       case SIM -> {
         TalonFXSimpleMotorSim rollerMotor =
-            new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
+        new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
         roller = new IntakeRollerSubsystem(rollerMotor);
 
         TalonFXSimpleMotorSim slapMotor =
             new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
-        slap = new Slapdown(slapMotor);
+            slap = new Slapdown(slapMotor);      
       }
 
       default -> {
-        roller = new IntakeRollerSubsystem(new NoOppTalonFX("IntakeRoller", 0));
-        slap = new Slapdown(new NoOppTalonFX("Slapdown", 0));
+        NoOppTalonFX rollerMotor = new NoOppTalonFX("IntakeRoller", 0);
+        roller = new IntakeRollerSubsystem(rollerMotor);
+
+        NoOppTalonFX slapMotor = new NoOppTalonFX("Slapdown", 0);
+        slap = new Slapdown(slapMotor);
       }
     }
   }
