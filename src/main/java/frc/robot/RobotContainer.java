@@ -214,10 +214,8 @@ public class RobotContainer {
 
     // Hood Commands
 
-    // Auto Align
-    m_drivecontroller.rightTrigger().whileTrue(new SnapToTargetCommand(drive, shooter));
-
-    m_codriverController.rightTrigger().whileTrue(new SnapToTargetCommand(drive, shooter));
+    // Auto Align (co-driver A button)
+    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
   }
 
   /**
