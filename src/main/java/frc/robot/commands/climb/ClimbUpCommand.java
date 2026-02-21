@@ -6,13 +6,12 @@ import frc.robot.subsystems.climb.Climb;
 /** Command to move both climb motors up at the same time. */
 public class ClimbUpCommand {
 
-    public static Command create(Climb climb) {
-        return climb.startEnd(
-            () -> {
-                climb.climberLeftUp();
-                climb.climberRightUp();
-            },
-            climb::stopAllCommand
-        );
-    }
+  public static Command create(Climb climb) {
+    return climb.startEnd(
+        () -> {
+          climb.climberLeftUp();
+          climb.climberRightUp();
+        },
+        climb::stopAllCommand);
+  }
 }

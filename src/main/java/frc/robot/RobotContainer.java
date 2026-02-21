@@ -201,15 +201,16 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Shooter Commands
-    m_codriverController.leftTrigger().whileTrue(
-        frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer)
-    );
+    m_codriverController
+        .leftTrigger()
+        .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
     // Climb Commands
     m_codriverController.povUp().whileTrue(frc.robot.commands.climb.ClimbUpCommand.create(climb));
-    m_codriverController.povDown().whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
-    
-    // Intake Commands
+    m_codriverController
+        .povDown()
+        .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
 
+    // Intake Commands
 
     // Auto Align (co-driver A button)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
