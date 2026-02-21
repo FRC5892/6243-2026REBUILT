@@ -33,13 +33,7 @@ public class ShootCommand {
 
               // Only run indexer if flywheel and hood are ready, and robot is facing correct
               // rotation
-              if (shooter.isReadyToShoot()) {
-                // Run feeder + indexer rollers forward
-                indexer.runForShooting().schedule();
-              } else {
-                // Stop all indexer rollers if not ready
-                indexer.stopAll().schedule();
-              }
+              indexer.runWhenShooterReady(shooter).execute();
             });
   }
 }
