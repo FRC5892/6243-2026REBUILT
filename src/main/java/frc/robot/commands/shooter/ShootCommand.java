@@ -16,21 +16,20 @@ public class ShootCommand {
    * @return a Command ready to be scheduled
    */
   public static Command shoot(Shooter shooter, Indexer indexer) {
-  return shooter
-      .getFlywheel()
-      .run(
-          () -> {
-            var shot =
-                frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
+    return shooter
+        .getFlywheel()
+        .run(
+            () -> {
+              var shot = frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
 
-            shooter
-                .getFlywheel()
-                .setSetpoints(
-                    RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()),
-                    RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
+              shooter
+                  .getFlywheel()
+                  .setSetpoints(
+                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()),
+                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
 
-            shooter.getHood().requestAngle(shot.hoodAngle());
-          })
-      .alongWith(indexer.runWhenShooterReady(shooter));
+              shooter.getHood().requestAngle(shot.hoodAngle());
+            })
+        .alongWith(indexer.runWhenShooterReady(shooter));
   }
 }
