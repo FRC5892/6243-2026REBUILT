@@ -1,9 +1,9 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 
 /** Controls the slap-down actuator on the intake. */
 public class Slapdown extends SubsystemBase {
@@ -11,7 +11,7 @@ public class Slapdown extends SubsystemBase {
   private final LoggedTalonFX motor;
   private final DutyCycleOut output = new DutyCycleOut(0);
 
-  private static final double EXTEND_OUTPUT = 0.75;  // adjust for real hardware
+  private static final double EXTEND_OUTPUT = 0.75; // adjust for real hardware
   private static final double RETRACT_OUTPUT = -0.75;
 
   public Slapdown(LoggedTalonFX motor) {

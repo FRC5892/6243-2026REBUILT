@@ -114,10 +114,10 @@ public class RobotContainer {
             new Climb(
                 new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1),
                 new TalonFXSimpleMotorSim(3, rioCAN, "LeftClimb", 1, 1));
-      
+
         intake = new Intake(rioCAN);
 
-        indexer = new Indexer(rioCAN);  
+        indexer = new Indexer(rioCAN);
         break;
 
       default:
@@ -132,7 +132,7 @@ public class RobotContainer {
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
         climb = new Climb(new NoOppTalonFX("RightCLimb", 0), new NoOppTalonFX("LeftCLimb", 0));
-       
+
         intake = new Intake(rioCAN);
 
         indexer = new Indexer(rioCAN);
@@ -213,22 +213,14 @@ public class RobotContainer {
         .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
 
     // Intake Commands
-    m_codriverController
-        .rightTrigger()
-        .whileTrue(intake.deploy());
+    m_codriverController.rightTrigger().whileTrue(intake.deploy());
 
-    m_codriverController
-        .rightBumper()
-        .whileTrue(intake.retract());
+    m_codriverController.rightBumper().whileTrue(intake.retract());
 
     // Indexer Commands
-    m_codriverController
-        .leftBumper()
-        .whileTrue(indexer.runForShooting());
+    m_codriverController.leftBumper().whileTrue(indexer.runForShooting());
 
-    m_codriverController
-        .b()
-        .whileTrue(indexer.stopAll());
+    m_codriverController.b().whileTrue(indexer.stopAll());
 
     // Auto Align (co-driver A button)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
