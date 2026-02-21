@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.indexer.rollersubsystems.FeederRollerSubsystem;
 import frc.robot.subsystems.indexer.rollersubsystems.IndexerRollerSubsystem;
-import frc.robot.subsystems.shooter.Shooter; // <-- YOU NEED THIS
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
