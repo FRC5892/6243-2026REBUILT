@@ -15,6 +15,8 @@ public class Intake {
   @Getter private final IntakeRollerSubsystem roller;
   @Getter private final Slapdown slap;
 
+  private boolean isDeployed = false;
+
   public Intake(CANBus bus) {
     switch (Constants.currentMode) {
       case REAL -> {
@@ -30,7 +32,8 @@ public class Intake {
             new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
+        TalonFXSimpleMotorSim slapMotor =
+            new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
         slap = new Slapdown(slapMotor);
       }
 
@@ -44,12 +47,12 @@ public class Intake {
     }
   }
 
-  /** Run the intake roller forward. */
+  /** Run the intake roller forward (INTAKE IN). */
   public Command runRollerForward() {
     return roller.runRoller(frc.robot.util.RollerSubsystem.Direction.FORWARD);
   }
 
-  /** Run the intake roller reverse. */
+  /** Run the intake roller reverse (OUTTAKE). */
   public Command runRollerReverse() {
     return roller.runRoller(frc.robot.util.RollerSubsystem.Direction.REVERSE);
   }
@@ -69,13 +72,34 @@ public class Intake {
     return slap.retractCommand();
   }
 
-  /** Deploy intake: rollers forward + slap down. */
+  /** Deploy intake (slap down only). */
   public Command deploy() {
+    return extendSlap();
+  }
+
+  /** Retract intake (slap up + stop roller). */
+  public Command retract() {
+    return Commands.parallel(stopRoller(), retractSlap());
+  }
+
+  /** Toggle intake up/down. */
+  public Command toggle() {
+    return Commands.runOnce(
+            () -> isDeployed = !isDeployed)
+        .andThen(
+            Commands.either(
+                deploy(),
+                retract(),
+                () -> isDeployed));
+  }
+
+  /** Intake IN (forward + ensure deployed). */
+  public Command intakeIn() {
     return Commands.parallel(runRollerForward(), extendSlap());
   }
 
-  /** Retract intake: rollers stopped + slap retracted. */
-  public Command retract() {
-    return Commands.parallel(stopRoller(), retractSlap());
+  /** Intake OUT (reverse + ensure deployed). */
+  public Command intakeOut() {
+    return Commands.parallel(runRollerReverse(), extendSlap());
   }
 }
