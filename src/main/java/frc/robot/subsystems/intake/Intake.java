@@ -32,8 +32,7 @@ public class Intake {
             new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        TalonFXSimpleMotorSim slapMotor =
-            new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
+        TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
         slap = new Slapdown(slapMotor);
       }
 
@@ -84,13 +83,8 @@ public class Intake {
 
   /** Toggle intake up/down. */
   public Command toggle() {
-    return Commands.runOnce(
-            () -> isDeployed = !isDeployed)
-        .andThen(
-            Commands.either(
-                deploy(),
-                retract(),
-                () -> isDeployed));
+    return Commands.runOnce(() -> isDeployed = !isDeployed)
+        .andThen(Commands.either(deploy(), retract(), () -> isDeployed));
   }
 
   /** Intake IN (forward + ensure deployed). */
