@@ -14,12 +14,9 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
@@ -158,9 +155,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // TODO: Configure the button bindings
-    configureButtonBindings();
   }
 
   /**
@@ -170,7 +164,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command, normal field-relative drive
+    // ================= DRIVE =================
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
@@ -178,52 +172,62 @@ public class RobotContainer {
             () -> -m_drivecontroller.getLeftX(),
             () -> -m_drivecontroller.getRightX()));
 
-    // Lock to 0° when A button is held
-    m_drivecontroller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -m_drivecontroller.getLeftY(),
-                () -> -m_drivecontroller.getLeftX(),
-                () -> Rotation2d.kZero));
+    // Driver: Auto align (hold A)
+    m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter));
 
-    // Switch to X pattern when X button is pressed
-    m_drivecontroller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // Driver: Hood stow (X)
+    m_drivecontroller.x().whileTrue(shooter.getHood().stowCommand());
 
-    // Reset gyro to 0° when Y button is pressed
-    m_drivecontroller
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // ================= DRIVER INTAKE =================
 
-    // Shooter Commands
-    m_codriverController
-        .leftTrigger()
-        .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
-    // Climb Commands
+    // Toggle intake up/down (B)
+    m_drivecontroller.b().toggleOnTrue(intake.deploy());
+
+    // Hold to intake IN (left bumper)
+    m_drivecontroller.leftBumper().whileTrue(intake.intakeIn());
+
+    // Hold to intake OUT (right bumper)
+    m_drivecontroller.rightBumper().whileTrue(intake.intakeOut());
+
+    // ================= CODRIVER =================
+
+    // Climb
     m_codriverController.povUp().whileTrue(frc.robot.commands.climb.ClimbUpCommand.create(climb));
+
     m_codriverController
         .povDown()
         .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
 
-    // Intake Commands
-    m_codriverController.rightTrigger().whileTrue(intake.deploy());
+    // Emergency indexer
+    m_codriverController.rightTrigger().whileTrue(indexer.runForShooting());
+    m_codriverController.leftTrigger().whileTrue(indexer.stopAll());
 
-    m_codriverController.rightBumper().whileTrue(intake.retract());
+    // Manual hood (left joystick Y)
+    shooter
+        .getHood()
+        .setDefaultCommand(shooter.getHood().manualControl(() -> -m_codriverController.getLeftY()));
 
-    // Indexer Commands
-    m_codriverController.leftBumper().whileTrue(indexer.runForShooting());
+    // Manual shoot (right joystick up only)
+    m_codriverController
+        .rightStick()
+        .whileTrue(shooter.getFlywheel().manualShoot(() -> -m_codriverController.getRightY()));
 
-    m_codriverController.b().whileTrue(indexer.stopAll());
-
-    // Auto Align (co-driver A button)
+    // Auto align (A)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
+
+    // Intake toggle (left bumper)
+    m_codriverController.leftBumper().toggleOnTrue(intake.deploy());
+
+    // Intake IN (X hold)
+    m_codriverController.x().whileTrue(intake.intakeIn());
+
+    // Intake OUT (B hold)
+    m_codriverController.b().whileTrue(intake.intakeOut());
+
+    // Shoot / unload (right bumper hold)
+    m_codriverController
+        .rightBumper()
+        .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
   }
 
   /**
