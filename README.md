@@ -10,14 +10,18 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 
 ## Controls
 
-| Function           | Controller | Button / Stick           | Description            |
-|--------------------|------------|--------------------------|------------------------|
-| Drive (field-oriented) | Driver     | Left Stick (X/Y)         | Robot translation      |
-| Drive (field-oriented) | Driver     | Right Stick (X/Y)  | Robot rotation         |
-|                    |            |                          |                        |
-|                    |            |                          |                        |
-|                    |            |                          |                        |
-|                    |            |                          |                        |
+**Driver Controls**
+
+| Function           | Button / Stick           | Description            | LED Indicator Color  |
+|--------------------|--------------------------|------------------------|---|
+| Drive (field-oriented) | Left Stick (X/Y)         | Robot translation      | N/A |
+| Drive (field-oriented) | Right Stick (X/Y)  | Robot rotation         | N/A |
+| Slapdown Intake | B (toggle)           | Raising and lowering the slapdown intake | Green when in lowered position|
+| Intake in             | Left bumper (hold down) | Intakes balls into the hopper                       | N/A |
+| Intake out                   | Right bumper (hold down)                       | Outtakes balls from the hopper                       | N/A |
+| Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
+| Stow hood                          | X (press)                         | Stows hood for going under trench. Not a toggle.   | Blue when hood is stowed |
+| Beach Alert                          | Y (hold)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
 
 
 ---
@@ -28,10 +32,8 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 |---------------------|--------|--------------------------------------------------|
 |                     |   #    |                                                  |
 | Indexer             |   #    |                                                  |
-| Feeder              |   #    |                                                  |
-| Left Climb Arm      |   #    |                                                  |
-| Right Climb Arm     |   #    |                                                  |
-| Hopper Rollers      |   #    |                                                  |
+| Feeder and hopper rollers |   #    |                                                  |
+| Climb Arm           |   #    |                                                  |
 | Intake Rollers      |   #    |                                                  |
 | Intake Slapdown     |   #    |                                                  |
 | Front Left Drive    |   #    | Swerve Module                                    |
