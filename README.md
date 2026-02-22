@@ -42,3 +42,5 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 | Back Left Steer     |   #    | Swerve Module                                    |
 | Back Right Drive    |   #    | Swerve Module                                    |
 | Back Right Steer    |   #    | Swerve Module                                    |
+
+// TODO: Add color flashing key for the LEDS
