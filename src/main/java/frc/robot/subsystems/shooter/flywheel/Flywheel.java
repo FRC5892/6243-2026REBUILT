@@ -11,41 +11,40 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.ShotCalculator;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
+import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Flywheel extends SubsystemBase {
 
-  private final LoggedTalonFX rightMotor;
-  private final LoggedTalonFX leftMotor;
+  // Single leader motor. Followers (if any) should be configured at the LoggedTalon
+  // construction level using PhoenixTalonFollower so the CTRE hardware handles
+  // aligning follower outputs.
+  private final LoggedTalonFX leaderMotor;
 
-  private final MotionMagicVelocityTorqueCurrentFOC rightMMControl =
-      new MotionMagicVelocityTorqueCurrentFOC(0);
-  private final MotionMagicVelocityTorqueCurrentFOC leftMMControl =
+  private final MotionMagicVelocityTorqueCurrentFOC mmControl =
       new MotionMagicVelocityTorqueCurrentFOC(0);
 
   // Store targets explicitly (this is the important part you were missing)
-  private AngularVelocity targetRightVelocity = RotationsPerSecond.of(0);
-  private AngularVelocity targetLeftVelocity = RotationsPerSecond.of(0);
+  private AngularVelocity targetVelocity = RotationsPerSecond.of(0);
 
-  @Getter @AutoLogOutput private boolean rightAtSetpoint = false;
-  @Getter @AutoLogOutput private boolean leftAtSetpoint = false;
+  @Getter @AutoLogOutput private boolean atSetpoint = false;
 
   private final LoggedTunableMeasure<MutAngularVelocity> tolerance =
       new LoggedTunableMeasure<>("Flywheel/Tolerance", RPM.mutable(5));
 
-  public Flywheel(LoggedTalonFX rightMotor, LoggedTalonFX leftMotor) {
-    this.rightMotor = rightMotor;
-    this.leftMotor = leftMotor;
+  /**
+   * Construct a Flywheel that commands a single leader motor. Any followers should be configured on
+   * the LoggedTalon implementation (see {@code PhoenixTalonFollower}).
+   */
+  public Flywheel(LoggedTalonFX leaderMotor) {
+    this.leaderMotor = leaderMotor;
     setDefaultCommand(aimCommand());
   }
 
-  public void setSetpoints(AngularVelocity rightVelocity, AngularVelocity leftVelocity) {
-    targetRightVelocity = rightVelocity;
-    targetLeftVelocity = leftVelocity;
-
-    rightMotor.setControl(rightMMControl.withVelocity(rightVelocity));
-    leftMotor.setControl(leftMMControl.withVelocity(leftVelocity));
+  public void setSetpoints(AngularVelocity velocity) {
+    targetVelocity = velocity;
+    leaderMotor.setControl(mmControl.withVelocity(velocity));
   }
 
   public Command aimCommand() {
@@ -55,29 +54,27 @@ public class Flywheel extends SubsystemBase {
 
           double speed = shot.flywheelSpeedRotPerSec();
 
-          setSetpoints(RotationsPerSecond.of(speed), RotationsPerSecond.of(speed));
+          setSetpoints(RotationsPerSecond.of(speed));
         });
   }
 
+  /** Manual control command for teleop: supplier should provide a target velocity (rot/s). */
+  public Command manualShoot(DoubleSupplier targetRotPerSec) {
+    return run(() -> setSetpoints(RotationsPerSecond.of(targetRotPerSec.getAsDouble())));
+  }
+
   public boolean isAtTarget() {
-    return rightAtSetpoint && leftAtSetpoint;
+    return atSetpoint;
   }
 
   @Override
   public void periodic() {
-    rightMotor.periodic();
-    leftMotor.periodic();
+    leaderMotor.periodic();
 
-    rightAtSetpoint =
+    atSetpoint =
         Math.abs(
-                rightMotor.getVelocity().in(RotationsPerSecond)
-                    - targetRightVelocity.in(RotationsPerSecond))
-            < tolerance.get().in(RotationsPerSecond);
-
-    leftAtSetpoint =
-        Math.abs(
-                leftMotor.getVelocity().in(RotationsPerSecond)
-                    - targetLeftVelocity.in(RotationsPerSecond))
+                leaderMotor.getVelocity().in(RotationsPerSecond)
+                    - targetVelocity.in(RotationsPerSecond))
             < tolerance.get().in(RotationsPerSecond);
 
     // Clear AFTER everything uses the cached value
@@ -86,6 +83,6 @@ public class Flywheel extends SubsystemBase {
 
   /** Returns the current flywheel velocity in units consistent with ShotCalculator. */
   public double getVelocity() {
-    return rightMotor.getVelocity().in(RotationsPerSecond);
+    return leaderMotor.getVelocity().in(RotationsPerSecond);
   }
 }

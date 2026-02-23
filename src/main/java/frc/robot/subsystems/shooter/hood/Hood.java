@@ -34,6 +34,7 @@ import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTunableMeasure;
 import frc.robot.util.LoggedTunableNumber;
 import frc.robot.util.MechanismUtil;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.Setter;
@@ -291,5 +292,17 @@ public class Hood extends SubsystemBase {
   /** Returns the current hood angle relative to vertical down. */
   public Rotation2d getAngle() {
     return positionToAngle(motor.getPosition());
+  }
+
+  /** Manual control for teleop. Supplier should provide a scalar control input (e.g. joystick) */
+  public Command manualControl(DoubleSupplier input) {
+    return run(
+        () -> {
+          // Map raw input to a small angle delta and apply it to the target position.
+          double deltaDeg = input.getAsDouble() * 5.0; // 5 degrees per second max per unit input
+          requestAngle(
+              new Rotation2d(
+                  positionToAngle(motor.getPosition()).getRadians() + Math.toRadians(deltaDeg)));
+        });
   }
 }
