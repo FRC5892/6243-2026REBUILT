@@ -24,9 +24,7 @@ public class ShootCommand {
 
               shooter
                   .getFlywheel()
-                  .setSetpoints(
-                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()),
-                      RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
+                  .setSetpoints(RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
 
               shooter.getHood().requestAngle(shot.hoodAngle());
             })
