@@ -171,8 +171,8 @@ public class RobotContainer {
     // Driver: Auto align (hold A)
     m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter));
 
-    // Driver: Hood stow (X)
-    m_drivecontroller.x().whileTrue(shooter.getHood().stowCommand());
+    // Driver: Hood stow (X) - on press, move to stow angle if currently below it
+    m_drivecontroller.x().onTrue(shooter.getHood().stowCommand());
 
     //  DRIVER INTAKE
 
