@@ -23,13 +23,16 @@ public class Shooter {
   public Shooter(CANBus bus) {
     switch (Constants.currentMode) {
       case REAL -> {
-        PhoenixTalonFX leftFlywheel =
+        // Configure right Talon as leader and add the left Talon as a CTRE follower.
+        PhoenixTalonFX rightFlywheel =
             new PhoenixTalonFX(
-                25, bus, "FlywheelLeft", new PhoenixTalonFollower(26, MotorAlignmentValue.Aligned));
+                26,
+                bus,
+                "FlywheelRight",
+                new PhoenixTalonFollower(25, MotorAlignmentValue.Opposed));
 
-        PhoenixTalonFX rightFlywheel = new PhoenixTalonFX(26, bus, "FlywheelRight");
-
-        flywheel = new Flywheel(rightFlywheel, leftFlywheel);
+        // Flywheel commands only the leader; followers inherit the output via CTRE.
+        flywheel = new Flywheel(rightFlywheel);
 
         hood =
             new Hood(
@@ -39,19 +42,17 @@ public class Shooter {
       }
 
       case SIM -> {
-        TalonFXFlywheelSim leftFlywheel =
+        // Configure the simulated leader (26) and add the simulated follower (25).
+        TalonFXFlywheelSim rightFlywheel =
             new TalonFXFlywheelSim(
-                25,
+                26,
                 bus,
-                "FlywheelLeft",
+                "FlywheelRight",
                 0.0007567661,
                 1 / 1.25,
-                new PhoenixTalonFollower(26, MotorAlignmentValue.Aligned));
+                new PhoenixTalonFollower(25, MotorAlignmentValue.Opposed));
 
-        TalonFXSimpleMotorSim rightFlywheel =
-            new TalonFXSimpleMotorSim(26, bus, "FlywheelRight", 0.0007567661, 1 / 1.25);
-
-        flywheel = new Flywheel(rightFlywheel, leftFlywheel);
+        flywheel = new Flywheel(rightFlywheel);
 
         hood =
             new Hood(
@@ -61,10 +62,9 @@ public class Shooter {
       }
 
       default -> {
-        NoOppTalonFX leftFlywheel = new NoOppTalonFX("FlywheelLeft", 1);
+        // Replay/default: create a leader with one follower (replay doesn't control physical IO)
         NoOppTalonFX rightFlywheel = new NoOppTalonFX("FlywheelRight", 1);
-
-        flywheel = new Flywheel(rightFlywheel, leftFlywheel);
+        flywheel = new Flywheel(rightFlywheel);
 
         hood =
             new Hood(
