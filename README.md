@@ -37,6 +37,9 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 |              |               |          |           |
 |              |               |          |           |
 |              |               |          |           |
+| Climb Up              | D-pad up (hold down)             | Raises the robot's climb mechanism          | TBD         |
+| Climb Down             | D-pad down (hold down)              | Lowers the robot's climb mechanism          | TBD          |
+
 
 
 ---
