@@ -13,16 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 
 public class Climb extends SubsystemBase {
+  private final LoggedTalonFX climber;
 
-  private final LoggedTalonFX climberLeft;
-  private final LoggedTalonFX climberRight;
+  private final DutyCycleOut request = new DutyCycleOut(0);
 
-  private final DutyCycleOut leftRequest = new DutyCycleOut(0);
-  private final DutyCycleOut rightRequest = new DutyCycleOut(0);
-
-  public Climb(LoggedTalonFX climberLeft, LoggedTalonFX climberRight) {
-    this.climberLeft = climberLeft;
-    this.climberRight = climberRight;
+  public Climb(LoggedTalonFX climber) {
+    this.climber = climber;
 
     var config =
         new TalonFXConfiguration()
@@ -33,55 +29,33 @@ public class Climb extends SubsystemBase {
                     .withInverted(InvertedValue.Clockwise_Positive))
             .withCurrentLimits(new CurrentLimitsConfigs().withStatorCurrentLimit(60));
 
-    this.climberLeft.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
-    this.climberRight.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
+    this.climber.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
   }
 
-  public void climberLeftUp() {
-    climberLeft.setControl(leftRequest.withOutput(-0.75));
+  public void climbUp() {
+    climber.setControl(request.withOutput(-0.75));
   }
 
-  public void climberLeftDown() {
-    climberLeft.setControl(leftRequest.withOutput(0.75));
+  public void climbDown() {
+    climber.setControl(request.withOutput(0.75));
   }
 
-  public void climberRightUp() {
-    climberRight.setControl(rightRequest.withOutput(0.75));
+  public void stopMotor() {
+    climber.setControl(request.withOutput(0));
   }
 
-  public void climberRightDown() {
-    climberRight.setControl(rightRequest.withOutput(-0.75));
+  public Command upCommand() {
+    return startEnd(this::climbUp, this::stopMotor);
   }
 
-  public void stopLeftMotor() {
-    climberLeft.setControl(leftRequest.withOutput(0));
-  }
-
-  public void stopRightMotor() {
-    climberRight.setControl(rightRequest.withOutput(0));
-  }
-
-  public Command leftUpCommand() {
-    return startEnd(this::climberLeftUp, this::stopLeftMotor);
-  }
-
-  public Command leftDownCommand() {
-    return startEnd(this::climberLeftDown, this::stopLeftMotor);
-  }
-
-  public Command rightUpCommand() {
-    return startEnd(this::climberRightUp, this::stopRightMotor);
-  }
-
-  public Command rightDownCommand() {
-    return startEnd(this::climberRightDown, this::stopRightMotor);
+  public Command downCommand() {
+    return startEnd(this::climbDown, this::stopMotor);
   }
 
   public Command stopAllCommand() {
     return runOnce(
         () -> {
-          stopLeftMotor();
-          stopRightMotor();
+          stopMotor();
         });
   }
 }

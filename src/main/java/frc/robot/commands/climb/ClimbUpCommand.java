@@ -7,11 +7,6 @@ import frc.robot.subsystems.climb.Climb;
 public class ClimbUpCommand {
 
   public static Command create(Climb climb) {
-    return climb.startEnd(
-        () -> {
-          climb.climberLeftUp();
-          climb.climberRightUp();
-        },
-        climb::stopAllCommand);
+    return climb.startEnd(() -> climb.climbUp(), climb::stopAllCommand);
   }
 }
