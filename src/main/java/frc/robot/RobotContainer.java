@@ -104,7 +104,7 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        climb = new Climb(new TalonFXSimpleMotorSim(13, rioCAN, "RightClimb", 1, 1));
+        climb = new Climb(new TalonFXSimpleMotorSim(13, rioCAN, "Climb", 1, 1));
 
         intake = new Intake(rioCAN);
 
