@@ -75,6 +75,3 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 | Green (solid)                |   `rgb(0, 255, 0)`        |     4        | Indicates slapdown intake is in the "down" position                                          |
 | Blue (solid)                  |   `rgb(0, 0, 255)`        |      5       |   Indicates that hood is in the "stowed" position                                         |
 |    |  |     |                                        |
-
-
-
