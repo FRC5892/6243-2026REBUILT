@@ -131,6 +131,8 @@ public class RobotContainer {
     }
     shooter = new Shooter(rioCAN);
 
+    configureButtonBindings();
+
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
