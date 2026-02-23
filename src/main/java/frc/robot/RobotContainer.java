@@ -122,7 +122,7 @@ public class RobotContainer {
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
 
-    climb = new Climb(new NoOppTalonFX("RightCLimb", 0));
+        climb = new Climb(new NoOppTalonFX("RightCLimb", 0));
 
         intake = new Intake(rioCAN);
 
