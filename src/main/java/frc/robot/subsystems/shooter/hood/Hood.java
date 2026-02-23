@@ -11,6 +11,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.SlotConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,12 +51,13 @@ public class Hood extends SubsystemBase {
   /* Movement Constants */
   private final LoggedTunableMeasure<MutAngle> downPosition =
       new LoggedTunableMeasure<>("Hood/DownPosition", Degrees.mutable(18.575));
-  private final LoggedTunableMeasure<MutAngle> stowPosition =
-      new LoggedTunableMeasure<>("Hood/StowAngle", Degrees.mutable(15));
   public static LoggedTunableNumber stowTrenchGapOffset =
       new LoggedTunableNumber("Hood/stowTrenchGapOffset", 0, "m");
   private final LoggedTunableMeasure<MutAngle> tolerance =
       new LoggedTunableMeasure<>("Hood/Tolerance", Degrees.mutable(5));
+  // Hard limits for hood angle (degrees, relative to vertical). Non-tunable constants.
+  private static final double MIN_ANGLE_DEG = 70.0;
+  private static final double MAX_ANGLE_DEG = 43.0;
   /* Homing */
   private final LoggedTunableNumber homingVoltage =
       new LoggedTunableNumber("Hood/Homing/Voltage", 4, "v");
@@ -80,6 +82,7 @@ public class Hood extends SubsystemBase {
 
   /* Control  Requests*/
   private final MotionMagicVoltage mmControl = new MotionMagicVoltage(targetPosition);
+  private final NeutralOut neutralControl = new NeutralOut();
 
   public Hood(LoggedTalonFX motor, LoggedDIO reverseLimit, LoggedDIO forwardLimit) {
     this.motor = motor;
@@ -120,7 +123,8 @@ public class Hood extends SubsystemBase {
   public Command stowCommand() {
     return startEnd(
             () -> {
-              this.requestAngle(new Rotation2d(stowPosition.get()));
+              // Stow should move the hood to the minimum allowed angle.
+              this.requestAngle(Rotation2d.fromDegrees(MIN_ANGLE_DEG));
             },
             () -> {})
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
@@ -164,8 +168,14 @@ public class Hood extends SubsystemBase {
    * @param angle the target angle relative to vertical. 0 is vertical, 90 is horizontal
    */
   public void requestAngle(Rotation2d angle) {
-    Logger.recordOutput("Hood/RequestedAngle", angle.getDegrees(), "deg");
-    angleToPosition(angle, targetPosition);
+    // Clamp the requested angle to the allowed (non-tunable) range before converting.
+    double requestedDeg = angle.getDegrees();
+    double clampedDeg = Math.max(MIN_ANGLE_DEG, Math.min(MAX_ANGLE_DEG, requestedDeg));
+    if (clampedDeg != requestedDeg) {
+      Logger.recordOutput("Hood/RequestedAngleClamped", clampedDeg, "deg");
+    }
+    Logger.recordOutput("Hood/RequestedAngle", clampedDeg, "deg");
+    angleToPosition(Rotation2d.fromDegrees(clampedDeg), targetPosition);
     positionControl = true;
     setControl();
   }
@@ -245,6 +255,15 @@ public class Hood extends SubsystemBase {
     ShotCalculator.getInstance().clearCache();
     LoggedTunableNumber.ifChanged(this, (value) -> this.updateTrenchAreas(), stowTrenchGapOffset);
 
+    // Safety: if the mechanism is beyond the allowed max angle, stop commanding it.
+    double currentDeg = positionToAngle(motor.getPosition()).getDegrees();
+    if (currentDeg > MAX_ANGLE_DEG) {
+      // disable position control and neutral the motor
+      positionControl = false;
+      motor.setControl(neutralControl);
+      Logger.recordOutput("Hood/ExceededMaxAngle", true);
+    }
+
     setControl();
   }
 
@@ -260,6 +279,9 @@ public class Hood extends SubsystemBase {
               .withPosition(targetPosition)
               .withLimitReverseMotion(reverseLimit.get())
               .withLimitForwardMotion(forwardLimit.get()));
+    } else {
+      // When not in position control, set motor to neutral to ensure it stops applying output.
+      motor.setControl(neutralControl);
     }
   }
 
