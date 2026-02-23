@@ -174,7 +174,7 @@ public class RobotContainer {
     // Driver: Hood stow (X)
     m_drivecontroller.x().whileTrue(shooter.getHood().stowCommand());
 
-    //  DRIVER INTAKE 
+    //  DRIVER INTAKE
 
     // Toggle intake up/down (B)
     m_drivecontroller.b().toggleOnTrue(intake.deploy());
@@ -185,7 +185,7 @@ public class RobotContainer {
     // Hold to intake OUT (right bumper)
     m_drivecontroller.rightBumper().whileTrue(intake.intakeOut());
 
-    // CODRIVER 
+    // CODRIVER
 
     // Climb
     m_codriverController.povUp().whileTrue(frc.robot.commands.climb.ClimbUpCommand.create(climb));
