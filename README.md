@@ -27,18 +27,15 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 
 | Function           | Button / Stick           | Description            | LED Indicator Color  |
 |--------------------|--------------------------|------------------------|---|
-|  | Left Stick (X/Y)         |       | N/A |
-|  | Right Stick (X/Y)  |          | N/A |
-| Slapdown Intake |      (toggle)      | Raising and lowering the slapdown intake | Green when in lowered position|
-| Intake in             |  (hold down) | Intakes balls into the hopper                       | N/A |
-| Intake out                   |  (hold down)                       | Outtakes balls from the hopper                       | N/A |
+| Slapdown Intake | Left Bumper     (toggle)      | Raising and lowering the slapdown intake | Green when in lowered position|
+| Intake in             | B (hold down) | Intakes balls into the hopper                       | N/A |
+| Intake out                   | X (hold down)                       | Outtakes balls from the hopper                       | N/A |
 | Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
 | Beach Alert                          | Y (hold down)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
-|              |               |          |           |
-|              |               |          |           |
-|              |               |          |           |
 | Climb Up              | D-pad up (hold down)             | Raises the robot's climb mechanism          | N/A         |
 | Climb Down             | D-pad down (hold down)              | Lowers the robot's climb mechanism          | N/A          |
+| Shoot             | Right bumper (hold down)              | Runs shot calculator, rotates robot and adjusts hood accordingly, then spins indexer, feeding balls into the already spinning flywheels, shooting them into the hub    |           |
+
 
 
 
