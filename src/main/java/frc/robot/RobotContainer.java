@@ -194,7 +194,7 @@ public class RobotContainer {
         .povDown()
         .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
 
-    // Emergency indexer
+    // indexer unclog
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
     // Manual hood (left joystick Y)
