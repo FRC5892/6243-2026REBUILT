@@ -195,18 +195,12 @@ public class RobotContainer {
         .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
 
     // Emergency indexer
-    m_codriverController.rightTrigger().whileTrue(indexer.runForShooting());
-    m_codriverController.leftTrigger().whileTrue(indexer.stopAll());
+    m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
     // Manual hood (left joystick Y)
     shooter
         .getHood()
         .setDefaultCommand(shooter.getHood().manualControl(() -> -m_codriverController.getLeftY()));
-
-    // Manual shoot (right joystick up only)
-    m_codriverController
-        .rightStick()
-        .whileTrue(shooter.getFlywheel().manualShoot(() -> -m_codriverController.getRightY()));
 
     // Auto align (A)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));

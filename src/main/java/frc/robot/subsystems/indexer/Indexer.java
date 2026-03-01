@@ -76,6 +76,12 @@ public class Indexer {
         .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.FORWARD));
   }
 
+  public Command unclog() {
+    return feeder
+        .runRoller(RollerSubsystem.Direction.REVERSE)
+        .alongWith(indexerRollers.runRoller(RollerSubsystem.Direction.REVERSE));
+  }
+
   /** Optional: staged feeding (prevents double-feeding / jams). */
   public Command runStagedFeed() {
     return Commands.sequence(
