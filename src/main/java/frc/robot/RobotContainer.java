@@ -84,6 +84,7 @@ public class RobotContainer {
                 new VisionIOLimelight(camera0Name, drive::getRotation),
                 new VisionIOLimelight(camera1Name, drive::getRotation));
         climb = new Climb(new PhoenixTalonFX(13, rioCAN, "RightClimb"));
+        // TODO: make climb wiht neos
 
         intake = new Intake(rioCAN);
 
