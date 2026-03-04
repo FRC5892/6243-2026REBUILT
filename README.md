@@ -67,6 +67,8 @@ Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High S
 | Color And Behavior   | RGB Values | Priority    | Notes                                       |
 |---------------------|------------|-------------|---------------------------------------------|
 | White (flashing)    | `rgb(255, 255, 255)` |      1       | Indicates overheating motor                                          |
+| orange (flashing)    | `rgb(255, 165, 0)` |      1       | Indicates disconnected motor                                          |
+
 | Rainbow (fade) | varius        |     2        | Indicates to allince members that robot is beached                                           |
 | Red (solid)                |   `rgb(255, 0, 0)` |    3         | Indicates auto allign feature is active                                           |
 | Green (solid)                |   `rgb(0, 255, 0)`        |     4        | Indicates slapdown intake is in the "down" position                                          |
