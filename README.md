@@ -1,6 +1,6 @@
 # (tbd) (FRC 6243) - 2026 REBUILT
 
-Welcome to the repository for (tbd), FRC Team 6243 Energy NERDs' robot for the 2026 REBUILT season.
+Welcome to the repository for (tbd), FRC Team 6243 Energy NERDs' competition robot for the 2026 REBUILT season.
 
 ## About Team 6243
 Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High School located in Houston, Texas. It is the sister team of FRC 5892, the Energy HEROs.
