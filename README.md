@@ -72,36 +72,32 @@ Higher rows override lower rows.
 
 `IMPORTANT`: CAN IDs, bus names, camera names, and IO ports below are reference placeholders. Verify and update to match final robot wiring before running on hardware.
 
-### RIO CAN Bus Devices
-
-| Device | ID | Notes |
-|---|---:|---|
-| Climb motor | 13 | `RightClimb` |
-| Intake roller | 20 | `IntakeRoller` |
-| Slapdown motor | 21 | `Slapdown` |
-| Flywheel leader | 26 | `FlywheelRight` (left follows in config) |
-| Hood motor | 27 | `Hood` |
-| Feeder roller | 30 | `Feeder` |
-| Indexer right | 31 | `IndexerRight` |
-| Indexer left | 32 | `IndexerLeft` (follower of 31) |
-
-### Swerve CAN Bus Devices (`TunerConstants`)
-
-| Device | ID |
-|---|---:|
-| Pigeon2 | 13 |
-| Front Left Drive / Steer / Encoder | 2 / 6 / 41 |
-| Front Right Drive / Steer / Encoder | 3 / 7 / 42 |
-| Back Left Drive / Steer / Encoder | 4 / 8 / 43 |
-| Back Right Drive / Steer / Encoder | 5 / 9 / 44 |
-
-### Other IO
-
-| Device | Port |
-|---|---:|
-| LED strip PWM | 0 |
-| Hood reverse limit DIO | 1 |
-| Hood forward limit DIO | 2 |
+| Device | Bus / IO Type | ID / Port | Function / Notes |
+|---|---|---:|---|
+| Climb motor | RIO CAN | 13 | `RightClimb` |
+| Intake roller | RIO CAN | 20 | `IntakeRoller` |
+| Slapdown motor | RIO CAN | 21 | `Slapdown` |
+| Flywheel leader | RIO CAN | 26 | `FlywheelRight` (left follows in config) |
+| Hood motor | RIO CAN | 27 | `Hood` |
+| Feeder roller | RIO CAN | 30 | `Feeder` |
+| Indexer right | RIO CAN | 31 | `IndexerRight` |
+| Indexer left | RIO CAN | 32 | `IndexerLeft` (follower of 31) |
+| Pigeon2 | Swerve CAN (`TunerConstants`) | 13 | Drivetrain gyro |
+| Front Left Drive | Swerve CAN (`TunerConstants`) | 2 | Swerve module drive motor |
+| Front Left Steer | Swerve CAN (`TunerConstants`) | 6 | Swerve module steer motor |
+| Front Left Encoder | Swerve CAN (`TunerConstants`) | 41 | Swerve module azimuth encoder |
+| Front Right Drive | Swerve CAN (`TunerConstants`) | 3 | Swerve module drive motor |
+| Front Right Steer | Swerve CAN (`TunerConstants`) | 7 | Swerve module steer motor |
+| Front Right Encoder | Swerve CAN (`TunerConstants`) | 42 | Swerve module azimuth encoder |
+| Back Left Drive | Swerve CAN (`TunerConstants`) | 4 | Swerve module drive motor |
+| Back Left Steer | Swerve CAN (`TunerConstants`) | 8 | Swerve module steer motor |
+| Back Left Encoder | Swerve CAN (`TunerConstants`) | 43 | Swerve module azimuth encoder |
+| Back Right Drive | Swerve CAN (`TunerConstants`) | 5 | Swerve module drive motor |
+| Back Right Steer | Swerve CAN (`TunerConstants`) | 9 | Swerve module steer motor |
+| Back Right Encoder | Swerve CAN (`TunerConstants`) | 44 | Swerve module azimuth encoder |
+| LED strip | PWM | 0 | Addressable LED strip output |
+| Hood reverse limit | DIO | 1 | Hood reverse travel limit switch |
+| Hood forward limit | DIO | 2 | Hood forward travel limit switch |
 
 ## Vision
 
