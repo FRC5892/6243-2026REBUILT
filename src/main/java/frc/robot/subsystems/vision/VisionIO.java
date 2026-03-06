@@ -1,10 +1,3 @@
-// Copyright (c) 2021-2026 Littleton Robotics
-// http://github.com/Mechanical-Advantage
-//
-// Use of this source code is governed by a BSD
-// license that can be found in the LICENSE file
-// at the root directory of this project.
-
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,10 +8,19 @@ public interface VisionIO {
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
+
+    // Latest AprilTag target angles (used for simple servoing)
     public TargetObservation latestTargetObservation =
         new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+
+    // AprilTag pose observations
     public PoseObservation[] poseObservations = new PoseObservation[0];
+
+    // Detected AprilTag IDs
     public int[] tagIds = new int[0];
+
+    // PhotonVision targets (optional logging for multiple objects)
+    public PhotonTargetObservation[] photonTargets = new PhotonTargetObservation[0];
   }
 
   /** Represents the angle to a simple target, not used for pose estimation. */
@@ -33,11 +35,22 @@ public interface VisionIO {
       double averageTagDistance,
       PoseObservationType type) {}
 
+  /** PhotonVision target record for logging detected objects */
+  public static record PhotonTargetObservation(
+      double timestamp,
+      double yaw, // horizontal angle
+      double pitch, // vertical angle
+      double area, // target size / confidence
+      double bestDistance, // estimated distance to target
+      int id // optional ID if you classify objects
+      ) {}
+
   public static enum PoseObservationType {
     MEGATAG_1,
     MEGATAG_2,
     PHOTONVISION
   }
 
+  /** Default method to update inputs; implement in your hardware layer */
   public default void updateInputs(VisionIOInputs inputs) {}
 }
