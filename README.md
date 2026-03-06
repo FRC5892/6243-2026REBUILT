@@ -5,7 +5,6 @@
 [![License](https://img.shields.io/badge/license-WPILib%20%2B%20AdvantageKit-blue)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/WPILib-License.md)
 [![Java](https://img.shields.io/badge/java-17-informational)](https://adoptium.net/)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/build.gradle)
-[![Releases](https://img.shields.io/github/v/release/FRC5892/6243-2026REBUILT?display_name=tag)](https://github.com/FRC5892/6243-2026REBUILT/releases)
 
 ## Project Indicators
 
