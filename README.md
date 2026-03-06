@@ -1,76 +1,116 @@
 # KickBack (FRC 6243) - 2026 REBUILT
 
-Welcome to the repository for KickBack, FRC Team 6243 Energy NERDs' competition robot for the 2026 REBUILT season.
-
-## About Team 6243
-Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High School located in Houston, Texas. It is the sister team of FRC 5892, the Energy HEROs.
-
-## About KickBack (2026)
-KickBack is our robot entry for the 2026 FRC competition, REBUILT. KickBack features a swerve drivechain (a system allowing wheels to rotate and move in any direction), a dual shooter with a conjoined hood, an expandable hopper design with a roller floor, a slapdown intake, a split indexer with a vortex wheel feeder, L1 climbing capabilities, and can navigate both over the bump and under the trench.
-
-## Controls
-
-**Driver Controls**
-
-| Function           | Button / Stick           | Description            | LED Indicator Color  |
-|--------------------|--------------------------|------------------------|---|
-| Drive (field-oriented) | Left Stick (X/Y)         | Robot translation      | N/A |
-| Drive (field-oriented) | Right Stick (X/Y)  | Robot rotation         | N/A |
-| Slapdown Intake | B (toggle)           | Raising and lowering the slapdown intake | Green when in lowered position|
-| Intake in             | Left bumper (hold down) | Intakes balls into the hopper                       | N/A |
-| Intake out                   | Right bumper (hold down)                       | Outtakes balls from the hopper                       | N/A |
-| Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
-| Stow hood                          | X (press)                         | Stows hood for going under trench. Not a toggle.   | Blue when hood is stowed |
-| Beach Alert                          | Y (hold)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
-
-**Codriver Controls**
-
-| Function           | Button / Stick           | Description            | LED Indicator Color  |
-|--------------------|--------------------------|------------------------|---|
-| Slapdown Intake | Left Bumper     (toggle)      | Raising and lowering the slapdown intake | Green when in lowered position|
-| Intake in             | B (hold down) | Intakes balls into the hopper                       | N/A |
-| Intake out                   | X (hold down)                       | Outtakes balls from the hopper                       | N/A |
-| Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
-| Beach Alert                          | Y (hold down)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
-| Climb Up              | D-pad up (hold down)             | Raises the robot's climb mechanism          | N/A         |
-| Climb Down             | D-pad down (hold down)              | Lowers the robot's climb mechanism          | N/A          |
-| Shoot             | Right bumper (hold down)              | Runs shot calculator, rotates robot and adjusts hood accordingly, then spins indexer, feeding balls into the already spinning flywheels, shooting them into the hub    |           |
+[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
 
 
+Robot code for FRC Team 6243 (Energy NERDs), maintained with WPILib command-based structure, AdvantageKit logging, CTRE Phoenix 6 swerve, and PathPlanner.
 
+## What The Robot Can Do
 
----
+- Drive with field-relative swerve control.
+- Run AprilTag-based pose fusion from two vision cameras.
+- Switch a third camera between AprilTag and object-detection pipelines.
+- Auto-snap robot yaw to shot heading while commanding hood angle.
+- Shoot with flywheel + hood setpointing and shooter-readiness-gated indexing.
+- Intake and outtake with a slapdown intake mechanism.
+- Run indexer + feeder forward for shooting or reverse for unclogging.
+- Operate a single-motor climb (up/down hold commands).
+- Run LED priority states for fault/status/operator feedback.
+- Select PathPlanner autos through dashboard chooser.
+- Run drive characterization and SysId routines from the auto chooser.
 
-## CAN IDs
+## Operator Controls
 
-| Device              | CAN ID | Notes                                            |
-|---------------------|--------|--------------------------------------------------|
-|                     |   #    |                                                  |
-| Indexer             |   #    |                                                  |
-| Feeder and hopper rollers |   #    |                                                  |
-| Climb Arm           |   #    |                                                  |
-| Intake Rollers      |   #    |                                                  |
-| Intake Slapdown     |   #    |                                                  |
-| Front Left Drive    |   #    | Swerve Module                                    |
-| Front Left Steer    |   #    | Swerve Module                                    |
-| Front Right Drive   |   #    | Swerve Module                                    |
-| Front Right Steer   |   #    | Swerve Module                                    |
-| Back Left Drive     |   #    | Swerve Module                                    |
-| Back Left Steer     |   #    | Swerve Module                                    |
-| Back Right Drive    |   #    | Swerve Module                                    |
-| Back Right Steer    |   #    | Swerve Module                                    |
+Controller ports in code:
+- Driver controller: USB `0`
+- Codriver controller: USB `2`
 
----
+### Driver (Xbox)
 
-## LED Indicator Color
+| Control | Action |
+|---|---|
+| Left stick X/Y | Field-relative translation |
+| Right stick X | Rotation |
+| `A` (hold) | Snap-to-target align (`SnapToTargetCommand`) |
+| `X` (press) | Stow hood |
+| `B` (toggle) | Toggle intake deploy/retract |
+| Left bumper (hold) | Intake in |
+| Right bumper (hold) | Intake out |
+| `Y` (hold) | Beach alert LED mode |
 
-| Color And Behavior   | RGB Values | Priority    | Notes                                       |
-|---------------------|------------|-------------|---------------------------------------------|
-| White (flashing)    | `rgb(255, 255, 255)` |      1       | Indicates overheating motor                                          |
-| orange (flashing)    | `rgb(255, 165, 0)` |      1       | Indicates disconnected motor                                          |
+### Codriver (Xbox)
 
-| Rainbow (fade) | varius        |     2        | Indicates to allince members that robot is beached                                           |
-| Red (solid)                |   `rgb(255, 0, 0)` |    3         | Indicates auto allign feature is active                                           |
-| Green (solid)                |   `rgb(0, 255, 0)`        |     4        | Indicates slapdown intake is in the "down" position                                          |
-| Blue (solid)                  |   `rgb(0, 0, 255)`        |      5       |   Indicates that hood is in the "stowed" position                                         |
-|    |  |     |                                        |
+| Control | Action |
+|---|---|
+| Left stick Y | Manual hood adjust (default hood command) |
+| `A` (hold) | Snap-to-target align |
+| Left bumper (toggle) | Toggle intake deploy/retract |
+| `X` (hold) | Intake in |
+| `B` (hold) | Intake out |
+| Right bumper (hold) | Shoot (flywheel + hood + gated index feed) |
+| Right trigger (hold) | Indexer unclog (reverse feed) |
+| D-pad up (hold) | Climb up |
+| D-pad down (hold) | Climb down |
+| `Y` (hold) | Beach alert LED mode |
+
+## LED States (Priority Order)
+
+Higher rows override lower rows.
+
+| Priority | State | Output |
+|---|---|---|
+| 1 | Drive motor overheated | Flashing white `rgb(255,255,255)` |
+| 2 | Drive motor disconnected | Flashing orange `rgb(255,165,0)` |
+| 3 | Beach alert active | Rainbow animation |
+| 4 | Auto-align active | Solid red `rgb(255,0,0)` |
+| 5 | Intake down | Solid green `rgb(0,255,0)` |
+| 6 | Hood stowed | Solid blue `rgb(0,0,255)` |
+| 7 | Default | LEDs off |
+
+## CAN / IO Map
+
+### RIO CAN bus devices
+
+| Device | ID | Notes |
+|---|---:|---|
+| Climb motor | 13 | `RightClimb` |
+| Intake roller | 20 | `IntakeRoller` |
+| Slapdown motor | 21 | `Slapdown` |
+| Flywheel leader | 26 | `FlywheelRight` (left follows in config) |
+| Hood motor | 27 | `Hood` |
+| Feeder roller | 30 | `Feeder` |
+| Indexer right | 31 | `IndexerRight` |
+| Indexer left | 32 | `IndexerLeft` (follower of 31) |
+
+### Swerve CAN bus devices (`TunerConstants`)
+
+| Device | ID |
+|---|---:|
+| Pigeon2 | 13 |
+| Front Left Drive / Steer / Encoder | 2 / 6 / 41 |
+| Front Right Drive / Steer / Encoder | 3 / 7 / 42 |
+| Back Left Drive / Steer / Encoder | 4 / 8 / 43 |
+| Back Right Drive / Steer / Encoder | 5 / 9 / 44 |
+
+### Other IO
+
+| Device | Port |
+|---|---:|
+| LED strip PWM | 0 |
+| Hood reverse limit DIO | 1 |
+| Hood forward limit DIO | 2 |
+
+## Vision Configuration
+
+- AprilTag cameras: `camera_0`, `camera_1`
+- Object camera: `camera_object`
+- Object camera pipeline indices:
+  - `0`: AprilTag
+  - `1`: Object detection
+- Robot code switches object camera to detection in autonomous and back to AprilTag in teleop.
+
+## Important Setup Notes
+
+- Update `src/main/java/frc/robot/generated/TunerConstants.java` CAN bus name from `"Default Name"` to your actual drivetrain CAN bus name before running on hardware.
+- Verify USB controller indexing at each event (`0` driver, `2` codriver in current code).
+- If hood behavior changes mechanically, re-check hood angle tuning and limit switch orientation.
