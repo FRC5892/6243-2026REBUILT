@@ -1,7 +1,18 @@
 # KickBack (FRC 6243) - 2026 REBUILT
 
 [![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
-![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
+[![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)](https://github.com/FRC5892/6243-2026REBUILT/commits/main)
+[![License](https://img.shields.io/badge/license-WPILib%20%2B%20AdvantageKit-blue)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/WPILib-License.md)
+[![Java](https://img.shields.io/badge/java-17-informational)](https://adoptium.net/)
+[![Gradle](https://img.shields.io/badge/build-Gradle-02303A)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/build.gradle)
+[![Releases](https://img.shields.io/github/v/release/FRC5892/6243-2026REBUILT?display_name=tag)](https://github.com/FRC5892/6243-2026REBUILT/releases)
+
+## Project Indicators
+
+Active indicators:
+
+[![Open Issues](https://img.shields.io/github/issues/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/pulls)
 
 Competition code for FRC Team 6243 (Energy NERDs), 2026 REBUILT.
 
