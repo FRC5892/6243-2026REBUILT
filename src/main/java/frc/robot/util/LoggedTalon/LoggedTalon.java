@@ -449,6 +449,26 @@ public abstract class LoggedTalon<T extends LoggedTalon<T>> {
     return this.inputs.supplyCurrentAmps[follower];
   }
 
+  /** Returns true when any device in this motor group is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    for (int i = 0; i < inputs.connected.length; i++) {
+      if (!inputs.connected[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Returns true when any device in this motor group exceeds the overheat threshold. */
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    for (int i = 0; i < inputs.temperatureC.length; i++) {
+      if (inputs.temperatureC[i] >= tempThresholdC) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Get the current position as a measure.
    *

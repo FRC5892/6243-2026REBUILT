@@ -32,6 +32,11 @@ public class Climb extends SubsystemBase {
     this.climber.withConfig(config).withMMPIDTuning(SlotConfigs.from(config.Slot0), null);
   }
 
+  @Override
+  public void periodic() {
+    climber.periodic();
+  }
+
   public void climbUp() {
     climber.setControl(request.withOutput(-0.75));
   }
@@ -57,5 +62,13 @@ public class Climb extends SubsystemBase {
         () -> {
           stopMotor();
         });
+  }
+
+  public boolean hasDisconnectedMotor() {
+    return climber.hasDisconnectedMotor();
+  }
+
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return climber.hasOverheatedMotor(tempThresholdC);
   }
 }

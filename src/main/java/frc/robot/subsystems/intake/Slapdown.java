@@ -18,6 +18,11 @@ public class Slapdown extends SubsystemBase {
     this.motor = motor;
   }
 
+  @Override
+  public void periodic() {
+    motor.periodic();
+  }
+
   /** Extend the slap-down actuator. */
   public void extend() {
     motor.setControl(output.withOutput(EXTEND_OUTPUT));
@@ -41,5 +46,13 @@ public class Slapdown extends SubsystemBase {
   /** Command to retract the slap actuator while held. */
   public Command retractCommand() {
     return startEnd(this::retract, this::stop);
+  }
+
+  public boolean hasDisconnectedMotor() {
+    return motor.hasDisconnectedMotor();
+  }
+
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return motor.hasOverheatedMotor(tempThresholdC);
   }
 }

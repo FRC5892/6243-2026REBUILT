@@ -11,6 +11,7 @@ import lombok.Getter;
 
 /** Container subsystem for intake rollers + slap-down actuator. */
 public class Intake {
+  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
 
   @Getter private final IntakeRollerSubsystem roller;
   @Getter private final Slapdown slap;
@@ -95,5 +96,16 @@ public class Intake {
   /** Intake OUT (reverse + ensure deployed). */
   public Command intakeOut() {
     return Commands.parallel(runRollerReverse(), extendSlap());
+  }
+
+  /** Returns true if any intake motor is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    return roller.hasDisconnectedMotor() || slap.hasDisconnectedMotor();
+  }
+
+  /** Returns true if any intake motor is above the overheat threshold. */
+  public boolean hasOverheatedMotor() {
+    return roller.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C)
+        || slap.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C);
   }
 }

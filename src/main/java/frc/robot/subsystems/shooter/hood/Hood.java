@@ -328,4 +328,12 @@ public class Hood extends SubsystemBase {
                   positionToAngle(motor.getPosition()).getRadians() + Math.toRadians(deltaDeg)));
         });
   }
+
+  public boolean hasDisconnectedMotor() {
+    return motor.hasDisconnectedMotor();
+  }
+
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return motor.hasOverheatedMotor(tempThresholdC);
+  }
 }

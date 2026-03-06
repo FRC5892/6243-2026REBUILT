@@ -85,4 +85,12 @@ public class Flywheel extends SubsystemBase {
   public double getVelocity() {
     return leaderMotor.getVelocity().in(RotationsPerSecond);
   }
+
+  public boolean hasDisconnectedMotor() {
+    return leaderMotor.hasDisconnectedMotor();
+  }
+
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return leaderMotor.hasOverheatedMotor(tempThresholdC);
+  }
 }
