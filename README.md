@@ -77,7 +77,7 @@ Higher rows override lower rows.
 | 4 | Auto-align active | Solid red `rgb(255,0,0)` |
 | 5 | Intake down | Solid green `rgb(0,255,0)` |
 | 6 | Hood stowed | Solid blue `rgb(0,0,255)` |
-| 7 | Default | LEDs off |
+| 7 | Default | LEDs TBD |
 
 ## Hardware Map (Reference)
 
