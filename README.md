@@ -10,7 +10,7 @@ Competition code for FRC Team 6243 (Energy NERDs), 2026 REBUILT.
 Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 
 - Swerve drive with field-relative control.
-- AprilTag pose fusion from two Limelight-based vision inputs (real robot).
+- AprilTag pose fusion from two PhotonVision-based vision inputs.
 - Separate object camera with mode-based pipeline switching.
 - Shooter with dynamic hood/flywheel targets from shot calculation.
 - Feeder/indexer gated on shooter-ready state during shoot command.
@@ -107,7 +107,7 @@ Higher rows override lower rows.
 
 - AprilTag camera names: `camera_0`, `camera_1`
 - Object camera name: `camera_object`
-- Real robot stack: two cameras instances for AprilTag observations plus one object camera (switches to apriltag during teleop).
+- Real robot stack: two cameras for AprilTag detection plus one for gamepiece detection (switches to Apriltag during teleop).
 - Object camera pipeline indices:
   - `0`: AprilTag
   - `1`: Object detection
