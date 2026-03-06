@@ -1,30 +1,32 @@
 # KickBack (FRC 6243) - 2026 REBUILT
 
-[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml) ![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
+[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
+![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
 
+Competition robot code for FRC Team 6243 (Energy NERDs) for the 2026 REBUILT season.
 
-Robot code for FRC Team 6243 (Energy NERDs) for the 2026 REBUILT season.
+## System Overview
 
-## What The Robot Can Do
+This codebase includes:
 
-- Swerve drivechain with field-relative control. 
-- Run AprilTag-based pose fusion from two vision cameras (Luma P1).
-- Switch a third camera between AprilTag and object-detection pipelines (Luma P1).
-- Auto-snap robot yaw and hood angle to optimal position for shooting
-- Slapdown intake mechanism
-- Run indexer + feeder forward for transporting balls from hopper to shooter or in reverse for unclogging.
-- Operate a single-motor climb (up/down hold commands).
-- Run LED priority states for fault/status/operator feedback.
-- Select PathPlanner autos through dashboard chooser.
-- Run drive characterization and SysId routines from the auto chooser.
+- Swerve drive with field-relative control.
+- Photonvision for pose estimation using apriltags.
+- A third camera that switches between AprilTag and object-detection pipelines.
+- Snap-to-target alignment for robot yaw and hood angle.
+- Slapdown intake, indexer, feeder, shooter, and single-motor climb subsystems.
+- LED state arbitration for status, alerts, and operator feedback.
+- PathPlanner auto selection and drivetrain characterization/SysId routines.
 
-## Operator Controls
+## Driver Controls (Fixed Mapping)
 
-Controller ports in code:
-- Driver controller: USB `0`
-- Codriver controller: USB `2`
+Controller USB assignments in code:
 
-### Driver (Xbox controller)
+- Driver controller: `0`
+- Codriver controller: `2`
+
+These controller mappings are intentional and fixed for this robot code configuration.
+
+### Driver (Xbox)
 
 | Control | Action |
 |---|---|
@@ -37,7 +39,7 @@ Controller ports in code:
 | Right bumper (hold) | Intake out |
 | `Y` (hold) | Beach alert LED mode |
 
-### Codriver (Xbox controller)
+### Codriver (Xbox)
 
 | Control | Action |
 |---|---|
@@ -52,9 +54,9 @@ Controller ports in code:
 | D-pad down (hold) | Climb down |
 | `Y` (hold) | Beach alert LED mode |
 
-## LED States (Priority Order)
+## LED Priority Table
 
-Higher rows override lower rows.
+Higher priority states override lower priority states.
 
 | Priority | State | Output |
 |---|---|---|
@@ -66,9 +68,10 @@ Higher rows override lower rows.
 | 6 | Hood stowed | Solid blue `rgb(0,0,255)` |
 | 7 | Default | LEDs off |
 
-## CAN / IO Map
+## Hardware Addressing Reference
 
-### RIO CAN bus devices
+`IMPORTANT`: CAN IDs, bus names, camera names, and IO ports below are integration placeholders/reference values. Validate and update all hardware information before running on the robot.
+### RIO CAN Bus Devices
 
 | Device | ID | Notes |
 |---|---:|---|
@@ -81,7 +84,7 @@ Higher rows override lower rows.
 | Indexer right | 31 | `IndexerRight` |
 | Indexer left | 32 | `IndexerLeft` (follower of 31) |
 
-### Swerve CAN bus devices (`TunerConstants`)
+### Swerve CAN Bus Devices (`TunerConstants`)
 
 | Device | ID |
 |---|---:|
@@ -106,10 +109,11 @@ Higher rows override lower rows.
 - Object camera pipeline indices:
   - `0`: AprilTag
   - `1`: Object detection
-- Robot code switches object camera to detection in autonomous and back to AprilTag in teleop.
+- Code behavior: object camera switches to detection in autonomous and back to AprilTag in teleop.
 
-## Important Setup Notes
+## Bring-Up Checklist
 
-- Update `src/main/java/frc/robot/generated/TunerConstants.java` CAN bus name from `"Default Name"` to your actual drivetrain CAN bus name before running on hardware.
-- Verify USB controller indexing at each event (`0` driver, `2` codriver in current code).
-- If hood behavior changes mechanically, re-check hood angle tuning and limit switch orientation.
+- Set drivetrain CAN bus name in `src/main/java/frc/robot/generated/TunerConstants.java` (replace `"Default Name"`).
+- Confirm all CAN IDs and IO ports match final robot wiring.
+- Confirm camera device names and active pipelines match coprocessor configuration.
+- Verify hood limit switch polarity and hood angle tuning after mechanical changes.
