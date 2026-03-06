@@ -59,4 +59,9 @@ public final class Constants {
     public static final double CLIMB_BACK_MOTOR_SPEED = -1;
     public static final double SHOOTER_SPEED = -0.6;
   }
+
+  public static class LEDConstants {
+    public static final int PWM_PORT = 0;
+    public static final int LED_COUNT = 60;
+  }
 }
