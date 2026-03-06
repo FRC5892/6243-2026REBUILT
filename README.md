@@ -107,7 +107,7 @@ Higher rows override lower rows.
 
 - AprilTag camera names: `camera_0`, `camera_1`
 - Object camera name: `camera_object`
-- Real robot stack: two `VisionIOLimelight` instances for AprilTag observations plus one PhotonVision object camera.
+- Real robot stack: two cameras instances for AprilTag observations plus one object camera (switches to apriltag during teleop).
 - Object camera pipeline indices:
   - `0`: AprilTag
   - `1`: Object detection
