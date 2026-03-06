@@ -3,6 +3,7 @@
 [![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
 [![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)](https://github.com/FRC5892/6243-2026REBUILT/commits/main)
 [![License](https://img.shields.io/badge/license-WPILib%20%2B%20AdvantageKit-blue)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/WPILib-License.md)
+
 [![Java](https://img.shields.io/badge/java-17-informational)](https://adoptium.net/)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/build.gradle)
 
