@@ -18,6 +18,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
@@ -32,6 +33,9 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.leds.LED;
+import frc.robot.subsystems.leds.LEDIO;
+import frc.robot.subsystems.leds.LEDIOReal;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
@@ -57,6 +61,7 @@ public class RobotContainer {
   private final Climb climb;
   private final Indexer indexer;
   private final Shooter shooter;
+  private final LED led;
 
   // Controller
   private final CommandXboxController m_drivecontroller = new CommandXboxController(0);
@@ -91,6 +96,9 @@ public class RobotContainer {
         intake = new Intake(rioCAN);
 
         indexer = new Indexer(rioCAN);
+        led =
+            new LED(
+                new LEDIOReal(Constants.LEDConstants.PWM_PORT, Constants.LEDConstants.LED_COUNT));
         break;
 
       case SIM:
@@ -113,6 +121,7 @@ public class RobotContainer {
         intake = new Intake(rioCAN);
 
         indexer = new Indexer(rioCAN);
+        led = new LED(new LEDIO() {});
         break;
 
       default:
@@ -131,6 +140,7 @@ public class RobotContainer {
         intake = new Intake(rioCAN);
 
         indexer = new Indexer(rioCAN);
+        led = new LED(new LEDIO() {});
         break;
     }
     shooter = new Shooter(rioCAN);
@@ -174,20 +184,28 @@ public class RobotContainer {
 
     // Driver: Auto align (hold A)
     m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_drivecontroller.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
+    m_drivecontroller.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
     // Driver: Hood stow (X) - on press, move to stow angle if currently below it
     m_drivecontroller.x().onTrue(shooter.getHood().stowCommand());
+    m_drivecontroller.x().onTrue(Commands.runOnce(() -> led.setHoodStowed(true)));
 
     //  DRIVER INTAKE
 
     // Toggle intake up/down (B)
     m_drivecontroller.b().toggleOnTrue(intake.deploy());
+    m_drivecontroller.b().onTrue(Commands.runOnce(led::toggleIntakeDown));
 
     // Hold to intake IN (left bumper)
     m_drivecontroller.leftBumper().whileTrue(intake.intakeIn());
 
     // Hold to intake OUT (right bumper)
     m_drivecontroller.rightBumper().whileTrue(intake.intakeOut());
+
+    // Beach alert (Y hold)
+    m_drivecontroller.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+    m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // CODRIVER
 
@@ -208,9 +226,16 @@ public class RobotContainer {
 
     // Auto align (A)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
+    m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
     // Intake toggle (left bumper)
     m_codriverController.leftBumper().toggleOnTrue(intake.deploy());
+    m_codriverController.leftBumper().onTrue(Commands.runOnce(led::toggleIntakeDown));
+
+    // Beach alert (Y hold)
+    m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+    m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // Intake IN (X hold)
     m_codriverController.x().whileTrue(intake.intakeIn());
@@ -222,6 +247,15 @@ public class RobotContainer {
     m_codriverController
         .rightBumper()
         .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
+
+    // Keep high-priority motor disconnect alert updated continuously.
+    led.setDefaultCommand(
+        led.run(
+            () -> {
+              led.setMotorOverheated(drive.hasOverheatedMotor());
+              led.setMotorDisconnected(drive.hasDisconnectedMotor());
+              led.setHoodStowed(shooter.getHood().getAngle().getDegrees() >= 69.0);
+            }));
   }
 
   /**
