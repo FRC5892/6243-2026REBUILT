@@ -17,7 +17,7 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
 
-## Controls (Fixed)
+## Controls
 
 Controller USB ports:
 
@@ -26,7 +26,7 @@ Controller USB ports:
 
 Mappings are fixed in `src/main/java/frc/robot/RobotContainer.java`.
 
-### Driver (Xbox)
+### Driver
 
 | Control | Action |
 |---|---|
@@ -39,7 +39,7 @@ Mappings are fixed in `src/main/java/frc/robot/RobotContainer.java`.
 | Right bumper (hold) | Intake out |
 | `Y` (hold) | Beach alert LED mode |
 
-### Codriver (Xbox)
+### Codriver
 
 | Control | Action |
 |---|---|
@@ -54,7 +54,7 @@ Mappings are fixed in `src/main/java/frc/robot/RobotContainer.java`.
 | D-pad down (hold) | Climb down |
 | `Y` (hold) | Beach alert LED mode |
 
-## LED Priority
+## LED Indicator Priority
 
 Higher rows override lower rows.
 
