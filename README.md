@@ -1,6 +1,6 @@
 # KickBack (FRC 6243) - 2026 REBUILT
 
-[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
+[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml) ![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
 
 
 Robot code for FRC Team 6243 (Energy NERDs), maintained with WPILib command-based structure, AdvantageKit logging, CTRE Phoenix 6 swerve, and PathPlanner.
