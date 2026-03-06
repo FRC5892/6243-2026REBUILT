@@ -56,8 +56,8 @@ public class Hood extends SubsystemBase {
   private final LoggedTunableMeasure<MutAngle> tolerance =
       new LoggedTunableMeasure<>("Hood/Tolerance", Degrees.mutable(5));
   // Hard limits for hood angle (degrees, relative to vertical). Non-tunable constants.
-  private static final double MIN_ANGLE_DEG = 70.0;
-  private static final double MAX_ANGLE_DEG = 43.0;
+  private static final double MIN_ANGLE_DEG = 43.0;
+  private static final double MAX_ANGLE_DEG = 70.0;
   /* Homing */
   private final LoggedTunableNumber homingVoltage =
       new LoggedTunableNumber("Hood/Homing/Voltage", 4, "v");
@@ -123,8 +123,9 @@ public class Hood extends SubsystemBase {
   public Command stowCommand() {
     return startEnd(
             () -> {
-              // Stow should move the hood to the minimum allowed angle.
-              this.requestAngle(Rotation2d.fromDegrees(MIN_ANGLE_DEG));
+              // Stow should move the hood to the closest angle to horizontal (highest from
+              // vertical).
+              this.requestAngle(Rotation2d.fromDegrees(MAX_ANGLE_DEG));
             },
             () -> {})
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
