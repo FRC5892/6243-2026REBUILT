@@ -1,0 +1,6 @@
+{
+  "MLModelVersionStringKey" : "1",
+  "MLModelDescriptionKey" : "Fine-tuned model based on YOLO26n",
+  "MLModelAuthorKey" : "Littleton Robotics",
+  "MLModelLicenseKey" : "AGPL-3.0 License"
+}
