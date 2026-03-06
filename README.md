@@ -3,17 +3,16 @@
 [![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml) ![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
 
 
-Robot code for FRC Team 6243 (Energy NERDs) for the 2026 REBUILT season
+Robot code for FRC Team 6243 (Energy NERDs) for the 2026 REBUILT season.
 
 ## What The Robot Can Do
 
-- Drive with field-relative swerve control.
-- Run AprilTag-based pose fusion from two vision cameras.
-- Switch a third camera between AprilTag and object-detection pipelines.
-- Auto-snap robot yaw to shot heading while commanding hood angle.
-- Shoot with flywheel + hood setpointing and shooter-readiness-gated indexing.
-- Intake and outtake with a slapdown intake mechanism.
-- Run indexer + feeder forward for shooting or reverse for unclogging.
+- Swerve drivechain with field-relative control. 
+- Run AprilTag-based pose fusion from two vision cameras (Luma P1).
+- Switch a third camera between AprilTag and object-detection pipelines (Luma P1).
+- Auto-snap robot yaw and hood angle to optimal position for shooting
+- Slapdown intake mechanism
+- Run indexer + feeder forward for transporting balls from hopper to shooter or in reverse for unclogging.
 - Operate a single-motor climb (up/down hold commands).
 - Run LED priority states for fault/status/operator feedback.
 - Select PathPlanner autos through dashboard chooser.
