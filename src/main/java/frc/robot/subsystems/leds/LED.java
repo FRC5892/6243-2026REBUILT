@@ -74,7 +74,7 @@ public class LED extends SubsystemBase {
     }
 
     if (beachAlertActive) {
-      io.setRainbow();
+      io.setRainbowFade();
       return;
     }
 
