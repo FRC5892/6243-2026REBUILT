@@ -3,7 +3,7 @@
 [![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml) ![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)
 
 
-Robot code for FRC Team 6243 (Energy NERDs), maintained with WPILib command-based structure, AdvantageKit logging, CTRE Phoenix 6 swerve, and PathPlanner.
+Robot code for FRC Team 6243 (Energy NERDs) for the 2026 REBUILT season
 
 ## What The Robot Can Do
 
@@ -25,7 +25,7 @@ Controller ports in code:
 - Driver controller: USB `0`
 - Codriver controller: USB `2`
 
-### Driver (Xbox)
+### Driver (Xbox controller)
 
 | Control | Action |
 |---|---|
@@ -38,7 +38,7 @@ Controller ports in code:
 | Right bumper (hold) | Intake out |
 | `Y` (hold) | Beach alert LED mode |
 
-### Codriver (Xbox)
+### Codriver (Xbox controller)
 
 | Control | Action |
 |---|---|
