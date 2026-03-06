@@ -20,6 +20,11 @@ public class VisionConstants {
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "camera_0";
   public static String camera1Name = "camera_1";
+  public static String objectCameraName = "camera_object";
+
+  // PhotonVision pipeline indices for the object camera
+  public static int objectCameraAprilTagPipeline = 0;
+  public static int objectCameraDetectionPipeline = 1;
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
