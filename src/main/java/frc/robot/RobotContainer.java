@@ -39,7 +39,7 @@ import frc.robot.subsystems.leds.LEDIOReal;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
-import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
@@ -53,6 +53,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
+
   private final CANBus rioCAN = new CANBus("rio");
   // Subsystems
   private final Drive drive;
@@ -88,8 +90,8 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 objectCameraName,
-                new VisionIOLimelight(camera0Name, drive::getRotation),
-                new VisionIOLimelight(camera1Name, drive::getRotation));
+                new VisionIOPhotonVision(camera0Name, robotToCamera0),
+                new VisionIOPhotonVision(camera1Name, robotToCamera1));
         climb = new Climb(new PhoenixTalonFX(13, rioCAN, "RightClimb"));
         // TODO: make climb wiht neos
 
@@ -252,8 +254,18 @@ public class RobotContainer {
     led.setDefaultCommand(
         led.run(
             () -> {
-              led.setMotorOverheated(drive.hasOverheatedMotor());
-              led.setMotorDisconnected(drive.hasDisconnectedMotor());
+              led.setMotorOverheated(
+                  drive.hasOverheatedMotor()
+                      || intake.hasOverheatedMotor()
+                      || indexer.hasOverheatedMotor()
+                      || shooter.hasOverheatedMotor()
+                      || climb.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C));
+              led.setMotorDisconnected(
+                  drive.hasDisconnectedMotor()
+                      || intake.hasDisconnectedMotor()
+                      || indexer.hasDisconnectedMotor()
+                      || shooter.hasDisconnectedMotor()
+                      || climb.hasDisconnectedMotor());
               led.setHoodStowed(shooter.getHood().getAngle().getDegrees() >= 69.0);
             }));
   }
