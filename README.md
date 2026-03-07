@@ -14,7 +14,7 @@ Active indicators:
 [![Open Issues](https://img.shields.io/github/issues/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/issues)
 [![Open PRs](https://img.shields.io/github/issues-pr/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/pulls)
 
-Competition code for FRC Team 6243 (Energy NERDs), 2026 REBUILT.
+FRC Team 6243 (Energy NERDs') code for the 2026 REBUILT season.
 
 ## Robot Summary
 
