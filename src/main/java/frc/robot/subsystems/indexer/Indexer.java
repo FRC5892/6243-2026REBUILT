@@ -17,6 +17,7 @@ import lombok.Getter;
 
 /** Container for indexer mechanisms (feeder, indexer rollers). */
 public class Indexer {
+  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
 
   @Getter private final FeederRollerSubsystem feeder;
   @Getter private final IndexerRollerSubsystem indexerRollers;
@@ -91,5 +92,16 @@ public class Indexer {
 
   public Command stopAll() {
     return feeder.stop().alongWith(indexerRollers.stop());
+  }
+
+  /** Returns true if any indexer motor is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    return feeder.hasDisconnectedMotor() || indexerRollers.hasDisconnectedMotor();
+  }
+
+  /** Returns true if any indexer motor is above the overheat threshold. */
+  public boolean hasOverheatedMotor() {
+    return feeder.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C)
+        || indexerRollers.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C);
   }
 }

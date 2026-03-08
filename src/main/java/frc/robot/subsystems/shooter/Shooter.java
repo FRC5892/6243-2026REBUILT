@@ -17,6 +17,8 @@ import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import lombok.Getter;
 
 public class Shooter {
+  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
+
   @Getter private final Flywheel flywheel;
   @Getter private final Hood hood;
 
@@ -101,5 +103,16 @@ public class Shooter {
     Rotation2d current = RobotState.getInstance().getRobotPosition().getRotation();
 
     return Math.abs(current.minus(target).getDegrees()) < 2.0;
+  }
+
+  /** Returns true if any shooter motor is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    return flywheel.hasDisconnectedMotor() || hood.hasDisconnectedMotor();
+  }
+
+  /** Returns true if any shooter motor is above the overheat threshold. */
+  public boolean hasOverheatedMotor() {
+    return flywheel.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C)
+        || hood.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C);
   }
 }

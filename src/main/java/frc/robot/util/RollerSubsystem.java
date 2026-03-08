@@ -43,6 +43,14 @@ public class RollerSubsystem extends SubsystemBase {
     return startRun(() -> motor.setControl(voltageOut.withOutput(0)), () -> {});
   }
 
+  public boolean hasDisconnectedMotor() {
+    return motor.hasDisconnectedMotor();
+  }
+
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return motor.hasOverheatedMotor(tempThresholdC);
+  }
+
   public enum Direction {
     FORWARD,
     REVERSE

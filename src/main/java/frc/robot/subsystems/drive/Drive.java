@@ -54,6 +54,7 @@ import org.littletonrobotics.junction.Logger;
 public class Drive extends SubsystemBase {
   // TunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY = TunerConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
+  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
@@ -268,6 +269,26 @@ public class Drive extends SubsystemBase {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(output);
     }
+  }
+
+  /** Returns true when any swerve drive or turn motor is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    for (Module module : modules) {
+      if (module.hasDisconnectedMotor()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Returns true when any swerve drive or turn motor exceeds the overheat threshold. */
+  public boolean hasOverheatedMotor() {
+    for (Module module : modules) {
+      if (module.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /** Stops the drive. */

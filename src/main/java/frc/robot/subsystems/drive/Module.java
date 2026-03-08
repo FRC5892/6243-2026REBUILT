@@ -172,4 +172,14 @@ public class Module {
   public void setDrivePID(double p, double i, double d, double ks, double kv) {
     io.setDrivePID(p, i, d, ks, kv);
   }
+
+  /** Returns true when either drive or turn motor is disconnected. */
+  public boolean hasDisconnectedMotor() {
+    return !inputs.driveConnected || !inputs.turnConnected;
+  }
+
+  /** Returns true when either module motor exceeds the provided temperature threshold in C. */
+  public boolean hasOverheatedMotor(double tempThresholdC) {
+    return inputs.driveTempC >= tempThresholdC || inputs.turnTempC >= tempThresholdC;
+  }
 }

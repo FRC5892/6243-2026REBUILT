@@ -1,74 +1,130 @@
-# (tbd) (FRC 6243) - 2026 REBUILT
+# KickBack (FRC 6243) - 2026 REBUILT
 
-Welcome to the repository for (tbd), FRC Team 6243 Energy NERDs' robot for the 2026 REBUILT season.
+[![Build](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/FRC5892/6243-2026REBUILT/actions/workflows/build.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/FRC5892/6243-2026REBUILT?color=yellow)](https://github.com/FRC5892/6243-2026REBUILT/commits/main)
+[![License](https://img.shields.io/badge/license-WPILib%20%2B%20AdvantageKit-blue)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/WPILib-License.md)
 
-## About Team 6243
-Team 6243, the Energy NERDs, is an FRC team based out of Energy Institute High School located in Houston, Texas. It is the sister team of FRC 5892, the Energy HEROs.
+[![Java](https://img.shields.io/badge/java-17-informational)](https://adoptium.net/)
+[![Gradle](https://img.shields.io/badge/build-Gradle-02303A)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/build.gradle)
 
-## About (tbd) (2026)
-(tbd) is our robot entry for the 2026 FRC competition, REBUILT. (tbd) features a swerve drivechain (a system allowing wheels to rotate and move in any direction), a dual shooter with a conjoined hood, an expandable hopper design with a roller floor, a slapdown intake, a split indexer with a vortex wheel feeder, L1 climbing capabilities, and can navigate both over the bump and under the trench.
+## Project Indicators
+
+Active indicators:
+
+[![Open Issues](https://img.shields.io/github/issues/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/issues)
+[![Open PRs](https://img.shields.io/github/issues-pr/FRC5892/6243-2026REBUILT)](https://github.com/FRC5892/6243-2026REBUILT/pulls)
+
+FRC Team 6243 (Energy NERDs') code for the 2026 REBUILT season.
+
+## Robot Summary
+
+Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
+
+- Swerve drive with field-relative control.
+- AprilTag pose fusion from two PhotonVision-based vision inputs.
+- Separate object camera with mode-based pipeline switching.
+- Shooter with dynamic hood/flywheel targets from shot calculation.
+- Feeder/indexer gated on shooter-ready state during shoot command.
+- Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
+- Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
 
 ## Controls
 
-**Driver Controls**
+Controller USB ports:
 
-| Function           | Button / Stick           | Description            | LED Indicator Color  |
-|--------------------|--------------------------|------------------------|---|
-| Drive (field-oriented) | Left Stick (X/Y)         | Robot translation      | N/A |
-| Drive (field-oriented) | Right Stick (X/Y)  | Robot rotation         | N/A |
-| Slapdown Intake | B (toggle)           | Raising and lowering the slapdown intake | Green when in lowered position|
-| Intake in             | Left bumper (hold down) | Intakes balls into the hopper                       | N/A |
-| Intake out                   | Right bumper (hold down)                       | Outtakes balls from the hopper                       | N/A |
-| Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
-| Stow hood                          | X (press)                         | Stows hood for going under trench. Not a toggle.   | Blue when hood is stowed |
-| Beach Alert                          | Y (hold)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
+- Driver controller: `0`
+- Codriver controller: `2`
 
-**Codriver Controls**
+Mappings are fixed in `src/main/java/frc/robot/RobotContainer.java`.
 
-| Function           | Button / Stick           | Description            | LED Indicator Color  |
-|--------------------|--------------------------|------------------------|---|
-| Slapdown Intake | Left Bumper     (toggle)      | Raising and lowering the slapdown intake | Green when in lowered position|
-| Intake in             | B (hold down) | Intakes balls into the hopper                       | N/A |
-| Intake out                   | X (hold down)                       | Outtakes balls from the hopper                       | N/A |
-| Activate auto align    | A (hold down)     | Activates auto align feature whilst held down                       | Red when active |
-| Beach Alert                          | Y (hold down)                         | Makes the robot's indicator LEDs rainbow fade. Used to indicate to alliance members that we are beached on a fuel and need assistance | Rainbow fade when active                        |
-| Climb Up              | D-pad up (hold down)             | Raises the robot's climb mechanism          | N/A         |
-| Climb Down             | D-pad down (hold down)              | Lowers the robot's climb mechanism          | N/A          |
-| Shoot             | Right bumper (hold down)              | Runs shot calculator, rotates robot and adjusts hood accordingly, then spins indexer, feeding balls into the already spinning flywheels, shooting them into the hub    |           |
+### Driver
 
+| Control | Action |
+|---|---|
+| Left stick X/Y | Field-relative translation |
+| Right stick X | Rotation |
+| `A` (hold) | Snap-to-target (yaw + hood alignment) |
+| `X` (press) | Stow hood |
+| `B` (toggle) | Toggle intake deploy/retract |
+| Left bumper (hold) | Intake in |
+| Right bumper (hold) | Intake out |
+| `Y` (hold) | Beach alert LED mode |
 
+### Codriver
 
+| Control | Action |
+|---|---|
+| Left stick Y | Manual hood adjust (default hood command) |
+| `A` (hold) | Snap-to-target (yaw + hood alignment) |
+| Left bumper (toggle) | Toggle intake deploy/retract |
+| `X` (hold) | Intake in |
+| `B` (hold) | Intake out |
+| Right bumper (hold) | Shoot (flywheel + hood request + gated feed) |
+| Right trigger (hold) | Indexer unclog (reverse feed) |
+| D-pad up (hold) | Climb up |
+| D-pad down (hold) | Climb down |
+| `Y` (hold) | Beach alert LED mode |
 
----
+## LED Indicator Priority
 
-## CAN IDs
+Higher rows override lower rows.
 
-| Device              | CAN ID | Notes                                            |
-|---------------------|--------|--------------------------------------------------|
-|                     |   #    |                                                  |
-| Indexer             |   #    |                                                  |
-| Feeder and hopper rollers |   #    |                                                  |
-| Climb Arm           |   #    |                                                  |
-| Intake Rollers      |   #    |                                                  |
-| Intake Slapdown     |   #    |                                                  |
-| Front Left Drive    |   #    | Swerve Module                                    |
-| Front Left Steer    |   #    | Swerve Module                                    |
-| Front Right Drive   |   #    | Swerve Module                                    |
-| Front Right Steer   |   #    | Swerve Module                                    |
-| Back Left Drive     |   #    | Swerve Module                                    |
-| Back Left Steer     |   #    | Swerve Module                                    |
-| Back Right Drive    |   #    | Swerve Module                                    |
-| Back Right Steer    |   #    | Swerve Module                                    |
+| Priority | State | Output |
+|---|---|---|
+| 1 | Drive motor overheated | Flashing white `rgb(255,255,255)` |
+| 2 | Drive motor disconnected | Flashing orange `rgb(255,165,0)` |
+| 3 | Beach alert active | Rainbow fade animation |
+| 4 | Auto-align active | Solid red `rgb(255,0,0)` |
+| 5 | Intake down | Solid green `rgb(0,255,0)` |
+| 6 | Hood stowed | Solid blue `rgb(0,0,255)` |
+| 7 | Default | LEDs TBD |
 
----
+## Hardware Map (Reference)
 
-## LED Indicator Color
+`IMPORTANT`: CAN IDs, bus names, camera names, and IO ports below are reference placeholders. Verify and update to match final robot wiring before running on hardware.
 
-| Color And Behavior   | RGB Values | Priority    | Notes                                       |
-|---------------------|------------|-------------|---------------------------------------------|
-| White (flashing)    | `rgb(255, 255, 255)` |      1       | Indicates overheating motor                                          |
-| Rainbow (fade) | varius        |     2        | Indicates to allince members that robot is beached                                           |
-| Red (solid)                |   `rgb(255, 0, 0)` |    3         | Indicates auto allign feature is active                                           |
-| Green (solid)                |   `rgb(0, 255, 0)`        |     4        | Indicates slapdown intake is in the "down" position                                          |
-| Blue (solid)                  |   `rgb(0, 0, 255)`        |      5       |   Indicates that hood is in the "stowed" position                                         |
-|    |  |     |                                        |
+| Device | Bus / IO Type | ID / Port | Function / Notes |
+|---|---|---:|---|
+| Climb motor | RIO CAN | 13 | `RightClimb` |
+| Intake roller | RIO CAN | 20 | `IntakeRoller` |
+| Slapdown motor | RIO CAN | 21 | `Slapdown` |
+| Flywheel leader | RIO CAN | 26 | `FlywheelRight` (left follows in config) |
+| Hood motor | RIO CAN | 27 | `Hood` |
+| Feeder roller | RIO CAN | 30 | `Feeder` |
+| Indexer right | RIO CAN | 31 | `IndexerRight` |
+| Indexer left | RIO CAN | 32 | `IndexerLeft` (follower of 31) |
+| Pigeon2 | Swerve CAN (`TunerConstants`) | 13 | Drivetrain gyro |
+| Front Left Drive | Swerve CAN (`TunerConstants`) | 2 | Swerve module drive motor |
+| Front Left Steer | Swerve CAN (`TunerConstants`) | 6 | Swerve module steer motor |
+| Front Left Encoder | Swerve CAN (`TunerConstants`) | 41 | Swerve module azimuth encoder |
+| Front Right Drive | Swerve CAN (`TunerConstants`) | 3 | Swerve module drive motor |
+| Front Right Steer | Swerve CAN (`TunerConstants`) | 7 | Swerve module steer motor |
+| Front Right Encoder | Swerve CAN (`TunerConstants`) | 42 | Swerve module azimuth encoder |
+| Back Left Drive | Swerve CAN (`TunerConstants`) | 4 | Swerve module drive motor |
+| Back Left Steer | Swerve CAN (`TunerConstants`) | 8 | Swerve module steer motor |
+| Back Left Encoder | Swerve CAN (`TunerConstants`) | 43 | Swerve module azimuth encoder |
+| Back Right Drive | Swerve CAN (`TunerConstants`) | 5 | Swerve module drive motor |
+| Back Right Steer | Swerve CAN (`TunerConstants`) | 9 | Swerve module steer motor |
+| Back Right Encoder | Swerve CAN (`TunerConstants`) | 44 | Swerve module azimuth encoder |
+| LED strip | PWM | 0 | Addressable LED strip output |
+| Hood reverse limit | DIO | 1 | Hood reverse travel limit switch |
+| Hood forward limit | DIO | 2 | Hood forward travel limit switch |
+
+## Vision
+
+- AprilTag camera names: `camera_0`, `camera_1`
+- Object camera name: `camera_object`
+- Real robot stack: two cameras for AprilTag detection plus one for gamepiece detection (switches to Apriltag during teleop).
+- Object camera pipeline indices:
+  - `0`: AprilTag
+  - `1`: Object detection
+- Runtime behavior:
+  - `autonomousInit()`: object camera set to detection pipeline.
+  - `teleopInit()`: object camera set back to AprilTag pipeline.
+
+## Setup Checklist
+
+1. Set drivetrain CAN bus name in `src/main/java/frc/robot/generated/TunerConstants.java` (replace `"Default Name"`).
+2. Validate all CAN IDs, DIO, and PWM assignments.
+3. Confirm vision device names and object-camera pipeline indices.
+4. Verify hood limit switch polarity and hood calibration.

@@ -20,9 +20,13 @@ public class VisionConstants {
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "camera_0";
   public static String camera1Name = "camera_1";
+  public static String objectCameraName = "camera_object";
+
+  // PhotonVision pipeline indices for the object camera
+  public static int objectCameraAprilTagPipeline = 0;
+  public static int objectCameraDetectionPipeline = 1;
 
   // Robot to camera transforms
-  // (Not used by Limelight, configure in web UI instead)
   public static Transform3d robotToCamera0 =
       new Transform3d(0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, 0.0));
   public static Transform3d robotToCamera1 =
@@ -44,9 +48,4 @@ public class VisionConstants {
         1.0, // Camera 0
         1.0 // Camera 1
       };
-
-  // Multipliers to apply for MegaTag 2 observations
-  public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
-  public static double angularStdDevMegatag2Factor =
-      Double.POSITIVE_INFINITY; // No rotation data available
 }

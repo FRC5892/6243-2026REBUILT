@@ -19,20 +19,48 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
+  public static enum ObjectPipeline {
+    APRILTAG,
+    OBJECT_DETECTION
+  }
+
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
+  // PhotonCamera for object detection (game pieces, etc.) - separate from AprilTag cameras
+  // Public so commands can access latest results directly
+  public final PhotonCamera objectCamera;
+  private ObjectPipeline activeObjectPipeline = ObjectPipeline.APRILTAG;
+
   public Vision(VisionConsumer consumer, VisionIO... io) {
+    this(consumer, null, io);
+  }
+
+  /**
+   * Creates a Vision subsystem with optional object detection camera
+   *
+   * @param consumer Consumer for AprilTag pose measurements
+   * @param objectCameraName Name of the PhotonVision camera for object detection (null to disable)
+   * @param io VisionIO implementations for AprilTag cameras
+   */
+  public Vision(VisionConsumer consumer, String objectCameraName, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
+
+    // Initialize object detection camera if provided
+    this.objectCamera = objectCameraName != null ? new PhotonCamera(objectCameraName) : null;
+    if (this.objectCamera != null) {
+      // Default to AprilTag pipeline (for teleop odometry)
+      this.objectCamera.setPipelineIndex(objectCameraAprilTagPipeline);
+    }
 
     // Initialize inputs
     this.inputs = new VisionIOInputsAutoLogged[io.length];
@@ -58,8 +86,47 @@ public class Vision extends SubsystemBase {
     return inputs[cameraIndex].latestTargetObservation.tx();
   }
 
+  /** Returns whether the object detection camera is configured and connected */
+  public boolean isObjectCameraConnected() {
+    return objectCamera != null && objectCamera.isConnected();
+  }
+
+  /** Sets the active pipeline on the object camera. */
+  public void setObjectPipeline(ObjectPipeline pipeline) {
+    if (objectCamera == null) {
+      return;
+    }
+
+    int pipelineIndex =
+        switch (pipeline) {
+          case APRILTAG -> objectCameraAprilTagPipeline;
+          case OBJECT_DETECTION -> objectCameraDetectionPipeline;
+        };
+    objectCamera.setPipelineIndex(pipelineIndex);
+    activeObjectPipeline = pipeline;
+  }
+
+  /** Convenience helper for autonomous mode - switches to object detection on object camera. */
+  public void setAutonomousPipeline() {
+    setObjectPipeline(ObjectPipeline.OBJECT_DETECTION);
+  }
+
+  /** Convenience helper for teleop mode - switches to AprilTag on object camera. */
+  public void setTeleopPipeline() {
+    setObjectPipeline(ObjectPipeline.APRILTAG);
+  }
+
+  /** Returns the last requested object camera pipeline mode. */
+  public ObjectPipeline getActiveObjectPipeline() {
+    return activeObjectPipeline;
+  }
+
   @Override
   public void periodic() {
+    Logger.recordOutput(
+        "Vision/ObjectCamera/PipelineMode",
+        activeObjectPipeline == ObjectPipeline.APRILTAG ? 0 : 1);
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
@@ -124,10 +191,6 @@ public class Vision extends SubsystemBase {
             Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
         double linearStdDev = linearStdDevBaseline * stdDevFactor;
         double angularStdDev = angularStdDevBaseline * stdDevFactor;
-        if (observation.type() == PoseObservationType.MEGATAG_2) {
-          linearStdDev *= linearStdDevMegatag2Factor;
-          angularStdDev *= angularStdDevMegatag2Factor;
-        }
         if (cameraIndex < cameraStdDevFactors.length) {
           linearStdDev *= cameraStdDevFactors[cameraIndex];
           angularStdDev *= cameraStdDevFactors[cameraIndex];
