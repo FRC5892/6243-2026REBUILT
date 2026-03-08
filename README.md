@@ -24,6 +24,7 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - AprilTag pose fusion from two PhotonVision-based vision inputs.
 - Separate object camera with mode-based pipeline switching.
 - Shooter with dynamic hood/flywheel targets from shot calculation.
+- Backrollers to introduce controlled and tunable levels of backspin on shots.
 - Feeder/indexer gated on shooter-ready state during shoot command.
 - Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
