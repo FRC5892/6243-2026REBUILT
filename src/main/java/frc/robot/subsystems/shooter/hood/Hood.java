@@ -58,6 +58,13 @@ public class Hood extends SubsystemBase {
   // Hard limits for hood angle (degrees, relative to vertical). Non-tunable constants.
   private static final double MIN_ANGLE_DEG = 43.0;
   private static final double MAX_ANGLE_DEG = 70.0;
+
+  // Slow the hood when approaching limits to avoid mechanical shock
+  private static final double LIMIT_SLOW_ZONE_DEG = 5.0;
+
+  private final MotionMagicConfigs slowMotionMagic =
+      new MotionMagicConfigs().withMotionMagicCruiseVelocity(6).withMotionMagicAcceleration(12);
+
   /* Homing */
   private final LoggedTunableNumber homingVoltage =
       new LoggedTunableNumber("Hood/Homing/Voltage", 4, "v");
@@ -169,14 +176,30 @@ public class Hood extends SubsystemBase {
    * @param angle the target angle relative to vertical. 0 is vertical, 90 is horizontal
    */
   public void requestAngle(Rotation2d angle) {
-    // Clamp the requested angle to the allowed (non-tunable) range before converting.
+
     double requestedDeg = angle.getDegrees();
+
+    // Clamp to allowed range
     double clampedDeg = Math.max(MIN_ANGLE_DEG, Math.min(MAX_ANGLE_DEG, requestedDeg));
+
     if (clampedDeg != requestedDeg) {
-      Logger.recordOutput("Hood/RequestedAngleClamped", clampedDeg, "deg");
+      Logger.recordOutput("Hood/RequestedAngleClamped", clampedDeg);
     }
-    Logger.recordOutput("Hood/RequestedAngle", clampedDeg, "deg");
+
+    Logger.recordOutput("Hood/RequestedAngle", clampedDeg);
+
+    // Slow motion magic when near limits
+    boolean nearLimit =
+        clampedDeg > (MAX_ANGLE_DEG - LIMIT_SLOW_ZONE_DEG)
+            || clampedDeg < (MIN_ANGLE_DEG + LIMIT_SLOW_ZONE_DEG);
+
+    if (nearLimit) {
+      motor.quickApplyConfig(new TalonFXConfiguration().withMotionMagic(slowMotionMagic));
+      Logger.recordOutput("Hood/LimitSlowdownActive", true);
+    }
+
     angleToPosition(Rotation2d.fromDegrees(clampedDeg), targetPosition);
+
     positionControl = true;
     setControl();
   }
