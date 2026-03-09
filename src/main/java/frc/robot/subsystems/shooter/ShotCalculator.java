@@ -11,9 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
-import edu.wpi.first.math.interpolation.InverseInterpolator;
+// Lookup tables removed; using simple estimators and gravity parameter instead.
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.RobotState;
 import frc.robot.util.AllianceFlipUtil;
@@ -55,47 +53,14 @@ public class ShotCalculator {
   private static final double maxDistance;
   private static final double phaseDelay;
 
-  private static final InterpolatingTreeMap<Double, Rotation2d> shotHoodAngleMap =
-      new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
-
-  private static final InterpolatingDoubleTreeMap shotFlywheelSpeedMap =
-      new InterpolatingDoubleTreeMap();
-
-  private static final InterpolatingDoubleTreeMap timeOfFlightMap =
-      new InterpolatingDoubleTreeMap();
+  // Gravity (m/s^2) — exposed as a constant parameter per request
+  private static final double GRAVITY = 6.18;
 
   static {
     minDistance = 1.34;
     maxDistance = 5.60;
     phaseDelay = 0.03;
-
-    shotHoodAngleMap.put(1.34, Rotation2d.fromDegrees(19.0));
-    shotHoodAngleMap.put(1.78, Rotation2d.fromDegrees(19.0));
-    shotHoodAngleMap.put(2.17, Rotation2d.fromDegrees(24.0));
-    shotHoodAngleMap.put(2.81, Rotation2d.fromDegrees(27.0));
-    shotHoodAngleMap.put(3.82, Rotation2d.fromDegrees(29.0));
-    shotHoodAngleMap.put(4.09, Rotation2d.fromDegrees(30.0));
-    shotHoodAngleMap.put(4.40, Rotation2d.fromDegrees(31.0));
-    shotHoodAngleMap.put(4.77, Rotation2d.fromDegrees(32.0));
-    shotHoodAngleMap.put(5.57, Rotation2d.fromDegrees(32.0));
-    shotHoodAngleMap.put(5.60, Rotation2d.fromDegrees(35.0));
-
-    shotFlywheelSpeedMap.put(1.34, 210.0);
-    shotFlywheelSpeedMap.put(1.78, 220.0);
-    shotFlywheelSpeedMap.put(2.17, 220.0);
-    shotFlywheelSpeedMap.put(2.81, 230.0);
-    shotFlywheelSpeedMap.put(3.82, 250.0);
-    shotFlywheelSpeedMap.put(4.09, 255.0);
-    shotFlywheelSpeedMap.put(4.40, 260.0);
-    shotFlywheelSpeedMap.put(4.77, 265.0);
-    shotFlywheelSpeedMap.put(5.57, 275.0);
-    shotFlywheelSpeedMap.put(5.60, 290.0);
-
-    timeOfFlightMap.put(5.68, 1.16);
-    timeOfFlightMap.put(4.55, 1.12);
-    timeOfFlightMap.put(3.15, 1.11);
-    timeOfFlightMap.put(1.88, 1.09);
-    timeOfFlightMap.put(1.38, 0.90);
+    // Lookup tables removed. Use simple estimators driven by distance and gravity.
 
     AutoLogOutputManager.addObject(getInstance());
   }
@@ -131,7 +96,7 @@ public class ShotCalculator {
     double lookaheadDistance = robotToTargetDistance;
 
     for (int i = 0; i < 20; i++) {
-      double timeOfFlight = timeOfFlightMap.get(lookaheadDistance);
+      double timeOfFlight = estimateTimeOfFlight(lookaheadDistance);
 
       double offsetX = robotVelocityX * timeOfFlight;
       double offsetY = robotVelocityY * timeOfFlight;
@@ -146,20 +111,60 @@ public class ShotCalculator {
 
     robotYaw = target.minus(lookaheadPose.getTranslation()).getAngle();
 
-    hoodAngle = shotHoodAngleMap.get(lookaheadDistance);
+    hoodAngle = estimateHoodAngle(lookaheadDistance);
 
     latestShot =
         new ShotParameters(
             lookaheadDistance >= minDistance && lookaheadDistance <= maxDistance,
             robotYaw,
             hoodAngle,
-            shotFlywheelSpeedMap.get(lookaheadDistance));
+            estimateFlywheelSpeed(lookaheadDistance));
 
     Logger.recordOutput("ShotCalculator/LatestShot", latestShot);
     Logger.recordOutput("ShotCalculator/LookaheadPose", lookaheadPose);
     Logger.recordOutput("ShotCalculator/Distance", lookaheadDistance);
 
     return latestShot;
+  }
+
+  /**
+   * Estimate the time of flight for a ball to the target based on distance and gravity. This is a
+   * lightweight empirical estimator (previously provided by a table).
+   */
+  private static double estimateTimeOfFlight(double distanceMeters) {
+    // Base time for short shots, slight growth with distance. Scale inversely with sqrt(g)
+    double base = 1.05; // seconds at ~2m
+    double slope = 0.03; // seconds per meter
+    double t = base + slope * (distanceMeters - 2.0);
+    t *= Math.sqrt(6.18 / GRAVITY);
+    return Math.max(0.5, t);
+  }
+
+  /** Estimate hood angle (degrees) for a given distance. This replaces the previous LUT. */
+  private static Rotation2d estimateHoodAngle(double distanceMeters) {
+    // Linear interpolation between the previously used endpoints to preserve behavior.
+    double d0 = 1.34;
+    double a0 = 19.0;
+    double d1 = 5.60;
+    double a1 = 35.0;
+    double t = (distanceMeters - d0) / (d1 - d0);
+    t = Math.max(0.0, Math.min(1.0, t));
+    double deg = a0 + t * (a1 - a0);
+    // Keep the angle in a sensible range
+    deg = Math.max(10.0, Math.min(80.0, deg));
+    return Rotation2d.fromDegrees(deg);
+  }
+
+  /** Estimate flywheel speed (rotations per second) for a given distance. Replaces the LUT. */
+  private static double estimateFlywheelSpeed(double distanceMeters) {
+    double d0 = 1.34;
+    double s0 = 210.0;
+    double d1 = 5.60;
+    double s1 = 290.0;
+    double t = (distanceMeters - d0) / (d1 - d0);
+    t = Math.max(0.0, Math.min(1.0, t));
+    double speed = s0 + t * (s1 - s0);
+    return Math.max(0.0, speed);
   }
 
   public void clearCache() {
