@@ -93,7 +93,6 @@ public class RobotContainer {
                 new VisionIOPhotonVision(camera0Name, robotToCamera0),
                 new VisionIOPhotonVision(camera1Name, robotToCamera1));
         climb = new Climb(new PhoenixTalonFX(13, rioCAN, "RightClimb"));
-        // TODO: make climb with neos
 
         intake = new Intake(rioCAN);
 

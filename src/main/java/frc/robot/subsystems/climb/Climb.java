@@ -1,6 +1,5 @@
 package frc.robot.subsystems.climb;
 
-// TODO: switch to neos
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
