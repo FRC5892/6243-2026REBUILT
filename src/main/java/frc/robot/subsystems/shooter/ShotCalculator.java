@@ -1,6 +1,6 @@
 // Inspired by Mechanical Advantage shot calculator
 // http://github.com/Mechanical-Advantage
-
+//TODO: Fix this hot mess because of 2/3 of a gravity
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
