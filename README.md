@@ -6,6 +6,7 @@
 
 [![Java](https://img.shields.io/badge/java-17-informational)](https://adoptium.net/)
 [![Gradle](https://img.shields.io/badge/build-Gradle-02303A)](https://github.com/FRC5892/6243-2026REBUILT/blob/main/build.gradle)
+[![Gravity](2/3)
 
 ## Project Indicators
 
