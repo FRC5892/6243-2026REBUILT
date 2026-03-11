@@ -28,6 +28,7 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - Feeder/indexer gated on shooter-ready state during shoot command.
 - Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
+- custom shot calculator inspired by Mechanical Advantage's shot calculator
 
 ## Controls
 
