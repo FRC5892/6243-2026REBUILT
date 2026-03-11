@@ -177,7 +177,7 @@ public class ShotCalculator {
 }
 
 /*
-* ok so hte issue with this is that our shots are really scerwed up bc of the gravity isseus so im making this pr 
-* to clean uop the shot calculator because currently thsi one is unfortunatley usuelss for us
-*
-*/
+ * ok so hte issue with this is that our shots are really scerwed up bc of the gravity isseus so im making this pr
+ * to clean uop the shot calculator because currently thsi one is unfortunatley usuelss for us
+ *
+ */
