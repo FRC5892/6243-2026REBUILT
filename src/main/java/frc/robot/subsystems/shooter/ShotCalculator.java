@@ -84,6 +84,7 @@ public class ShotCalculator {
   static {
     double d = 1.3;
 
+    // Baseline distance tables; final values are adjusted by tunable offsets/slopes at runtime.
     while (d <= 5.8) {
 
       double hoodDeg = 17 + (d - 1.3) * 4.2;
@@ -102,6 +103,7 @@ public class ShotCalculator {
 
   public ShotParameters calculateShot() {
 
+    // Reuse the per-cycle result until clearCache() is called.
     if (latestShot != null) {
       return latestShot;
     }
@@ -125,6 +127,7 @@ public class ShotCalculator {
     ChassisSpeeds robotVelocity =
         ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeVelocity, estimatedPose.getRotation());
 
+    // Project pose forward slightly to compensate for sensing/actuation delay.
     estimatedPose =
         estimatedPose.exp(
             new Twist2d(
@@ -142,6 +145,7 @@ public class ShotCalculator {
     Pose2d lookaheadPose = estimatedPose;
     double lookaheadDistance = robotToTargetDistance;
 
+    // Solve moving-shot geometry: flight time changes with distance, and distance changes with motion.
     for (int i = 0; i < 20; i++) {
 
       double timeOfFlight = timeOfFlightMap.get(lookaheadDistance) * tofScale.get();
