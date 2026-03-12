@@ -8,11 +8,14 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotState;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LinesHorizontal;
 import frc.robot.util.LoggedTunableNumber;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
@@ -38,7 +41,20 @@ public class ShotCalculator {
   public record ShotParameters(
       boolean isValid, Rotation2d robotYaw, Rotation2d hoodAngle, double flywheelSpeedRPM) {}
 
+  // One entry in the rolling shot history: where the robot was, what goal was targeted, and what
+  // parameters were computed. Stored only for valid shots.
+  private record RecentShotSample(
+      double timestampSec,
+      Goal goal,
+      Translation2d robotTranslation,
+      double distanceMeters,
+      Rotation2d hoodAngle,
+      double flywheelSpeedRPM) {}
+
   private ShotParameters latestShot = null;
+  // Bounded to ~100 entries (HISTORY_WINDOW / SAMPLE_PERIOD). Each entry is a small record.
+  private final Deque<RecentShotSample> recentShotSamples = new ArrayDeque<>();
+  private double lastRecentShotSampleSec = Double.NEGATIVE_INFINITY;
 
   public static boolean manualMode = false;
   public static double manualHoodAngleDeg = 0;
@@ -49,6 +65,10 @@ public class ShotCalculator {
   private static final double maxDistance = 5.8;
   private static final double phaseDelay = 0.03;
   private static final double validDistanceEpsilon = 1e-6;
+    // Keep the last 10 s of shot samples so data is warm when the driver presses shoot.
+    private static final double recentShotHistoryWindowSec = 10.0;
+    // Save a new sample at most every 100 ms — limits writes to 10 Hz and caps history to ~100 entries.
+    private static final double recentShotSamplePeriodSec = 0.1;
 
   private static final InterpolatingTreeMap<Double, Rotation2d> hoodAngleMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
@@ -105,6 +125,10 @@ public class ShotCalculator {
   private static final LoggedTunableNumber lowSpeedPreference =
       new LoggedTunableNumber("ShotTuning/LowSpeedPreference", 0.35);
 
+  // Limits how far from the current pose a saved shot can be and still influence the answer.
+  private static final LoggedTunableNumber recentShotPoseBandMeters =
+      new LoggedTunableNumber("ShotTuning/RecentShotPoseBandMeters", 0.75);
+
   // Constant idle RPM the flywheel spins at when not actively shooting
   public static final LoggedTunableNumber flywheelIdleRPM =
       new LoggedTunableNumber("ShotTuning/FlywheelIdleRPM", 3000.0);
@@ -153,10 +177,14 @@ public class ShotCalculator {
     // Rebuild tables if any range tunable changed from the dashboard.
     LoggedTunableNumber.ifChanged(
         getInstance(),
-        _unused -> rebuildTables(),
+                _unused -> {
+                    rebuildTables();
+                    getInstance().clearRecentShotHistory();
+                },
         flywheelMinRPM,
         flywheelMaxRPM,
         lowSpeedPreference,
+                recentShotPoseBandMeters,
         hoodMinAngleDeg,
         hoodMaxAngleDeg);
 
@@ -184,7 +212,8 @@ public class ShotCalculator {
                 robotRelVel.vyMetersPerSecond * phaseDelay,
                 robotRelVel.omegaRadiansPerSecond * phaseDelay));
 
-    Translation2d target = AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
+    Goal currentGoal = RobotState.getInstance().updateGoal();
+    Translation2d target = AllianceFlipUtil.apply(currentGoal.pose);
     double robotToTargetDistance = target.getDistance(estimatedPose.getTranslation());
 
     double robotVelX = robotVel.vxMetersPerSecond;
@@ -207,12 +236,31 @@ public class ShotCalculator {
 
     // Clamp distance for lookup tables, but keep validity based on the real lookahead distance.
     double distanceClamped = Math.max(minDistance, Math.min(maxDistance, lookaheadDistance));
+        double nowSec = Timer.getFPGATimestamp();
+        trimRecentShotHistory(nowSec);
 
     Rotation2d robotYaw = target.minus(lookaheadPose.getTranslation()).getAngle();
 
     // Base hood/flywheel values
     double hoodDeg = hoodAngleMap.get(distanceClamped).getDegrees();
     double flywheelSpeed = flywheelSpeedMap.get(distanceClamped);
+
+        // Blend in the closest saved sample from the last 10 s.
+        // historyWeight is 1.0 when the robot is exactly where it was and fades to 0.0 at poseBandMeters away.
+        // This smooths out micro-noise between consecutive loops with almost no CPU cost.
+        RecentShotSample recentSample = findRecentShotSample(currentGoal, lookaheadPose.getTranslation());
+        if (recentSample != null) {
+            double poseBandMeters = Math.max(validDistanceEpsilon, recentShotPoseBandMeters.get());
+            double poseDelta = recentSample.robotTranslation().getDistance(lookaheadPose.getTranslation());
+            double historyWeight = 1.0 - Math.min(1.0, poseDelta / poseBandMeters);
+            hoodDeg = lerp(hoodDeg, recentSample.hoodAngle().getDegrees(), historyWeight);
+            flywheelSpeed = lerp(flywheelSpeed, recentSample.flywheelSpeedRPM(), historyWeight);
+            Logger.recordOutput("ShotCalculator/HistoryWeight", historyWeight);
+            Logger.recordOutput("ShotCalculator/HistoryPoseDelta", poseDelta);
+        } else {
+            Logger.recordOutput("ShotCalculator/HistoryWeight", 0.0);
+            Logger.recordOutput("ShotCalculator/HistoryPoseDelta", -1.0);
+        }
 
     // Apply tuning offsets
     hoodDeg += hoodOffset.get();
@@ -230,6 +278,16 @@ public class ShotCalculator {
 
     latestShot = new ShotParameters(isValid, robotYaw, hoodAngle, flywheelSpeed);
 
+    if (isValid) {
+      saveRecentShotSample(
+          nowSec,
+          currentGoal,
+          lookaheadPose.getTranslation(),
+          distanceClamped,
+          hoodAngle,
+          flywheelSpeed);
+    }
+
     // Logging for dashboard tuning
     Logger.recordOutput("ShotCalculator/Distance", distanceClamped);
     Logger.recordOutput(
@@ -244,6 +302,68 @@ public class ShotCalculator {
   public void clearCache() {
     latestShot = null;
   }
+
+    private void clearRecentShotHistory() {
+        recentShotSamples.clear();
+        lastRecentShotSampleSec = Double.NEGATIVE_INFINITY;
+        Logger.recordOutput("ShotCalculator/RecentHistorySize", 0);
+    }
+
+    // Drops entries older than the history window. Called once per loop; at most a handful of
+    // removes ever happen at once because saveRecentShotSample throttles the write rate.
+    private void trimRecentShotHistory(double nowSec) {
+        while (!recentShotSamples.isEmpty()
+                && nowSec - recentShotSamples.peekFirst().timestampSec() > recentShotHistoryWindowSec) {
+            recentShotSamples.removeFirst();
+        }
+        Logger.recordOutput("ShotCalculator/RecentHistorySize", recentShotSamples.size());
+    }
+
+    // Linear scan over the history deque (≤100 entries) to find the spatially closest sample for
+    // the current goal. 100 distance checks per loop is negligible on the roboRIO 2.
+    private RecentShotSample findRecentShotSample(Goal goal, Translation2d robotTranslation) {
+        double poseBandMeters = Math.max(validDistanceEpsilon, recentShotPoseBandMeters.get());
+        RecentShotSample bestSample = null;
+        double bestPoseDelta = poseBandMeters;
+
+        for (RecentShotSample sample : recentShotSamples) {
+            if (sample.goal() != goal) {
+                continue;
+            }
+
+            double poseDelta = sample.robotTranslation().getDistance(robotTranslation);
+            if (poseDelta <= bestPoseDelta) {
+                bestPoseDelta = poseDelta;
+                bestSample = sample;
+            }
+        }
+
+        return bestSample;
+    }
+
+    // Saves a new sample at most once per recentShotSamplePeriodSec (100 ms).
+    // This prevents alloc churn at 50 Hz and caps the deque at ~100 entries.
+    private void saveRecentShotSample(
+            double nowSec,
+            Goal goal,
+            Translation2d robotTranslation,
+            double distanceMeters,
+            Rotation2d hoodAngle,
+            double flywheelSpeedRPM) {
+        if (nowSec - lastRecentShotSampleSec < recentShotSamplePeriodSec) {
+            return;
+        }
+
+        recentShotSamples.addLast(
+                new RecentShotSample(
+                        nowSec, goal, robotTranslation, distanceMeters, hoodAngle, flywheelSpeedRPM));
+        lastRecentShotSampleSec = nowSec;
+        trimRecentShotHistory(nowSec);
+    }
+
+    private static double lerp(double start, double end, double weight) {
+        return start + ((end - start) * weight);
+    }
 
   @RequiredArgsConstructor
   public enum Goal {
