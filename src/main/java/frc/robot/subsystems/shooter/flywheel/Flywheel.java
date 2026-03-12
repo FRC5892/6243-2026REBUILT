@@ -52,7 +52,9 @@ public class Flywheel extends SubsystemBase {
         () -> {
           var shot = ShotCalculator.getInstance().calculateShot();
 
-          double speed = shot.flywheelSpeedRPM();
+          // Stay at idle when out of range so recovery to a valid shot is quick.
+          double speed =
+              shot.isValid() ? shot.flywheelSpeedRPM() : ShotCalculator.flywheelIdleRPM.get();
 
           setSetpoints(RPM.of(speed));
         });

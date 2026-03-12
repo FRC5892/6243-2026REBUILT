@@ -65,9 +65,18 @@ public class Indexer {
 
   /** Runs indexer ONLY when shooter is ready (flywheel speed + hood angle + robot rotation). */
   public Command runWhenShooterReady(Shooter shooter) {
-    return Commands.either(
-        runForShooting(), stopAll(), shooter::isReadyToShoot // <-- YOU implement this
-        );
+    return Commands.run(
+        () -> {
+          if (shooter.isReadyToShoot()) {
+            feeder.applyDirection(RollerSubsystem.Direction.FORWARD);
+            indexerRollers.applyDirection(RollerSubsystem.Direction.FORWARD);
+          } else {
+            feeder.stopMotor();
+            indexerRollers.stopMotor();
+          }
+        },
+        feeder,
+        indexerRollers);
   }
 
   /** Basic shooting command (no gating). */

@@ -24,23 +24,33 @@ public class RollerSubsystem extends SubsystemBase {
     motor.periodic();
   }
 
-  public Command runRoller(DoubleSupplier speed) {
-    return runEnd(
-        () -> motor.setControl(voltageOut.withOutput(speed.getAsDouble())),
-        () -> motor.setControl(voltageOut.withOutput(0)));
+  private void setOutput(double outputVolts) {
+    motor.setControl(voltageOut.withOutput(outputVolts));
   }
 
-  public Command runRoller(Direction direction) {
+  public void applyDirection(Direction direction) {
     DoubleSupplier supplier =
         switch (direction) {
           case FORWARD -> forwardVolts;
           case REVERSE -> reverseVolts;
         };
-    return runRoller(supplier);
+    setOutput(supplier.getAsDouble());
+  }
+
+  public void stopMotor() {
+    setOutput(0);
+  }
+
+  public Command runRoller(DoubleSupplier speed) {
+    return runEnd(() -> setOutput(speed.getAsDouble()), this::stopMotor);
+  }
+
+  public Command runRoller(Direction direction) {
+    return runEnd(() -> applyDirection(direction), this::stopMotor);
   }
 
   public Command stop() {
-    return startRun(() -> motor.setControl(voltageOut.withOutput(0)), () -> {});
+    return startRun(this::stopMotor, () -> {});
   }
 
   public boolean hasDisconnectedMotor() {

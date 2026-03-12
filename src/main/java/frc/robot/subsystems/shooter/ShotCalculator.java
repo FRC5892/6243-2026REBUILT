@@ -190,7 +190,7 @@ public class ShotCalculator {
       lookaheadDistance = target.getDistance(lookaheadPose.getTranslation());
     }
 
-    // Clamp distance to prevent lookup extrapolation errors
+    // Clamp distance for lookup tables, but keep validity based on the real lookahead distance.
     double distanceClamped = Math.max(minDistance, Math.min(maxDistance, lookaheadDistance));
 
     Rotation2d robotYaw = target.minus(lookaheadPose.getTranslation()).getAngle();
@@ -208,12 +208,10 @@ public class ShotCalculator {
 
     Rotation2d hoodAngle = Rotation2d.fromDegrees(hoodDeg);
 
-    latestShot =
-        new ShotParameters(
-            distanceClamped >= minDistance && distanceClamped <= maxDistance,
-            robotYaw,
-            hoodAngle,
-            flywheelSpeed);
+    // Validity must use the real lookahead distance (not the clamped lookup distance).
+    boolean isValid = lookaheadDistance >= minDistance && lookaheadDistance <= maxDistance;
+
+    latestShot = new ShotParameters(isValid, robotYaw, hoodAngle, flywheelSpeed);
 
     // Logging for dashboard tuning
     Logger.recordOutput("ShotCalculator/Distance", distanceClamped);

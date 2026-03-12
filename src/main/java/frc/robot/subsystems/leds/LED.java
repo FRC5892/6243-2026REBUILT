@@ -7,6 +7,8 @@ import org.littletonrobotics.junction.Logger;
 /** Priority-based LED manager following README indicator definitions. */
 public class LED extends SubsystemBase {
   private static final double FLASH_PERIOD_SEC = 0.25;
+  // 4 flash periods = red on/off twice.
+  private static final double INVALID_SHOT_FLASH_DURATION_SEC = FLASH_PERIOD_SEC * 4.0;
 
   private final LEDIO io;
   private final LEDIOInputsAutoLogged inputs = new LEDIOInputsAutoLogged();
@@ -17,6 +19,7 @@ public class LED extends SubsystemBase {
   private boolean autoAlignActive = false;
   private boolean intakeDown = false;
   private boolean hoodStowed = false;
+  private double invalidShotFlashStartSec = Double.NEGATIVE_INFINITY;
 
   public LED(LEDIO io) {
     this.io = io;
@@ -50,6 +53,11 @@ public class LED extends SubsystemBase {
     this.hoodStowed = hoodStowed;
   }
 
+  public void triggerInvalidShotFlash() {
+    // Restart the pulse sequence each time a new invalid-shot event is raised.
+    invalidShotFlashStartSec = Timer.getFPGATimestamp();
+  }
+
   @Override
   public void periodic() {
     io.updateInputs(inputs);
@@ -78,6 +86,16 @@ public class LED extends SubsystemBase {
       return;
     }
 
+    // Flash red twice on an invalid shot, then fall back to the normal indicator priority.
+    if (isInvalidShotFlashActive()) {
+      if (isInvalidShotFlashOn()) {
+        io.setRGB(255, 0, 0);
+      } else {
+        io.clear();
+      }
+      return;
+    }
+
     if (autoAlignActive) {
       io.setRGB(255, 0, 0); // Red solid
       return;
@@ -98,5 +116,14 @@ public class LED extends SubsystemBase {
 
   private static boolean isFlashOn() {
     return ((int) (Timer.getFPGATimestamp() / FLASH_PERIOD_SEC)) % 2 == 0;
+  }
+
+  private boolean isInvalidShotFlashActive() {
+    return Timer.getFPGATimestamp() - invalidShotFlashStartSec < INVALID_SHOT_FLASH_DURATION_SEC;
+  }
+
+  private boolean isInvalidShotFlashOn() {
+    double elapsedSec = Timer.getFPGATimestamp() - invalidShotFlashStartSec;
+    return ((int) (elapsedSec / FLASH_PERIOD_SEC)) % 2 == 0;
   }
 }

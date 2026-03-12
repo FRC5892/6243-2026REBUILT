@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.RPM;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShotCalculator;
 
 public class ShootCommand {
 
@@ -20,12 +21,30 @@ public class ShootCommand {
         .getFlywheel()
         .run(
             () -> {
-              var shot = frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
+              var shot = ShotCalculator.getInstance().calculateShot();
+              double targetRpm =
+                  shot.isValid() ? shot.flywheelSpeedRPM() : ShotCalculator.flywheelIdleRPM.get();
 
-              shooter.getFlywheel().setSetpoints(RPM.of(shot.flywheelSpeedRPM()));
-
-              shooter.getHood().requestAngle(shot.hoodAngle());
+              // Fall back to the configured idle speed so the flywheel trims from idle instead of
+              // dropping out completely when the shot is out of range.
+              shooter.getFlywheel().setSetpoints(RPM.of(targetRpm));
             })
-        .alongWith(indexer.runWhenShooterReady(shooter));
+        .alongWith(
+            shooter
+                .getHood()
+                .run(
+                    () -> {
+                      var shot = ShotCalculator.getInstance().calculateShot();
+
+                      // Keep the previous hood target when invalid instead of chasing bad data.
+                      if (!shot.isValid()) {
+                        return;
+                      }
+
+                      // Claim the hood here so its manual/default command cannot fight the shot
+                      // target.
+                      shooter.getHood().requestAngle(shot.hoodAngle());
+                    }),
+            indexer.runWhenShooterReady(shooter));
   }
 }
