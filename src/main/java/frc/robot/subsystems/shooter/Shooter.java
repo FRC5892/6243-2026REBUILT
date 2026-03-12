@@ -90,7 +90,7 @@ public class Shooter {
 
   /** ---------------- MATCH CHECKS ---------------- */
   private boolean flywheelMatches(double targetRPM) {
-    double actualRPM = flywheel.getVelocity() * 60.0; // getVelocity() returns rot/s; convert to RPM
+    double actualRPM = flywheel.getVelocity() * 60.0; // getVelocity() is rot/s
     return Math.abs(actualRPM - targetRPM) < 100;
   }
 

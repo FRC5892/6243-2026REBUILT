@@ -184,7 +184,7 @@ public class RobotContainer {
             () -> -m_drivecontroller.getRightX()));
 
     // Driver: Auto align (hold A)
-    m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
     m_drivecontroller.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
     m_drivecontroller.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
@@ -226,7 +226,7 @@ public class RobotContainer {
         .setDefaultCommand(shooter.getHood().manualControl(() -> -m_codriverController.getLeftY()));
 
     // Auto align (A)
-    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter));
+    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
     m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
     m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
