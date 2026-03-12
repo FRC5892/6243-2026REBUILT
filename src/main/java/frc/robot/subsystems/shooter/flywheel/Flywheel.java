@@ -52,9 +52,9 @@ public class Flywheel extends SubsystemBase {
         () -> {
           var shot = ShotCalculator.getInstance().calculateShot();
 
-          double speed = shot.flywheelSpeedRotPerSec();
+          double speed = shot.flywheelSpeedRPM();
 
-          setSetpoints(RotationsPerSecond.of(speed));
+          setSetpoints(RPM.of(speed));
         });
   }
 
