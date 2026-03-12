@@ -48,6 +48,7 @@ public class ShotCalculator {
   private static final double minDistance = 1.3;
   private static final double maxDistance = 5.8;
   private static final double phaseDelay = 0.03;
+  private static final double validDistanceEpsilon = 1e-6;
 
   private static final InterpolatingTreeMap<Double, Rotation2d> hoodAngleMap =
       new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), Rotation2d::interpolate);
@@ -99,6 +100,11 @@ public class ShotCalculator {
   private static final LoggedTunableNumber flywheelMaxRPM =
       new LoggedTunableNumber("ShotTuning/FlywheelMaxRPM", 5000.0);
 
+  // Biases the curve toward more hood and less RPM while keeping the same distance endpoints.
+  // 0.0 = original linear curve, 1.0 = strongest low-RPM preference.
+  private static final LoggedTunableNumber lowSpeedPreference =
+      new LoggedTunableNumber("ShotTuning/LowSpeedPreference", 0.35);
+
   // Constant idle RPM the flywheel spins at when not actively shooting
   public static final LoggedTunableNumber flywheelIdleRPM =
       new LoggedTunableNumber("ShotTuning/FlywheelIdleRPM", 3000.0);
@@ -122,10 +128,18 @@ public class ShotCalculator {
     flywheelSpeedMap.clear();
     timeOfFlightMap.clear();
     double distRange = maxDistance - minDistance;
+    double speedPreference = Math.max(0.0, Math.min(1.0, lowSpeedPreference.get()));
+    double hoodShapeExponent = 1.0 - (0.4 * speedPreference);
+    double flywheelShapeExponent = 1.0 + (0.7 * speedPreference);
     for (double d = minDistance; d <= maxDistance; d += 0.1) {
       double t = (d - minDistance) / distRange;
-      double hoodDeg = hoodMinAngleDeg.get() + t * (hoodMaxAngleDeg.get() - hoodMinAngleDeg.get());
-      double flywheel = flywheelMinRPM.get() + t * (flywheelMaxRPM.get() - flywheelMinRPM.get());
+      // Increase hood a little sooner and delay RPM growth to prefer lower wheel speed.
+      double hoodT = Math.pow(t, hoodShapeExponent);
+      double flywheelT = Math.pow(t, flywheelShapeExponent);
+      double hoodDeg =
+          hoodMinAngleDeg.get() + hoodT * (hoodMaxAngleDeg.get() - hoodMinAngleDeg.get());
+      double flywheel =
+          flywheelMinRPM.get() + flywheelT * (flywheelMaxRPM.get() - flywheelMinRPM.get());
       double tof = 0.82 + (d - 1.3) * 0.085;
       hoodAngleMap.put(d, Rotation2d.fromDegrees(hoodDeg));
       flywheelSpeedMap.put(d, flywheel);
@@ -142,6 +156,7 @@ public class ShotCalculator {
         _unused -> rebuildTables(),
         flywheelMinRPM,
         flywheelMaxRPM,
+        lowSpeedPreference,
         hoodMinAngleDeg,
         hoodMaxAngleDeg);
 
@@ -209,7 +224,9 @@ public class ShotCalculator {
     Rotation2d hoodAngle = Rotation2d.fromDegrees(hoodDeg);
 
     // Validity must use the real lookahead distance (not the clamped lookup distance).
-    boolean isValid = lookaheadDistance >= minDistance && lookaheadDistance <= maxDistance;
+    boolean isValid =
+        lookaheadDistance >= (minDistance - validDistanceEpsilon)
+            && lookaheadDistance <= (maxDistance + validDistanceEpsilon);
 
     latestShot = new ShotParameters(isValid, robotYaw, hoodAngle, flywheelSpeed);
 
