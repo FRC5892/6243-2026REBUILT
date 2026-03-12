@@ -36,7 +36,7 @@ public class ShotCalculator {
       new Translation2d(rightTarget.getX(), LinesHorizontal.center);
 
   public record ShotParameters(
-      boolean isValid, Rotation2d robotYaw, Rotation2d hoodAngle, double flywheelSpeedRotPerSec) {}
+      boolean isValid, Rotation2d robotYaw, Rotation2d hoodAngle, double flywheelSpeedRPM) {}
 
   private ShotParameters latestShot = null;
 
@@ -73,13 +73,13 @@ public class ShotCalculator {
   private static final LoggedTunableNumber hoodDistanceSlope =
       new LoggedTunableNumber("ShotTuning/HoodDistanceSlope", 0.0);
 
-  // Flywheel offset (RPM or rotations/sec): raises/lowers all speeds
+  // Flywheel offset (RPM): raises/lowers all speeds
   // ↑ flywheelOffset → more speed, shots travel farther
   // ↓ flywheelOffset → less speed, shots fall short
   private static final LoggedTunableNumber flywheelOffset =
       new LoggedTunableNumber("ShotTuning/FlywheelOffset", 0.0);
 
-  // Flywheel distance slope (RPM/meter): increases/decreases flywheel speed for farther shots
+  // Flywheel distance slope (RPM/m): increases/decreases flywheel speed for farther shots
   // ↑ flywheelDistanceSlope → far shots get faster (compensates for distance)
   // ↓ flywheelDistanceSlope → far shots slower (far shots fall short)
   private static final LoggedTunableNumber flywheelDistanceSlope =
@@ -91,23 +91,59 @@ public class ShotCalculator {
   private static final LoggedTunableNumber tofScale =
       new LoggedTunableNumber("ShotTuning/TimeOfFlightScale", 1.0);
 
-  static {
-    // Populate baseline lookup tables
-    for (double d = minDistance; d <= maxDistance; d += 0.1) {
-      double hoodDeg = 17 + (d - 1.3) * 4.2; // baseline linear approximation
-      double flywheel = 200 + (d - 1.3) * 18.0; // baseline linear
-      double tof = 0.82 + (d - 1.3) * 0.085; // baseline flight time
+  // Flywheel RPM at closest shot distance (minDistance)
+  private static final LoggedTunableNumber flywheelMinRPM =
+      new LoggedTunableNumber("ShotTuning/FlywheelMinRPM", 3000.0);
 
+  // Flywheel RPM at furthest shot distance (maxDistance)
+  private static final LoggedTunableNumber flywheelMaxRPM =
+      new LoggedTunableNumber("ShotTuning/FlywheelMaxRPM", 5000.0);
+
+  // Constant idle RPM the flywheel spins at when not actively shooting
+  public static final LoggedTunableNumber flywheelIdleRPM =
+      new LoggedTunableNumber("ShotTuning/FlywheelIdleRPM", 3000.0);
+
+  // Hood angle (deg from vertical) at closest shot distance
+  private static final LoggedTunableNumber hoodMinAngleDeg =
+      new LoggedTunableNumber("ShotTuning/HoodMinAngleDeg", 43.0);
+
+  // Hood angle (deg from vertical) at furthest shot distance
+  private static final LoggedTunableNumber hoodMaxAngleDeg =
+      new LoggedTunableNumber("ShotTuning/HoodMaxAngleDeg", 68.0);
+
+  static {
+    rebuildTables();
+    AutoLogOutputManager.addObject(getInstance());
+  }
+
+  /** Rebuilds the interpolation tables from the current tunable range values. */
+  private static void rebuildTables() {
+    hoodAngleMap.clear();
+    flywheelSpeedMap.clear();
+    timeOfFlightMap.clear();
+    double distRange = maxDistance - minDistance;
+    for (double d = minDistance; d <= maxDistance; d += 0.1) {
+      double t = (d - minDistance) / distRange;
+      double hoodDeg = hoodMinAngleDeg.get() + t * (hoodMaxAngleDeg.get() - hoodMinAngleDeg.get());
+      double flywheel = flywheelMinRPM.get() + t * (flywheelMaxRPM.get() - flywheelMinRPM.get());
+      double tof = 0.82 + (d - 1.3) * 0.085;
       hoodAngleMap.put(d, Rotation2d.fromDegrees(hoodDeg));
       flywheelSpeedMap.put(d, flywheel);
       timeOfFlightMap.put(d, tof);
     }
-
-    AutoLogOutputManager.addObject(getInstance());
   }
 
   public ShotParameters calculateShot() {
     if (latestShot != null) return latestShot;
+
+    // Rebuild tables if any range tunable changed from the dashboard.
+    LoggedTunableNumber.ifChanged(
+        getInstance(),
+        _unused -> rebuildTables(),
+        flywheelMinRPM,
+        flywheelMaxRPM,
+        hoodMinAngleDeg,
+        hoodMaxAngleDeg);
 
     if (manualMode) {
       // Manual tuning mode: use dashboard-entered values

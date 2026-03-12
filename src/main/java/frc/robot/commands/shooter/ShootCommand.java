@@ -1,6 +1,6 @@
 package frc.robot.commands.shooter;
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RPM;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.indexer.Indexer;
@@ -22,9 +22,7 @@ public class ShootCommand {
             () -> {
               var shot = frc.robot.subsystems.shooter.ShotCalculator.getInstance().calculateShot();
 
-              shooter
-                  .getFlywheel()
-                  .setSetpoints(RotationsPerSecond.of(shot.flywheelSpeedRotPerSec()));
+              shooter.getFlywheel().setSetpoints(RPM.of(shot.flywheelSpeedRPM()));
 
               shooter.getHood().requestAngle(shot.hoodAngle());
             })

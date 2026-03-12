@@ -55,9 +55,12 @@ public class Hood extends SubsystemBase {
       new LoggedTunableNumber("Hood/stowTrenchGapOffset", 0, "m");
   private final LoggedTunableMeasure<MutAngle> tolerance =
       new LoggedTunableMeasure<>("Hood/Tolerance", Degrees.mutable(5));
-  // Hard limits for hood angle (degrees, relative to vertical). Non-tunable constants.
-  private static final double MIN_ANGLE_DEG = 43.0;
-  private static final double MAX_ANGLE_DEG = 70.0;
+  // Hard limits for hood angle (degrees from vertical). Tunable for mechanical adjustment.
+  private static final LoggedTunableNumber minAngleDeg =
+      new LoggedTunableNumber("Hood/MinAngleDeg", 43.0);
+
+  private static final LoggedTunableNumber maxAngleDeg =
+      new LoggedTunableNumber("Hood/MaxAngleDeg", 70.0);
 
   // Slow the hood when approaching limits to avoid mechanical shock
   private static final double LIMIT_SLOW_ZONE_DEG = 5.0;
@@ -132,7 +135,7 @@ public class Hood extends SubsystemBase {
             () -> {
               // Stow should move the hood to the closest angle to horizontal (highest from
               // vertical).
-              this.requestAngle(Rotation2d.fromDegrees(MAX_ANGLE_DEG));
+              this.requestAngle(Rotation2d.fromDegrees(maxAngleDeg.get()));
             },
             () -> {})
         .withInterruptBehavior(InterruptionBehavior.kCancelIncoming);
@@ -180,7 +183,7 @@ public class Hood extends SubsystemBase {
     double requestedDeg = angle.getDegrees();
 
     // Clamp to allowed range
-    double clampedDeg = Math.max(MIN_ANGLE_DEG, Math.min(MAX_ANGLE_DEG, requestedDeg));
+    double clampedDeg = Math.max(minAngleDeg.get(), Math.min(maxAngleDeg.get(), requestedDeg));
 
     if (clampedDeg != requestedDeg) {
       Logger.recordOutput("Hood/RequestedAngleClamped", clampedDeg);
@@ -190,8 +193,8 @@ public class Hood extends SubsystemBase {
 
     // Slow motion magic when near limits
     boolean nearLimit =
-        clampedDeg > (MAX_ANGLE_DEG - LIMIT_SLOW_ZONE_DEG)
-            || clampedDeg < (MIN_ANGLE_DEG + LIMIT_SLOW_ZONE_DEG);
+        clampedDeg > (maxAngleDeg.get() - LIMIT_SLOW_ZONE_DEG)
+            || clampedDeg < (minAngleDeg.get() + LIMIT_SLOW_ZONE_DEG);
 
     if (nearLimit) {
       motor.quickApplyConfig(new TalonFXConfiguration().withMotionMagic(slowMotionMagic));
@@ -281,7 +284,7 @@ public class Hood extends SubsystemBase {
 
     // Safety: if the mechanism is beyond the allowed max angle, stop commanding it.
     double currentDeg = positionToAngle(motor.getPosition()).getDegrees();
-    if (currentDeg > MAX_ANGLE_DEG) {
+    if (currentDeg > maxAngleDeg.get()) {
       // disable position control and neutral the motor
       positionControl = false;
       motor.setControl(neutralControl);

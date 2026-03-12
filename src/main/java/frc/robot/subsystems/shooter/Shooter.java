@@ -83,15 +83,15 @@ public class Shooter {
 
     if (!shot.isValid()) return false;
 
-    return flywheelMatches(shot.flywheelSpeedRotPerSec())
+    return flywheelMatches(shot.flywheelSpeedRPM())
         && hoodMatches(shot.hoodAngle())
         && rotationMatches(shot.robotYaw());
   }
 
   /** ---------------- MATCH CHECKS ---------------- */
-  private boolean flywheelMatches(double target) {
-    double actual = flywheel.getVelocity(); // must exist in Flywheel
-    return Math.abs(actual - target) < 100;
+  private boolean flywheelMatches(double targetRPM) {
+    double actualRPM = flywheel.getVelocity() * 60.0; // getVelocity() returns rot/s; convert to RPM
+    return Math.abs(actualRPM - targetRPM) < 100;
   }
 
   private boolean hoodMatches(Rotation2d target) {
