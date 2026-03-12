@@ -15,6 +15,7 @@ import frc.robot.util.FieldConstants.LinesHorizontal;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedTunableNumber;
 
 public class ShotCalculator {
 
@@ -59,6 +60,25 @@ public class ShotCalculator {
 
   private static final InterpolatingDoubleTreeMap timeOfFlightMap =
       new InterpolatingDoubleTreeMap();
+
+  /*
+   * Tunable parameters for real-time adjustment
+   */
+
+  private static final LoggedTunableNumber hoodOffset =
+      new LoggedTunableNumber("ShotTuning/HoodOffsetDeg", 0.0);
+
+  private static final LoggedTunableNumber hoodDistanceSlope =
+      new LoggedTunableNumber("ShotTuning/HoodDistanceSlope", 0.0);
+
+  private static final LoggedTunableNumber flywheelOffset =
+      new LoggedTunableNumber("ShotTuning/FlywheelOffset", 0.0);
+
+  private static final LoggedTunableNumber flywheelDistanceSlope =
+      new LoggedTunableNumber("ShotTuning/FlywheelDistanceSlope", 0.0);
+
+  private static final LoggedTunableNumber tofScale =
+      new LoggedTunableNumber("ShotTuning/TimeOfFlightScale", 1.0);
 
   static {
     double d = 1.3;
@@ -113,8 +133,6 @@ public class ShotCalculator {
 
     Translation2d target = AllianceFlipUtil.apply(RobotState.getInstance().updateGoal().pose);
 
-    Logger.recordOutput("ShotCalculator/Target", new Pose2d(target, Rotation2d.kZero));
-
     double robotToTargetDistance = target.getDistance(estimatedPose.getTranslation());
 
     double robotVelocityX = robotVelocity.vxMetersPerSecond;
@@ -125,7 +143,7 @@ public class ShotCalculator {
 
     for (int i = 0; i < 20; i++) {
 
-      double timeOfFlight = timeOfFlightMap.get(lookaheadDistance);
+      double timeOfFlight = timeOfFlightMap.get(lookaheadDistance) * tofScale.get();
 
       double offsetX = robotVelocityX * timeOfFlight;
       double offsetY = robotVelocityY * timeOfFlight;
@@ -140,9 +158,17 @@ public class ShotCalculator {
 
     Rotation2d robotYaw = target.minus(lookaheadPose.getTranslation()).getAngle();
 
-    Rotation2d hoodAngle = hoodAngleMap.get(lookaheadDistance);
+    double hoodDeg = hoodAngleMap.get(lookaheadDistance).getDegrees();
+
+    hoodDeg += hoodOffset.get();
+    hoodDeg += hoodDistanceSlope.get() * lookaheadDistance;
 
     double flywheelSpeed = flywheelSpeedMap.get(lookaheadDistance);
+
+    flywheelSpeed += flywheelOffset.get();
+    flywheelSpeed += flywheelDistanceSlope.get() * lookaheadDistance;
+
+    Rotation2d hoodAngle = Rotation2d.fromDegrees(hoodDeg);
 
     latestShot =
         new ShotParameters(
@@ -151,10 +177,12 @@ public class ShotCalculator {
             hoodAngle,
             flywheelSpeed);
 
-    Logger.recordOutput("ShotCalculator/LatestShot", latestShot);
     Logger.recordOutput("ShotCalculator/Distance", lookaheadDistance);
-    Logger.recordOutput("ShotCalculator/HoodAngle", hoodAngle.getDegrees());
-    Logger.recordOutput("ShotCalculator/FlywheelSpeed", flywheelSpeed);
+    Logger.recordOutput(
+        "ShotCalculator/HoodAngleBase", hoodAngleMap.get(lookaheadDistance).getDegrees());
+    Logger.recordOutput("ShotCalculator/HoodAngleFinal", hoodDeg);
+    Logger.recordOutput("ShotCalculator/FlywheelBase", flywheelSpeedMap.get(lookaheadDistance));
+    Logger.recordOutput("ShotCalculator/FlywheelFinal", flywheelSpeed);
 
     return latestShot;
   }
