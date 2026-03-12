@@ -29,6 +29,7 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
 - custom shot calculator inspired by Mechanical Advantage's shot calculator
+- Modified to fit the unique physics of our flywheel
 
 ## Controls
 
