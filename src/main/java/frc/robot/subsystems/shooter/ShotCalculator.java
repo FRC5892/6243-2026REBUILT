@@ -12,10 +12,10 @@ import frc.robot.RobotState;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
 import frc.robot.util.FieldConstants.LinesHorizontal;
+import frc.robot.util.LoggedTunableNumber;
 import lombok.RequiredArgsConstructor;
 import org.littletonrobotics.junction.AutoLogOutputManager;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedTunableNumber;
 
 public class ShotCalculator {
 
