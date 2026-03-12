@@ -145,7 +145,8 @@ public class ShotCalculator {
     Pose2d lookaheadPose = estimatedPose;
     double lookaheadDistance = robotToTargetDistance;
 
-    // Solve moving-shot geometry: flight time changes with distance, and distance changes with motion.
+    // Solve moving-shot geometry: flight time changes with distance, and distance changes with
+    // motion.
     for (int i = 0; i < 20; i++) {
 
       double timeOfFlight = timeOfFlightMap.get(lookaheadDistance) * tofScale.get();
