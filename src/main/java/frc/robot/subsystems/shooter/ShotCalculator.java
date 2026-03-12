@@ -8,7 +8,6 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-
 import frc.robot.RobotState;
 import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.FieldConstants;
@@ -182,7 +181,8 @@ public class ShotCalculator {
 
     // Logging for dashboard tuning
     Logger.recordOutput("ShotCalculator/Distance", distanceClamped);
-    Logger.recordOutput("ShotCalculator/HoodAngleBase", hoodAngleMap.get(distanceClamped).getDegrees());
+    Logger.recordOutput(
+        "ShotCalculator/HoodAngleBase", hoodAngleMap.get(distanceClamped).getDegrees());
     Logger.recordOutput("ShotCalculator/HoodAngleFinal", hoodDeg);
     Logger.recordOutput("ShotCalculator/FlywheelBase", flywheelSpeedMap.get(distanceClamped));
     Logger.recordOutput("ShotCalculator/FlywheelFinal", flywheelSpeed);
