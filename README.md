@@ -77,10 +77,11 @@ Higher rows override lower rows.
 | 1 | Drive motor overheated | Flashing white `rgb(255,255,255)` |
 | 2 | Drive motor disconnected | Flashing orange `rgb(255,165,0)` |
 | 3 | Beach alert active | Rainbow fade animation |
-| 4 | Auto-align active | Solid red `rgb(255,0,0)` |
-| 5 | Intake down | Solid green `rgb(0,255,0)` |
-| 6 | Hood stowed | Solid blue `rgb(0,0,255)` |
-| 7 | Default | LEDs TBD |
+| 4 | Invalid shot | Flashing red `rgb(255,0,0)` |
+| 5 | Auto-align active | Solid red `rgb(255,0,0)` |
+| 6 | Intake down | Solid green `rgb(0,255,0)` |
+| 7 | Hood stowed | Solid blue `rgb(0,0,255)` |
+| 8 | Default | LEDs TBD |
 
 ## Hardware Map (Reference)
 
