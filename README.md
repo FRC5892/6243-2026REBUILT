@@ -23,13 +23,12 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - Swerve drive with field-relative control.
 - AprilTag pose fusion from two PhotonVision-based vision inputs.
 - Separate object camera with mode-based pipeline switching.
+- Luma P1 cameras used with 1280x800 resolution 
 - Shooter with dynamic hood/flywheel targets from shot calculation.
 - Backrollers to introduce controlled and tunable levels of backspin on shots.
 - Feeder/indexer gated on shooter-ready state during shoot command.
 - Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
-- custom shot calculator inspired by Mechanical Advantage's shot calculator
-- Modified to fit the unique physics of our flywheel
 
 ## Controls
 
