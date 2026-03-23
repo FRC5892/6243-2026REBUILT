@@ -27,7 +27,7 @@ Stack: WPILib command-based, AdvantageKit, CTRE Phoenix 6, PathPlanner.
 - Dual shooter with dynamic hood/flywheel targets from shot calculation.
 - Backrollers to introduce controlled and tunable levels of backspin on shots.
 - Feeder/indexer gated on shooter-ready state during shoot command.
-- Subsystems: drive, intake, indexer, shooter, climb, LEDs, vision.
+- Subsystems: drive, intake, indexer, shooter, LEDs, vision.
 - Auto chooser includes PathPlanner autos and drive SysId/characterization routines.
 
 ## Controls
@@ -63,8 +63,6 @@ Mappings are fixed in `src/main/java/frc/robot/RobotContainer.java`.
 | `B` (hold) | Intake out |
 | Right bumper (hold) | Shoot (flywheel + hood request + gated feed) |
 | Right trigger (hold) | Indexer unclog (reverse feed) |
-| D-pad up (hold) | Climb up |
-| D-pad down (hold) | Climb down |
 | `Y` (hold) | Beach alert LED mode |
 
 ## LED Indicator Priority
@@ -88,7 +86,6 @@ Higher rows override lower rows.
 
 | Device | Bus / IO Type | ID / Port | Function / Notes |
 |---|---|---:|---|
-| Climb motor | RIO CAN | 13 | `RightClimb` |
 | Intake roller | RIO CAN | 20 | `IntakeRoller` |
 | Slapdown motor | RIO CAN | 21 | `Slapdown` |
 | Flywheel leader | RIO CAN | 26 | `FlywheelRight` (left follows in config) |
