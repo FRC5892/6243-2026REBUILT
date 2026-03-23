@@ -18,7 +18,8 @@
 
 ## Project Overview
 
-This repository contains the official codebase for FRC Team 6243 (Energy NERDs) and the 2026 "KickBack" robot. The project leverages modern FRC technologies and best practices for reliability, performance, and maintainability.
+This repository contains the official codebase for FRC Team 6243 (Energy NERDs) and the 2026 robot, KickBack. The project leverages modern FRC technologies and best practices for reliability, performance, and maintainability.
+
 
 **Key Features:**
 
