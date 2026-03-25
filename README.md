@@ -2,7 +2,7 @@
 # FRC 6243 - 2026 REBUILT
 
 <p align="center">
-  <b>KickBack - FRC Team 6243</b><br>
+  <b>Eviserator - FRC Team 6243</b><br>
   <i>2026 Competition Robot Code</i>
 </p>
 
@@ -18,7 +18,7 @@
 
 ## Project Overview
 
-This repository contains the codebase for FRC Team 6243 (Energy NERDs') 2026 robot, KickBack.
+This repository contains the codebase for FRC Team 6243 (Energy NERDs') 2026 robot, Eviserator.
 
 
 **Key Features:**
