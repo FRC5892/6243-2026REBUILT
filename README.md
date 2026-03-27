@@ -84,6 +84,8 @@ Mappings are defined in [`src/main/java/frc/robot/RobotContainer.java`](src/main
 
 Higher rows override lower rows.
 
+(NOT ADDED TO ROBOT YET)
+
 | Priority | State | Output |
 |---|---|---|
 | 1 | Drive motor overheated | Flashing white `rgb(255,255,255)` |
