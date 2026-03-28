@@ -166,12 +166,14 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Drive
+    // Joystick mapping: X = forward/back, Y = strafe (right). Invert Y axis to make
+    // pushing stick forward produce positive forward speed.
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> m_drivecontroller.getLeftY(),
-            () -> m_drivecontroller.getLeftX(),
-            () -> m_drivecontroller.getRightX()));
+            () -> -m_drivecontroller.getLeftY(), // forward is negative on the physical stick
+            () -> -m_drivecontroller.getLeftX(), // invert left/right so stick left->robot left
+            () -> -m_drivecontroller.getRightX())); // invert turning so stick right -> clockwise
 
     // Driver: Auto align (hold A)
     m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
