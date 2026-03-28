@@ -221,7 +221,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         BaseStatusSignal.isAllGood(drivePosition, driveVelocity, driveAppliedVolts, driveCurrent);
     var turnStatus =
         BaseStatusSignal.isAllGood(turnPosition, turnVelocity, turnAppliedVolts, turnCurrent);
-    var turnEncoderStatus = BaseStatusSignal.isAllGood(turnAbsolutePosition);
+    var turnEncoderStatus = BaseStatusSignal.isAllGood(turnAbsolutePosition.refresh());
 
     // Update drive inputs
     inputs.driveConnected = driveConnectedDebounce.calculate(driveStatus);
