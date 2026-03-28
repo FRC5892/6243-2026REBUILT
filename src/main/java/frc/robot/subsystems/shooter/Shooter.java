@@ -26,39 +26,39 @@ public class Shooter {
     switch (Constants.currentMode) {
       case REAL -> {
         // Configure right Talon as leader and add the left Talon as a CTRE follower.
-        PhoenixTalonFX rightFlywheel =
-            new PhoenixTalonFX(
-                26,
-                bus,
-                "FlywheelRight",
-                new PhoenixTalonFollower(25, MotorAlignmentValue.Opposed));
+    PhoenixTalonFX rightFlywheel =
+      new PhoenixTalonFX(
+        12,
+        bus,
+        "FlywheelRight",
+        new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
 
         // Flywheel commands only the leader; followers inherit the output via CTRE.
         flywheel = new Flywheel(rightFlywheel);
 
         hood =
             new Hood(
-                new PhoenixTalonFX(27, bus, "Hood"),
+                new PhoenixTalonFX(10, bus, "Hood"),
                 new HardwareDIO("HoodReverse", 1),
                 new HardwareDIO("HoodForward", 2));
       }
 
       case SIM -> {
         // Configure the simulated leader (26) and add the simulated follower (25).
-        TalonFXFlywheelSim rightFlywheel =
-            new TalonFXFlywheelSim(
-                26,
-                bus,
-                "FlywheelRight",
-                0.0007567661,
-                1 / 1.25,
-                new PhoenixTalonFollower(25, MotorAlignmentValue.Opposed));
+    TalonFXFlywheelSim rightFlywheel =
+      new TalonFXFlywheelSim(
+        12,
+        bus,
+        "FlywheelRight",
+        0.0007567661,
+        1 / 1.25,
+        new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
 
         flywheel = new Flywheel(rightFlywheel);
 
         hood =
             new Hood(
-                new TalonFXSimpleMotorSim(27, bus, "Hood", 0.0017154536, 1.3),
+                new TalonFXSimpleMotorSim(10, bus, "Hood", 0.0017154536, 1.3),
                 SimDIO.fromNT("HoodReverse"),
                 SimDIO.fromNT("HoodForward"));
       }

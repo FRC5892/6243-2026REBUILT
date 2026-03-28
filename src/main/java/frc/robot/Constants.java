@@ -59,6 +59,6 @@ public final class Constants {
 
   public static class LEDConstants {
     public static final int PWM_PORT = 0;
-    public static final int LED_COUNT = 60;
+    public static final int LED_COUNT = 60; // TODO: update
   }
 }
