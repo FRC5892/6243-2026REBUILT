@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.DriveCommands;
 import frc.robot.commands.shooter.SnapToTargetCommand;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.climb.Climb;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,9 +40,6 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
-import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
-import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
-import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -53,14 +49,12 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
 
   private final CANBus rioCAN = new CANBus("rio");
   // Subsystems
   private final Drive drive;
   private final Vision vision;
   private final Intake intake;
-  private final Climb climb;
   private final Indexer indexer;
   private final Shooter shooter;
   private final LED led;
@@ -92,7 +86,6 @@ public class RobotContainer {
                 objectCameraName,
                 new VisionIOPhotonVision(camera0Name, robotToCamera0),
                 new VisionIOPhotonVision(camera1Name, robotToCamera1));
-        climb = new Climb(new PhoenixTalonFX(13, rioCAN, "RightClimb"));
 
         intake = new Intake(rioCAN);
 
@@ -117,7 +110,6 @@ public class RobotContainer {
                 objectCameraName,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        climb = new Climb(new TalonFXSimpleMotorSim(13, rioCAN, "Climb", 1, 1));
 
         intake = new Intake(rioCAN);
 
@@ -135,8 +127,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-
-        climb = new Climb(new NoOppTalonFX("RightCLimb", 0));
 
         intake = new Intake(rioCAN);
 
@@ -210,13 +200,6 @@ public class RobotContainer {
 
     // CODRIVER
 
-    // Climb
-    m_codriverController.povUp().whileTrue(frc.robot.commands.climb.ClimbUpCommand.create(climb));
-
-    m_codriverController
-        .povDown()
-        .whileTrue(frc.robot.commands.climb.ClimbDownCommand.create(climb));
-
     // indexer unclog
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
@@ -257,14 +240,12 @@ public class RobotContainer {
                   drive.hasOverheatedMotor()
                       || intake.hasOverheatedMotor()
                       || indexer.hasOverheatedMotor()
-                      || shooter.hasOverheatedMotor()
-                      || climb.hasOverheatedMotor(MOTOR_OVERHEAT_TEMP_C));
+                      || shooter.hasOverheatedMotor());
               led.setMotorDisconnected(
                   drive.hasDisconnectedMotor()
                       || intake.hasDisconnectedMotor()
                       || indexer.hasDisconnectedMotor()
-                      || shooter.hasDisconnectedMotor()
-                      || climb.hasDisconnectedMotor());
+                      || shooter.hasDisconnectedMotor());
               led.setHoodStowed(shooter.getHood().getAngle().getDegrees() >= 69.0);
             }));
   }
