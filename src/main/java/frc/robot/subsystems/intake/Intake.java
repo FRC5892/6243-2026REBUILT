@@ -24,7 +24,7 @@ public class Intake {
         PhoenixTalonFX rollerMotor = new PhoenixTalonFX(20, bus, "IntakeRoller");
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        PhoenixTalonFX slapMotor = new PhoenixTalonFX(21, bus, "Slapdown");
+        PhoenixTalonFX slapMotor = new PhoenixTalonFX(24, bus, "Slapdown");
         slap = new Slapdown(slapMotor);
       }
 
@@ -33,7 +33,7 @@ public class Intake {
             new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(21, bus, "Slapdown", 0.001, 1);
+  TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(24, bus, "Slapdown", 0.001, 1);
         slap = new Slapdown(slapMotor);
       }
 
