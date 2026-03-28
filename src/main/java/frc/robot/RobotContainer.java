@@ -49,7 +49,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  
 
   private final CANBus rioCAN = new CANBus("rio");
   // Subsystems
@@ -87,7 +86,6 @@ public class RobotContainer {
                 objectCameraName,
                 new VisionIOPhotonVision(camera0Name, robotToCamera0),
                 new VisionIOPhotonVision(camera1Name, robotToCamera1));
-    
 
         intake = new Intake(rioCAN);
 
@@ -112,7 +110,6 @@ public class RobotContainer {
                 objectCameraName,
                 new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
                 new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-    
 
         intake = new Intake(rioCAN);
 
@@ -130,8 +127,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-
-    
 
         intake = new Intake(rioCAN);
 
@@ -204,7 +199,7 @@ public class RobotContainer {
     m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // CODRIVER
-    
+
     // indexer unclog
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
