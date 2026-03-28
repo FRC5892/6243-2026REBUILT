@@ -50,13 +50,10 @@ public final class Constants {
   }
 
   public static class IdConstants {
-    public static final int CLIMB_ARM_MOTOR_ID = 12;
     public static final int SHOOTER_ID = 17;
   }
 
   public static class SpeedConstants {
-    public static final double CLIMB_ARM_MOTOR_SPEED = 1;
-    public static final double CLIMB_BACK_MOTOR_SPEED = -1;
     public static final double SHOOTER_SPEED = -0.6;
   }
 
