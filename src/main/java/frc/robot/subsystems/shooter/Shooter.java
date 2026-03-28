@@ -26,12 +26,12 @@ public class Shooter {
     switch (Constants.currentMode) {
       case REAL -> {
         // Configure right Talon as leader and add the left Talon as a CTRE follower.
-    PhoenixTalonFX rightFlywheel =
-      new PhoenixTalonFX(
-        12,
-        bus,
-        "FlywheelRight",
-        new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
+        PhoenixTalonFX rightFlywheel =
+            new PhoenixTalonFX(
+                12,
+                bus,
+                "FlywheelRight",
+                new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
 
         // Flywheel commands only the leader; followers inherit the output via CTRE.
         flywheel = new Flywheel(rightFlywheel);
@@ -45,14 +45,14 @@ public class Shooter {
 
       case SIM -> {
         // Configure the simulated leader (26) and add the simulated follower (25).
-    TalonFXFlywheelSim rightFlywheel =
-      new TalonFXFlywheelSim(
-        12,
-        bus,
-        "FlywheelRight",
-        0.0007567661,
-        1 / 1.25,
-        new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
+        TalonFXFlywheelSim rightFlywheel =
+            new TalonFXFlywheelSim(
+                12,
+                bus,
+                "FlywheelRight",
+                0.0007567661,
+                1 / 1.25,
+                new PhoenixTalonFollower(11, MotorAlignmentValue.Opposed));
 
         flywheel = new Flywheel(rightFlywheel);
 

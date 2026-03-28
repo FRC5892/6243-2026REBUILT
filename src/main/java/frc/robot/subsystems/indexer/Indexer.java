@@ -26,29 +26,29 @@ public class Indexer {
 
     switch (Constants.currentMode) {
       case REAL -> {
-    // Mechanism CAN ID convention: 20-29 = intake/indexer block
-    // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 24 (left configured to follow right)
-    PhoenixTalonFX feederMotor = new PhoenixTalonFX(22, bus, "Feeder");
-    feeder = new FeederRollerSubsystem(feederMotor);
+        // Mechanism CAN ID convention: 20-29 = intake/indexer block
+        // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 24 (left configured to follow right)
+        PhoenixTalonFX feederMotor = new PhoenixTalonFX(22, bus, "Feeder");
+        feeder = new FeederRollerSubsystem(feederMotor);
 
-    PhoenixTalonFX rightIndexer = new PhoenixTalonFX(23, bus, "IndexerRight");
+        PhoenixTalonFX rightIndexer = new PhoenixTalonFX(23, bus, "IndexerRight");
 
-    PhoenixTalonFX leftIndexer =
-      new PhoenixTalonFX(
-        24, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
+        PhoenixTalonFX leftIndexer =
+            new PhoenixTalonFX(
+                24, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
 
-    indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
+        indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
 
       case SIM -> {
-    TalonFXSimpleMotorSim feederMotor = new TalonFXSimpleMotorSim(22, bus, "Feeder", 0.001, 1);
+        TalonFXSimpleMotorSim feederMotor = new TalonFXSimpleMotorSim(22, bus, "Feeder", 0.001, 1);
         feeder = new FeederRollerSubsystem(feederMotor);
 
-    TalonFXSimpleMotorSim rightIndexer =
-      new TalonFXSimpleMotorSim(23, bus, "IndexerRight", 0.001, 1);
+        TalonFXSimpleMotorSim rightIndexer =
+            new TalonFXSimpleMotorSim(23, bus, "IndexerRight", 0.001, 1);
 
-    TalonFXSimpleMotorSim leftIndexer =
-      new TalonFXSimpleMotorSim(24, bus, "IndexerLeft", 0.001, 1);
+        TalonFXSimpleMotorSim leftIndexer =
+            new TalonFXSimpleMotorSim(24, bus, "IndexerLeft", 0.001, 1);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
