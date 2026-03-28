@@ -206,7 +206,7 @@ public class RobotContainer {
     // Manual hood (left joystick Y)
     shooter
         .getHood()
-    .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getLeftY()));
+        .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getLeftY()));
 
     // Auto align (A)
     m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
