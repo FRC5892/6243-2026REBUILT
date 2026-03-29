@@ -171,9 +171,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> m_drivecontroller.getLeftY(), // forward is negative on the physical stick
-            () -> m_drivecontroller.getLeftX(), // invert left/right so stick left->robot left
-            () -> m_drivecontroller.getRightX())); // invert turning so stick right -> clockwise
+            () -> -m_drivecontroller.getLeftY(), // forward is negative on the physical stick
+            () -> -m_drivecontroller.getLeftX(), // invert left/right so stick left->robot left
+            () -> -m_drivecontroller.getRightX())); // invert turning so stick right -> clockwise
 
     // Driver: Auto align (hold A)
     m_drivecontroller.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
@@ -197,13 +197,13 @@ public class RobotContainer {
     m_drivecontroller.rightBumper().whileTrue(intake.intakeOut());
 
     // Beach alert (Y hold)
-    m_drivecontroller.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
-    m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
+  //m_drivecontroller.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+  //m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // CODRIVER
 
     // indexer unclog
-    m_codriverController.rightTrigger().whileTrue(indexer.runWhenShooterReady(shooter));
+    m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
     // Manual hood (left joystick Y)
     shooter
@@ -211,34 +211,31 @@ public class RobotContainer {
         .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getLeftY()));
 
     // Auto align (A)
-    // m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
-    // m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
-    //  m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
+    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
+    m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
+    m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
     // Intake toggle (left bumper)
     m_codriverController.leftBumper().toggleOnTrue(intake.deploy());
     m_codriverController.leftBumper().onTrue(Commands.runOnce(led::toggleIntakeDown));
 
     // Beach alert (Y hold)
-    // m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
-    // m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
+  //m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+  //m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // Intake IN (X hold)
-    // m_codriverController.x().whileTrue((intake.intakeIn()).alongWith(indexer.runForShooting()));
+    m_codriverController.x().whileTrue(intake.intakeIn());
 
     // Intake OUT (B hold)
     m_codriverController.b().whileTrue(intake.intakeOut());
-
-    // m_codriverController.a().whileTrue(intake.);
 
     // Shoot / unload (right bumper hold)
     m_codriverController
         .rightBumper()
         .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
-    // m_codriverController.y().whileTrue(Indexer.runForShooting());
-
+  }
     // Keep high-priority motor disconnect alert updated continuously.
-    led.setDefaultCommand(
+  /*led.setDefaultCommand(
         led.run(
             () -> {
               led.setMotorOverheated(
