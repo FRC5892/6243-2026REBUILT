@@ -61,7 +61,9 @@ public class RobotContainer {
 
   // Controller
   private final CommandXboxController m_drivecontroller = new CommandXboxController(0);
-  private final CommandXboxController m_codriverController = new CommandXboxController(2);
+  // Co-driver controller typically appears as USB port 1. If your controller is on a
+  // different port change this value accordingly in the future.
+  private final CommandXboxController m_codriverController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -197,8 +199,8 @@ public class RobotContainer {
     m_drivecontroller.rightBumper().whileTrue(intake.intakeOut());
 
     // Beach alert (Y hold)
-  //m_drivecontroller.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
-  //m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
+    // m_drivecontroller.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+    // m_drivecontroller.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // CODRIVER
 
@@ -220,8 +222,8 @@ public class RobotContainer {
     m_codriverController.leftBumper().onTrue(Commands.runOnce(led::toggleIntakeDown));
 
     // Beach alert (Y hold)
-  //m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
-  //m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
+    // m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
+    // m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
 
     // Intake IN (X hold)
     m_codriverController.x().whileTrue(intake.intakeIn());
@@ -234,7 +236,8 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
   }
-    // Keep high-priority motor disconnect alert updated continuously.
+
+  // Keep high-priority motor disconnect alert updated continuously.
   /*led.setDefaultCommand(
         led.run(
             () -> {

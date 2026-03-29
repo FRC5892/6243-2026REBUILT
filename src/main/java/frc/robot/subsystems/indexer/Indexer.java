@@ -27,7 +27,7 @@ public class Indexer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Mechanism CAN ID convention: 20-29 = intake/indexer block
-  // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 21 (left configured to follow right)
+        // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 21 (left configured to follow right)
         PhoenixTalonFX feederMotor = new PhoenixTalonFX(22, bus, "Feeder");
         feeder = new FeederRollerSubsystem(feederMotor);
 
@@ -35,7 +35,7 @@ public class Indexer {
 
         PhoenixTalonFX leftIndexer =
             new PhoenixTalonFX(
-    21, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
+                21, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
@@ -47,8 +47,8 @@ public class Indexer {
         TalonFXSimpleMotorSim rightIndexer =
             new TalonFXSimpleMotorSim(23, bus, "IndexerRight", 0.001, 1);
 
-    TalonFXSimpleMotorSim leftIndexer =
-      new TalonFXSimpleMotorSim(21, bus, "IndexerLeft", 0.001, 1);
+        TalonFXSimpleMotorSim leftIndexer =
+            new TalonFXSimpleMotorSim(21, bus, "IndexerLeft", 0.001, 1);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
