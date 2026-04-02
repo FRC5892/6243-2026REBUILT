@@ -102,15 +102,9 @@ public class Shooter {
   }
 
   /** ---------------- MATCH CHECKS ---------------- */
-  private boolean flywheelMatches(double targetRPM) {
-    double actualRPM = flywheel.getVelocity() * 60.0; // getVelocity() is rot/s
-    return Math.abs(actualRPM - targetRPM) < 100;
-  }
-
-  private boolean hoodMatches(Rotation2d target) {
-    Rotation2d actual = hood.getAngle(); // must exist in Hood
-    return Math.abs(actual.minus(target).getDegrees()) < 1.0;
-  }
+  // NOTE: the readiness check now uses the subsystems' at-setpoint flags
+  // (flywheel.isAtTarget(), hood.isAtSetpoint()), so the previous helper
+  // comparison functions are no longer needed and have been removed.
 
   private boolean rotationMatches(Rotation2d target) {
     Rotation2d current = RobotState.getInstance().getRobotPosition().getRotation();

@@ -55,7 +55,20 @@ public class ShootCommand {
                         }),
                 indexer.runWhenShooterReady(shooter));
 
-    return Commands.sequence(
-        Commands.runOnce(() -> Logger.recordOutput("Shooter/ShootCommandScheduled", true)), core);
+  // Enable indexer rollers only for the lifetime of the core shoot command. Use the
+  // actual roller subsystems as the requirements so start/end run with proper ownership.
+  var indexerGate =
+    Commands.startEnd(
+      () -> indexer.setEnabled(true),
+      () -> indexer.setEnabled(false),
+      indexer.getFeeder(),
+      indexer.getIndexerRollers());
+
+  return Commands.sequence(
+    Commands.runOnce(() -> Logger.recordOutput("Shooter/ShootCommandScheduled", true)),
+    // Race the core and the gate: when `core` ends (button released), the race finishes and
+    // the gate is interrupted so its end() disables the rollers. This keeps the feeder
+    // and indexer rollers active only while the shoot command is alive.
+    Commands.race(core, indexerGate));
   }
 }

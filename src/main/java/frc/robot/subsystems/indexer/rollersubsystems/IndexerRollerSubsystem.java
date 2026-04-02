@@ -19,5 +19,7 @@ public class IndexerRollerSubsystem extends RollerSubsystem {
 
     // We don't command followerMotor directly.
     // It must already be configured as a follower in the container.
+    // Default disabled to prevent indexer from running unless ShootCommand enables it.
+    setEnabled(false);
   }
 }

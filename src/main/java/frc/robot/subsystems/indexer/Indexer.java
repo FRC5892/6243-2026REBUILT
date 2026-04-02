@@ -66,6 +66,13 @@ public class Indexer {
     }
   }
 
+  /** Enable or disable the feeder and indexer rollers. */
+  public void setEnabled(boolean enabled) {
+    feeder.setEnabled(enabled);
+    indexerRollers.setEnabled(enabled);
+    Logger.recordOutput("Indexer/Enabled", enabled ? 1.0 : 0.0);
+  }
+
   /** Runs indexer ONLY when shooter is ready (flywheel speed + hood angle + robot rotation). */
   public Command runWhenShooterReady(Shooter shooter) {
     return Commands.run(
