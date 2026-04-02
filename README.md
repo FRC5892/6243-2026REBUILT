@@ -48,7 +48,7 @@ This repository contains the codebase for FRC Team 6243 (Energy NERDs') 2026 rob
 **Controller USB Ports:**
 
 - Driver controller: `0`
-- Codriver controller: `1`  
+- Codriver controller: `1`
 
 Mappings are defined in [`src/main/java/frc/robot/RobotContainer.java`](src/main/java/frc/robot/RobotContainer.java).
 

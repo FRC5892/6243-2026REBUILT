@@ -15,6 +15,7 @@ import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter {
   private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
@@ -81,11 +82,23 @@ public class Shooter {
   public boolean isReadyToShoot() {
     var shot = ShotCalculator.getInstance().calculateShot();
 
-    if (!shot.isValid()) return false;
+    if (!shot.isValid()) {
+      Logger.recordOutput("Shooter/ReadyToShoot", false);
+      return false;
+    }
 
-    return flywheelMatches(shot.flywheelSpeedRPM())
-        && hoodMatches(shot.hoodAngle())
-        && rotationMatches(shot.robotYaw());
+    // Use the subsystems' at-setpoint flags for a stricter, less noisy readiness check.
+    boolean flyOk = flywheel.isAtTarget();
+    boolean hoodOk = hood.isAtSetpoint();
+    boolean rotOk = rotationMatches(shot.robotYaw());
+
+    boolean ready = flyOk && hoodOk && rotOk;
+    Logger.recordOutput("Shooter/ReadyToShoot", ready);
+    Logger.recordOutput("Shooter/FlywheelAtSetpoint", flyOk);
+    Logger.recordOutput("Shooter/HoodAtSetpoint", hoodOk);
+    Logger.recordOutput("Shooter/RotationMatch", rotOk);
+
+    return ready;
   }
 
   /** ---------------- MATCH CHECKS ---------------- */

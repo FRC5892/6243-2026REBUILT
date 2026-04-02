@@ -76,10 +76,8 @@ public class Flywheel extends SubsystemBase {
 
     // Log target and actual RPM for diagnostics
     try {
-      Logger.recordOutput(
-          "Flywheel/TargetRPM", targetVelocity.in(RPM));
-      Logger.recordOutput(
-          "Flywheel/ActualRPM", leaderMotor.getVelocity().in(RPM));
+      Logger.recordOutput("Flywheel/TargetRPM", targetVelocity.in(RPM));
+      Logger.recordOutput("Flywheel/ActualRPM", leaderMotor.getVelocity().in(RPM));
     } catch (Exception ignored) {
       // Defensive: don't let logging break control loop
     }
