@@ -14,6 +14,7 @@ import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.RollerSubsystem;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 /** Container for indexer mechanisms (feeder, indexer rollers). */
 public class Indexer {
@@ -72,9 +73,11 @@ public class Indexer {
           if (shooter.isReadyToShoot()) {
             feeder.applyDirection(RollerSubsystem.Direction.FORWARD);
             indexerRollers.applyDirection(RollerSubsystem.Direction.FORWARD);
+            Logger.recordOutput("Indexer/ShootingActive", 1.0);
           } else {
             feeder.stopMotor();
             indexerRollers.stopMotor();
+            Logger.recordOutput("Indexer/ShootingActive", 0.0);
           }
         },
         feeder,
