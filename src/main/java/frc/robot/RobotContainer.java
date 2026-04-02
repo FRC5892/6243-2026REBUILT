@@ -207,18 +207,16 @@ public class RobotContainer {
     // indexer unclog
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
-    // Manual flywheel control: hold right-stick button and use the right stick Y to set
-    // the flywheel velocity manually (scaled by the tunable max RPM).
-    // Use a safe default maximum RPM for manual control (matches ShotCalculator's default).
+    // Manual flywheel control: use right stick Y as the flywheel manual input (continuous
+    // while teleop). This allows the co-driver to control flywheel and hood together.
     final double kManualFlywheelMaxRPM = 5000.0;
-    m_codriverController
-        .rightStick()
-        .whileTrue(
+    shooter
+        .getFlywheel()
+        .setDefaultCommand(
             shooter
                 .getFlywheel()
                 .manualShoot(
-                    (java.util.function.DoubleSupplier)
-                        () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
+                    () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
 
     // Manual hood (left joystick Y)
     shooter
@@ -227,6 +225,14 @@ public class RobotContainer {
 
     // Toggle indexer enable (A)
     m_codriverController.a().onTrue(Commands.runOnce(indexer::toggleEnabled));
+
+    // Run indexer when both co-driver sticks are pushed forward simultaneously. This
+    // allows the co-driver to command hood + flywheel and automatically feed when both
+    // sticks indicate an intention to shoot.
+    // Assumption: pushing sticks forward produces a negative Y value on this controller.
+    new edu.wpi.first.wpilibj2.command.button.Trigger(
+            () -> m_codriverController.getLeftY() < -0.2 && m_codriverController.getRightY() < -0.2)
+        .whileTrue(indexer.runForShooting());
 
     // Intake toggle (left bumper)
     m_codriverController.leftBumper().toggleOnTrue(intake.deploy());
