@@ -15,6 +15,7 @@ import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXFlywheelSim;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter {
   private static final double MOTOR_OVERHEAT_TEMP_C = 80.0;
@@ -81,23 +82,29 @@ public class Shooter {
   public boolean isReadyToShoot() {
     var shot = ShotCalculator.getInstance().calculateShot();
 
-    if (!shot.isValid()) return false;
+    if (!shot.isValid()) {
+      Logger.recordOutput("Shooter/ReadyToShoot", false);
+      return false;
+    }
 
-    return flywheelMatches(shot.flywheelSpeedRPM())
-        && hoodMatches(shot.hoodAngle())
-        && rotationMatches(shot.robotYaw());
+    // Use the subsystems' at-setpoint flags for a stricter, less noisy readiness check.
+    boolean flyOk = flywheel.isAtTarget();
+    boolean hoodOk = hood.isAtSetpoint();
+    boolean rotOk = rotationMatches(shot.robotYaw());
+
+    boolean ready = flyOk && hoodOk && rotOk;
+    Logger.recordOutput("Shooter/ReadyToShoot", ready);
+    Logger.recordOutput("Shooter/FlywheelAtSetpoint", flyOk);
+    Logger.recordOutput("Shooter/HoodAtSetpoint", hoodOk);
+    Logger.recordOutput("Shooter/RotationMatch", rotOk);
+
+    return ready;
   }
 
   /** ---------------- MATCH CHECKS ---------------- */
-  private boolean flywheelMatches(double targetRPM) {
-    double actualRPM = flywheel.getVelocity() * 60.0; // getVelocity() is rot/s
-    return Math.abs(actualRPM - targetRPM) < 100;
-  }
-
-  private boolean hoodMatches(Rotation2d target) {
-    Rotation2d actual = hood.getAngle(); // must exist in Hood
-    return Math.abs(actual.minus(target).getDegrees()) < 1.0;
-  }
+  // NOTE: the readiness check now uses the subsystems' at-setpoint flags
+  // (flywheel.isAtTarget(), hood.isAtSetpoint()), so the previous helper
+  // comparison functions are no longer needed and have been removed.
 
   private boolean rotationMatches(Rotation2d target) {
     Rotation2d current = RobotState.getInstance().getRobotPosition().getRotation();

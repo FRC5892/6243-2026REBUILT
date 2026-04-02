@@ -48,7 +48,7 @@ This repository contains the codebase for FRC Team 6243 (Energy NERDs') 2026 rob
 **Controller USB Ports:**
 
 - Driver controller: `0`
-- Codriver controller: `2`
+- Codriver controller: `1`
 
 Mappings are defined in [`src/main/java/frc/robot/RobotContainer.java`](src/main/java/frc/robot/RobotContainer.java).
 
@@ -238,11 +238,11 @@ Higher rows override lower rows.
 |---|---|---:|---|
 | Intake roller | RIO CAN | 20 | `IntakeRoller` |
 | Slapdown motor | RIO CAN | 24 | `Slapdown` |
-| Flywheel leader | RIO CAN | 26 | `FlywheelRight` (left follows in config) |
-| Hood motor | RIO CAN | 27 | `Hood` |
-| Feeder roller | RIO CAN | 30 | `Feeder` |
-| Indexer right | RIO CAN | 31 | `IndexerRight` |
-| Indexer left | RIO CAN | 21 | `IndexerLeft` (follower of 31) |
+| Flywheel leader | RIO CAN | 12 | `FlywheelRight` (left follows in config, follower=11) |
+| Hood motor | RIO CAN | 10 | `Hood` |
+| Feeder roller | RIO CAN | 22 | `Feeder` |
+| Indexer right | RIO CAN | 23 | `IndexerRight` |
+| Indexer left | RIO CAN | 21 | `IndexerLeft` (follower of 23) |
 | Pigeon2 | Swerve CAN (`TunerConstants`) | 13 | Drivetrain gyro |
 | Front Left Drive | Swerve CAN (`TunerConstants`) | 2 | Swerve module drive motor |
 | Front Left Steer | Swerve CAN (`TunerConstants`) | 6 | Swerve module steer motor |

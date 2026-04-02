@@ -11,5 +11,8 @@ public class FeederRollerSubsystem extends RollerSubsystem {
 
   public FeederRollerSubsystem(LoggedTalonFX motor) {
     super(motor, kForwardVolts, kReverseVolts);
+    // Default to disabled so the feeder doesn't run unless explicitly enabled by the
+    // shooting command. This prevents accidental feeding outside of an active shoot.
+    setEnabled(false);
   }
 }

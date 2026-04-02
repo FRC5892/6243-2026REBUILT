@@ -13,6 +13,9 @@ public class RollerSubsystem extends SubsystemBase {
   protected final DoubleSupplier forwardVolts;
   protected final DoubleSupplier reverseVolts;
   protected final VoltageOut voltageOut = new VoltageOut(0).withEnableFOC(true);
+  // Gate to allow external code to enable/disable this roller. Defaults to true for
+  // existing rollers (intake). Subclasses (indexer rollers) may disable by default.
+  private volatile boolean enabled = true;
 
   public RollerSubsystem(LoggedTalonFX motor, DoubleSupplier forwardVolts) {
     // Use the same speed for both directions
@@ -25,6 +28,7 @@ public class RollerSubsystem extends SubsystemBase {
   }
 
   private void setOutput(double outputVolts) {
+    if (!enabled) return;
     motor.setControl(voltageOut.withOutput(outputVolts));
   }
 
@@ -39,6 +43,15 @@ public class RollerSubsystem extends SubsystemBase {
 
   public void stopMotor() {
     setOutput(0);
+  }
+
+  /** Enable or disable this roller. When disabled, commands that try to set outputs are ignored. */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+    if (!enabled) {
+      // Ensure motor is stopped when disabled
+      stopMotor();
+    }
   }
 
   public Command runRoller(DoubleSupplier speed) {

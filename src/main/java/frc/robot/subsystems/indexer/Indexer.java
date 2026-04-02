@@ -14,6 +14,7 @@ import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
 import frc.robot.util.RollerSubsystem;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 /** Container for indexer mechanisms (feeder, indexer rollers). */
 public class Indexer {
@@ -27,7 +28,7 @@ public class Indexer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Mechanism CAN ID convention: 20-29 = intake/indexer block
-  // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 21 (left configured to follow right)
+        // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 21 (left configured to follow right)
         PhoenixTalonFX feederMotor = new PhoenixTalonFX(22, bus, "Feeder");
         feeder = new FeederRollerSubsystem(feederMotor);
 
@@ -35,7 +36,7 @@ public class Indexer {
 
         PhoenixTalonFX leftIndexer =
             new PhoenixTalonFX(
-    21, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
+                21, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
@@ -47,8 +48,8 @@ public class Indexer {
         TalonFXSimpleMotorSim rightIndexer =
             new TalonFXSimpleMotorSim(23, bus, "IndexerRight", 0.001, 1);
 
-    TalonFXSimpleMotorSim leftIndexer =
-      new TalonFXSimpleMotorSim(21, bus, "IndexerLeft", 0.001, 1);
+        TalonFXSimpleMotorSim leftIndexer =
+            new TalonFXSimpleMotorSim(21, bus, "IndexerLeft", 0.001, 1);
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
@@ -65,6 +66,13 @@ public class Indexer {
     }
   }
 
+  /** Enable or disable the feeder and indexer rollers. */
+  public void setEnabled(boolean enabled) {
+    feeder.setEnabled(enabled);
+    indexerRollers.setEnabled(enabled);
+    Logger.recordOutput("Indexer/Enabled", enabled ? 1.0 : 0.0);
+  }
+
   /** Runs indexer ONLY when shooter is ready (flywheel speed + hood angle + robot rotation). */
   public Command runWhenShooterReady(Shooter shooter) {
     return Commands.run(
@@ -72,9 +80,11 @@ public class Indexer {
           if (shooter.isReadyToShoot()) {
             feeder.applyDirection(RollerSubsystem.Direction.FORWARD);
             indexerRollers.applyDirection(RollerSubsystem.Direction.FORWARD);
+            Logger.recordOutput("Indexer/ShootingActive", 1.0);
           } else {
             feeder.stopMotor();
             indexerRollers.stopMotor();
+            Logger.recordOutput("Indexer/ShootingActive", 0.0);
           }
         },
         feeder,

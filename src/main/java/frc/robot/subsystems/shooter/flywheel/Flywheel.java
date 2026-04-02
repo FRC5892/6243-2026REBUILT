@@ -14,6 +14,7 @@ import frc.robot.util.LoggedTunableMeasure;
 import java.util.function.DoubleSupplier;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Flywheel extends SubsystemBase {
 
@@ -72,6 +73,14 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     leaderMotor.periodic();
+
+    // Log target and actual RPM for diagnostics
+    try {
+      Logger.recordOutput("Flywheel/TargetRPM", targetVelocity.in(RPM));
+      Logger.recordOutput("Flywheel/ActualRPM", leaderMotor.getVelocity().in(RPM));
+    } catch (Exception ignored) {
+      // Defensive: don't let logging break control loop
+    }
 
     atSetpoint =
         Math.abs(
