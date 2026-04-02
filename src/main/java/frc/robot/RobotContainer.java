@@ -216,8 +216,9 @@ public class RobotContainer {
         .whileTrue(
             shooter
                 .getFlywheel()
-                .manualShoot((java.util.function.DoubleSupplier)
-                    () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
+                .manualShoot(
+                    (java.util.function.DoubleSupplier)
+                        () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
 
     // Manual hood (left joystick Y)
     shooter
