@@ -207,15 +207,25 @@ public class RobotContainer {
     // indexer unclog
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
+    // Manual flywheel control: hold right-stick button and use the right stick Y to set
+    // the flywheel velocity manually (scaled by the tunable max RPM).
+    // Use a safe default maximum RPM for manual control (matches ShotCalculator's default).
+    final double kManualFlywheelMaxRPM = 5000.0;
+    m_codriverController
+        .rightStick()
+        .whileTrue(
+            shooter
+                .getFlywheel()
+                .manualShoot((java.util.function.DoubleSupplier)
+                    () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
+
     // Manual hood (left joystick Y)
     shooter
         .getHood()
         .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getLeftY()));
 
-    // Auto align (A)
-    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
-    m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
-    m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
+    // Toggle indexer enable (A)
+    m_codriverController.a().onTrue(Commands.runOnce(indexer::toggleEnabled));
 
     // Intake toggle (left bumper)
     m_codriverController.leftBumper().toggleOnTrue(intake.deploy());

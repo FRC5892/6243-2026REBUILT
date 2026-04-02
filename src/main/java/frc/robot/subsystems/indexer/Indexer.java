@@ -22,6 +22,8 @@ public class Indexer {
 
   @Getter private final FeederRollerSubsystem feeder;
   @Getter private final IndexerRollerSubsystem indexerRollers;
+  // Track whether the indexer is externally enabled (for toggle behavior)
+  private volatile boolean enabled = false;
 
   public Indexer(CANBus bus) {
 
@@ -70,7 +72,18 @@ public class Indexer {
   public void setEnabled(boolean enabled) {
     feeder.setEnabled(enabled);
     indexerRollers.setEnabled(enabled);
+    this.enabled = enabled;
     Logger.recordOutput("Indexer/Enabled", enabled ? 1.0 : 0.0);
+  }
+
+  /** Toggle the enabled state of the indexer. */
+  public void toggleEnabled() {
+    setEnabled(!this.enabled);
+  }
+
+  /** Returns whether the indexer is currently enabled. */
+  public boolean isEnabled() {
+    return this.enabled;
   }
 
   /** Runs indexer ONLY when shooter is ready (flywheel speed + hood angle + robot rotation). */
