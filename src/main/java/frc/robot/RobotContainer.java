@@ -205,10 +205,10 @@ public class RobotContainer {
 
     // CODRIVER
 
-    // indexer unclog
+    // indexer unclog (right trigger hold)
     m_codriverController.rightTrigger().whileTrue(indexer.unclog());
 
-    // Manual flywheel control: use right stick Y as the flywheel manual input (continuous
+    // Manual flywheel control: use left stick Y as the flywheel manual input (continuous
     // while teleop). This allows the co-driver to control flywheel and hood together.
     final double kManualFlywheelMaxRPM = 5000.0;
     shooter
@@ -217,15 +217,17 @@ public class RobotContainer {
             shooter
                 .getFlywheel()
                 .manualShoot(
-                    () -> -m_codriverController.getRightY() * (kManualFlywheelMaxRPM / 60.0)));
+                    () -> -m_codriverController.getLeftY() * (kManualFlywheelMaxRPM / 60.0)));
 
-    // Manual hood (left joystick Y)
+    // Manual hood (right joystick Y)
     shooter
         .getHood()
-        .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getLeftY()));
+        .setDefaultCommand(shooter.getHood().manualControl(() -> m_codriverController.getRightY()));
 
-    // Toggle indexer enable (A)
-    m_codriverController.a().onTrue(Commands.runOnce(indexer::toggleEnabled));
+    // A - Auto align (press & hold)
+    m_codriverController.a().whileTrue(new SnapToTargetCommand(drive, shooter, led));
+    m_codriverController.a().onTrue(Commands.runOnce(() -> led.setAutoAlignActive(true)));
+    m_codriverController.a().onFalse(Commands.runOnce(() -> led.setAutoAlignActive(false)));
 
     // Run indexer when both co-driver sticks are pushed forward simultaneously. This
     // allows the co-driver to command hood + flywheel and automatically feed when both
@@ -235,21 +237,28 @@ public class RobotContainer {
             () -> m_codriverController.getLeftY() < -0.2 && m_codriverController.getRightY() < -0.2)
         .whileTrue(indexer.runForShooting());
 
-    // Intake toggle (left bumper)
-    m_codriverController.leftBumper().toggleOnTrue(intake.deploy());
-    m_codriverController.leftBumper().onTrue(Commands.runOnce(led::toggleIntakeDown));
+    // Left bumper - Intaking (Hold): intake + indexer forward
+    m_codriverController
+        .leftBumper()
+        .whileTrue(Commands.parallel(intake.intakeIn(), indexer.runForShooting()));
+    m_codriverController.leftBumper().onTrue(Commands.runOnce(() -> led.setIntakeDown(true)));
+    m_codriverController.leftBumper().onFalse(Commands.runOnce(() -> led.setIntakeDown(false)));
 
-    // Beach alert (Y hold)
-    // m_codriverController.y().onTrue(Commands.runOnce(() -> led.setBeachAlertActive(true)));
-    // m_codriverController.y().onFalse(Commands.runOnce(() -> led.setBeachAlertActive(false)));
+    // Left trigger - Outtaking (hold): intake roller reverse only
+    m_codriverController.leftTrigger().whileTrue(intake.runRollerReverse());
 
-    // Intake IN (X hold)
-    m_codriverController.x().whileTrue(intake.intakeIn());
+    // X - Slapdown toggle: click to extend then retract
+    m_codriverController
+        .x()
+        .onTrue(Commands.sequence(intake.extendSlap().withTimeout(0.5), intake.retractSlap()));
 
-    // Intake OUT (B hold)
+    // Y - Indexer forward (hold)
+    m_codriverController.y().whileTrue(indexer.runForShooting());
+
+    // B - Intake OUT (hold) - keep existing behavior
     m_codriverController.b().whileTrue(intake.intakeOut());
 
-    // Shoot / unload (right bumper hold)
+    // Right bumper - Shooting (hold): runs shoot sequence (flywheel, hood, indexer)
     m_codriverController
         .rightBumper()
         .whileTrue(frc.robot.commands.shooter.ShootCommand.shoot(shooter, indexer));
