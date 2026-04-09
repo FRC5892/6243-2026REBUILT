@@ -91,6 +91,7 @@ public class RobotContainer {
 
         intake = new Intake(rioCAN);
 
+        // Indexer uses its own CAN ID (21). Do not reuse the slap motor here.
         indexer = new Indexer(rioCAN);
         led =
             new LED(

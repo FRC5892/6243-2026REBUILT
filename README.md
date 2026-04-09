@@ -120,10 +120,10 @@ To keep wiring and code consistent we follow a small CAN ID block convention. Up
 
 - Intake / Indexer block (recommended 20-29)
   - Intake roller: 20
-  - Slapdown / deploy motor: 24
+  - Slapdown / deploy motor: 23
   - Feeder: 22
-  - Indexer right: 23
-  - Indexer left (follower of right): 21
+  - Indexer (kicker): 21
+  - Hopper rollers (may be labeled "Indexer" in Phoenix tuner): 24
 
 Use these ranges when adding new mechanism motors. If you need a different block, update the README and the constructors that reference the CAN IDs.
 
@@ -134,12 +134,12 @@ Use these ranges when adding new mechanism motors. If you need a different block
 | Device | Bus / IO Type | ID / Port | Function / Notes |
 |---|---|---:|---|
 | Intake roller | RIO CAN | 20 | `IntakeRoller` |
-| Slapdown motor | RIO CAN | 24 | `Slapdown` |
+| Slapdown motor | RIO CAN | 23 | `Slapdown` |
 | Flywheel leader | RIO CAN | 12 | `FlywheelRight` (left follows in config, follower=11) |
 | Hood motor | RIO CAN | 10 | `Hood` |
 | Feeder roller | RIO CAN | 22 | `Feeder` |
-| Indexer right | RIO CAN | 23 | `IndexerRight` |
-| Indexer left | RIO CAN | 21 | `IndexerLeft` (follower of 23) |
+| Indexer right | RIO CAN | 24 | `IndexerRight` (same as `Slapdown`) |
+| Indexer left | RIO CAN | 23 | `IndexerLeft` (follower of 21) |
 | Pigeon2 | Swerve CAN (`TunerConstants`) | 13 | Drivetrain gyro |
 | Front Left Drive | Swerve CAN (`TunerConstants`) | 1 | Swerve module drive motor |
 | Front Left Steer | Swerve CAN (`TunerConstants`) | 2 | Swerve module steer motor |
@@ -241,8 +241,8 @@ Higher rows override lower rows.
 | Flywheel leader | RIO CAN | 12 | `FlywheelRight` (left follows in config, follower=11) |
 | Hood motor | RIO CAN | 10 | `Hood` |
 | Feeder roller | RIO CAN | 22 | `Feeder` |
-| Indexer right | RIO CAN | 23 | `IndexerRight` |
-| Indexer left | RIO CAN | 21 | `IndexerLeft` (follower of 23) |
+| Indexer (kicker) | RIO CAN | 21 | `IndexerRight` (called `Kicker` in Phoenix tuner) |
+| Hopper rollers | RIO CAN | 24 | `Indexer` (named `Indexer` in Phoenix tuner; these are the hopper rollers) |
 | Pigeon2 | Swerve CAN (`TunerConstants`) | 13 | Drivetrain gyro |
 | Front Left Drive | Swerve CAN (`TunerConstants`) | 2 | Swerve module drive motor |
 | Front Left Steer | Swerve CAN (`TunerConstants`) | 6 | Swerve module steer motor |

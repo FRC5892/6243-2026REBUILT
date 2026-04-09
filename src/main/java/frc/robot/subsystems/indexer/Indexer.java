@@ -1,14 +1,13 @@
 package frc.robot.subsystems.indexer;
 
 import com.ctre.phoenix6.CANBus;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.indexer.rollersubsystems.FeederRollerSubsystem;
 import frc.robot.subsystems.indexer.rollersubsystems.IndexerRollerSubsystem;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
+import frc.robot.util.LoggedTalon.TalonFX.LoggedTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.NoOppTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.PhoenixTalonFX;
 import frc.robot.util.LoggedTalon.TalonFX.TalonFXSimpleMotorSim;
@@ -30,15 +29,14 @@ public class Indexer {
     switch (Constants.currentMode) {
       case REAL -> {
         // Mechanism CAN ID convention: 20-29 = intake/indexer block
-        // Feeder -> 22, IndexerRight -> 23, IndexerLeft -> 21 (left configured to follow right)
+        // Feeder -> 22, Indexer (kicker) -> 21, Slapdown -> 23, Hopper rollers -> 24
         PhoenixTalonFX feederMotor = new PhoenixTalonFX(22, bus, "Feeder");
         feeder = new FeederRollerSubsystem(feederMotor);
 
-        PhoenixTalonFX rightIndexer = new PhoenixTalonFX(23, bus, "IndexerRight");
-
-        PhoenixTalonFX leftIndexer =
-            new PhoenixTalonFX(
-                21, bus, "IndexerLeft", new PhoenixTalonFollower(23, MotorAlignmentValue.Aligned));
+        // Primary indexer motor (called "kicker" in Phoenix Tuner) is CAN ID 21.
+        PhoenixTalonFX rightIndexer = new PhoenixTalonFX(21, bus, "IndexerRight");
+        // No physical left motor; alias to the same instance so subsystem works with one motor.
+        LoggedTalonFX leftIndexer = rightIndexer;
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
@@ -47,11 +45,10 @@ public class Indexer {
         TalonFXSimpleMotorSim feederMotor = new TalonFXSimpleMotorSim(22, bus, "Feeder", 0.001, 1);
         feeder = new FeederRollerSubsystem(feederMotor);
 
+        // SIM mirror of real: indexer primary = 21
         TalonFXSimpleMotorSim rightIndexer =
-            new TalonFXSimpleMotorSim(23, bus, "IndexerRight", 0.001, 1);
-
-        TalonFXSimpleMotorSim leftIndexer =
-            new TalonFXSimpleMotorSim(21, bus, "IndexerLeft", 0.001, 1);
+            new TalonFXSimpleMotorSim(21, bus, "IndexerRight", 0.001, 1);
+        TalonFXSimpleMotorSim leftIndexer = rightIndexer;
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }
@@ -61,7 +58,7 @@ public class Indexer {
         feeder = new FeederRollerSubsystem(feederMotor);
 
         NoOppTalonFX rightIndexer = new NoOppTalonFX("IndexerRight", 0);
-        NoOppTalonFX leftIndexer = new NoOppTalonFX("IndexerLeft", 0);
+        NoOppTalonFX leftIndexer = rightIndexer;
 
         indexerRollers = new IndexerRollerSubsystem(rightIndexer, leftIndexer);
       }

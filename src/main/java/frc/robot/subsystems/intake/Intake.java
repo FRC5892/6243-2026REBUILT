@@ -24,7 +24,8 @@ public class Intake {
         PhoenixTalonFX rollerMotor = new PhoenixTalonFX(20, bus, "IntakeRoller");
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        PhoenixTalonFX slapMotor = new PhoenixTalonFX(24, bus, "Slapdown");
+        // Slapdown actuator is wired to CAN ID 23 on the robot
+        PhoenixTalonFX slapMotor = new PhoenixTalonFX(23, bus, "Slapdown");
         slap = new Slapdown(slapMotor);
       }
 
@@ -33,7 +34,8 @@ public class Intake {
             new TalonFXSimpleMotorSim(20, bus, "IntakeRoller", 0.001, 1);
         roller = new IntakeRollerSubsystem(rollerMotor);
 
-        TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(24, bus, "Slapdown", 0.001, 1);
+        // SIM: keep same logical ID for slapdown sim (23)
+        TalonFXSimpleMotorSim slapMotor = new TalonFXSimpleMotorSim(23, bus, "Slapdown", 0.001, 1);
         slap = new Slapdown(slapMotor);
       }
 

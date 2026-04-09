@@ -18,6 +18,11 @@ public class Slapdown extends SubsystemBase {
     this.motor = motor;
   }
 
+  /** Expose the underlying motor so other subsystems may reuse the same physical device. */
+  public LoggedTalonFX getMotor() {
+    return motor;
+  }
+
   @Override
   public void periodic() {
     motor.periodic();
