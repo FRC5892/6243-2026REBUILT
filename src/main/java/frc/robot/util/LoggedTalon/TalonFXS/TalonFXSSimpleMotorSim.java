@@ -1,17 +1,21 @@
 package frc.robot.util.LoggedTalon.TalonFXS;
 
 import com.ctre.phoenix6.CANBus;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.util.LoggedTalon.Follower.PhoenixTalonFollower;
 import frc.robot.util.LoggedTalon.TalonInputs;
+import jsim.PhysicsBody;
+import jsim.PhysicsWorld;
+import jsim.Vec3;
 
 // Maintainer notes:
 // The file is currently a copy of LoggedTalonFX, with all instances of TalonFX replaced with
 // TalonFXS. Thanks CTRE, much appreciated
 public class TalonFXSSimpleMotorSim extends BaseTalonFXSSim {
-  private final DCMotorSim motorSim;
+  // JSim does not yet support mechanism-level motor simulation in Java.
+  // This stub uses a PhysicsBody to represent the motor shaft as a rigid body.
+  private static final PhysicsWorld world =
+      new PhysicsWorld(0.02, false); // Shared world for all sim motors
+  private final PhysicsBody shaftBody;
 
   /**
    * A simple motor sim representing a {@link LoggedTalonFXS}
@@ -38,18 +42,24 @@ public class TalonFXSSimpleMotorSim extends BaseTalonFXSSim {
       double gearReduction,
       PhoenixTalonFollower... followers) {
     super(canID, canBus, name, followers);
-    motorSim =
-        new DCMotorSim(
-            LinearSystemId.createDCMotorSystem(
-                DCMotor.getMinion(followers.length + 1), J_KgMetersSquared, gearReduction),
-            DCMotor.getMinion(followers.length + 1));
+    // Create a 1kg shaft body at origin (customize as needed)
+    this.shaftBody = world.createBody(1.0);
+    shaftBody.setPosition(new Vec3(0.0, 0.0, 0.0));
+    shaftBody.setLinearVelocity(new Vec3(0.0, 0.0, 0.0));
   }
 
   @Override
   protected void simulationPeriodic(TalonInputs inputs) {
-    motorSim.setInputVoltage(motorSimState.getMotorVoltage());
-    motorSim.update(0.02);
-    motorSimState.setRotorVelocity(motorSim.getAngularVelocity());
-    motorSimState.setRawRotorPosition(motorSim.getAngularPosition());
+    // Example: set shaft velocity based on input voltage (not physically accurate)
+    double voltage = motorSimState.getMotorVoltage();
+    // For now, just map voltage to a linear velocity for demonstration
+    shaftBody.setLinearVelocity(new Vec3(voltage, 0.0, 0.0));
+    world.step();
+
+    // Use shaftBody's X position and velocity as stand-ins for rotor position/velocity
+    motorSimState.setRotorVelocity(shaftBody.linearVelocity().x());
+    motorSimState.setRawRotorPosition(shaftBody.position().x());
+    // NOTE: This is a placeholder. Replace with real mechanism simulation when JSim exposes it in
+    // Java.
   }
 }

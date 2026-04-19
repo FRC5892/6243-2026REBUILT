@@ -157,7 +157,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    frc.robot.simulations.JSimExample.initialize();
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override

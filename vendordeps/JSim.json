@@ -1,7 +1,7 @@
 {
   "fileName": "JSim.json",
   "name": "JSim",
-  "version": "2026.4.15",
+  "version": "2026.04.19.01-p",
   "frcYear": "2026",
   "uuid": "a87eb0a9-efa5-4de6-9bb0-9ca5565d20c1",
   "mavenUrls": [
@@ -12,14 +12,14 @@
     {
       "groupId": "jsim",
       "artifactId": "JSim-java",
-      "version": "2026.4.15"
+      "version": "2026.04.19.01-p"
     }
   ],
   "jniDependencies": [
     {
       "groupId": "jsim",
       "artifactId": "JSim-driver",
-      "version": "2026.4.15",
+      "version": "2026.04.19.01-p",
       "skipInvalidPlatforms": true,
       "isJar": false,
       "validPlatforms": [
@@ -36,7 +36,7 @@
     {
       "groupId": "jsim",
       "artifactId": "JSim-cpp",
-      "version": "2026.4.15",
+      "version": "2026.04.19.01-p",
       "libName": "JSim",
       "headerClassifier": "headers",
       "sharedLibrary": false,
@@ -53,7 +53,7 @@
     {
       "groupId": "jsim",
       "artifactId": "JSim-driver",
-      "version": "2026.4.15",
+      "version": "2026.04.19.01-p",
       "libName": "JSimDriver",
       "headerClassifier": "headers",
       "sharedLibrary": false,

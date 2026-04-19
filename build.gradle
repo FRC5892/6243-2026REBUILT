@@ -97,6 +97,14 @@ dependencies {
 
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
+
+    // JSim vendordep integration
+    def jsimJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/JSim.json").text)
+    implementation "jsim:JSim-java:${jsimJson.version}"
+    runtimeOnly "jsim:JSim-driver:${jsimJson.version}"
+    repositories {
+        maven { url "https://jsim.dev/maven/release/" }
+    }
 }
 
 test {
